@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+from PIL import Image
 from datetime import datetime, timedelta
 
 from util import DATA, DIFFICULTIES
@@ -42,6 +43,19 @@ def containDebris(terrain: list):
                 return True
     return False
 
+def needBackdrop(mapId):
+    if not mapId:
+        return True
+
+    path = '../MEmu Download/Data/assets/Common/Field/'
+    if not mapId in util.fetchFehData("Common/SRPG/Field", 'map_id'):
+        path += 'Chip/'
+
+    with Image.open(path + mapId + '.png') as im:
+        if 'a' in im.mode or 'A' in im.mode:
+            return True
+    return False
+
 def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
     mapType = ""
     wallStyle = ""
@@ -60,7 +74,7 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
         extraField = util.fetchFehData("Common/SRPG/Field", "map_id")[field['id']]
         if 'terrain' in field and containDebris(field['terrain']):
             wallStyle = 'normal' if extraField['wall']['filename'] == 'Wallpattern.png' else extraField['wall']['filename'][12:-4]
-        backdrop = extraField['backdrop']['filename'][:-11] if extraField['backdrop']['filename'][-11:] == "Pattern.jpg" else extraField['backdrop']['filename']
+        backdrop = extraField['backdrop']['filename'][:-11] if extraField['backdrop']['filename'][-11:] == "Pattern.jpg" else extraField['backdrop']['filename'][:-4]
 
     if 'player_pos' in field:
         allyPos = "\n|allyPos="
@@ -84,7 +98,7 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
                 terrain[i] += [mapTerrain(field['terrain'], wallStyle, j, i, useDebris)]
 
     return f"{{{{{simpleMap and 'MapLayout' or '#invoke:MapLayout|initTabber'}" + \
-           f"\n|baseMap={'id' in field and field['id'] or ''}\n|backdrop={backdrop}{mapType}".replace("\n", "" if simpleMap else "\n") + \
+           f"\n|baseMap={'id' in field and field['id'] or ''}\n|backdrop={backdrop if needBackdrop(field['id']) else ''}{mapType}".replace("\n", "" if simpleMap else "\n") + \
            f"{allyPos}{enemyPos}\n" + \
            f"| a8={terrain and terrain[7][0] or ''} | b8={terrain and terrain[7][1] or ''} | c8={terrain and terrain[7][2] or ''} | d8={terrain and terrain[7][3] or ''} | e8={terrain and terrain[7][4] or ''} | f8={terrain and terrain[7][5] or ''}\n" + \
            f"| a7={terrain and terrain[6][0] or ''} | b7={terrain and terrain[6][1] or ''} | c7={terrain and terrain[6][2] or ''} | d7={terrain and terrain[6][3] or ''} | e7={terrain and terrain[6][4] or ''} | f7={terrain and terrain[6][5] or ''}\n" + \
@@ -206,7 +220,7 @@ def UnitData(SRPGMap):
         s += f"weapon={weapon or '-'};" if weapon else "weapon=;"
         s += f"assist={util.getName(unit['skills'][1]) or '-'};" if 'skills' in unit else "assist=;"
         s += f"special={util.getName(unit['skills'][2]) or '-'};" if 'skills' in unit else "special=;"
-        s += f"cooldown={unit['cooldown_count']};" if 'cooldown_count' in unit and unit['cooldown_count'] != -1 else ''
+        s += f"cooldown={unit['cooldown_count'] or ''};" if 'cooldown_count' in unit and unit['cooldown_count'] != -1 else ''
         s += f"a={util.getName(unit['skills'][3]) or '-'};" if 'skills' in unit else "a=;"
         s += f"b={util.getName(unit['skills'][4]) or '-'};" if 'skills' in unit else "b=;"
         s += f"c={util.getName(unit['skills'][5]) or '-'};" if 'skills' in unit else "c=;"

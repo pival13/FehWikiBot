@@ -94,6 +94,7 @@ def HBUnitData(StageEvent: dict, SRPGMap: dict, hero):
                     units[-1]['refine'] = 1
             for i in range(len(hero)):
                 units[i]['id_tag'] = hero[i]['id_tag']
+                units[i]['cooldown_count'] = None
             if StageEvent['scenarios'][idiff]['reinforcements']:
                 units += [{'rarity': StageEvent['scenarios'][idiff]['stars'], 'true_lv': StageEvent['scenarios'][idiff]['true_lv'], 'spawn_count': 0}]
                 if idiff > 2:
@@ -155,7 +156,7 @@ def GHBMap(mapId: str):
     content += "==Trivia==\n*\n"
     content += mapUtil.InOtherLanguage(["MID_STAGE_"+mapId, "MID_STAGE_HONOR_"+mapId], 1)
     content += "{{Special Maps Navbox}}"
-    print(content)
+
     return content
 
 from sys import argv

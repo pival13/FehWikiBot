@@ -16,7 +16,7 @@ ERROR = "\33[1;101mERROR\33[0m: "
 DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
 ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 
-
+# ð á ø þ í ú
 REMOVE_ACCENT = {
     "Á": "A", "À": "A", "Â": "A", "Ä": "A", "Ǎ": "A", "Ă": "A", "Ā": "A", "Ã": "A", "Å": "A", "Ą": "A", "á": "a", "à": "a", "â": "a", "ä": "a", "ǎ": "a", "ă": "a", "ā": "a", "ã": "a", "å": "a", "ą": "a", "ắ": "a", "ă": "a", "ằ": "a", "ắ": "a", "ẳ": "a", "ẵ": "a", "ặ": "a", "â": "a", "ầ": "a", "ẩ": "a", "ẫ": "a", "ấ": "a", "ậ": "a",
     "Æ": "Ae", "Ǣ": "Ae", "Ǽ": "Ae", "æ": "ae", "ǣ": "ae", "ǽ": "ae",
@@ -228,10 +228,10 @@ def fehBotLogin():
 from sys import argv
 
 if __name__ == "__main__":
-    #print(getName(argv[1]))
+    print(getName(argv[1]))
     """print(cleanStr("Veðrfölnir's Egg"))
     print(cleanStr("Sæhrímnir"))
     print(cleanStr("Hliðskjálf"))
     print(cleanStr("Vafþrúðnir"))"""
     #print(json.dumps(otherLanguages(), indent=2))
-    print(json.dumps(DATA, indent=2))
+    #print(json.dumps(DATA, indent=2))
