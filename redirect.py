@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 from sys import argv
+from datetime import datetime
 import requests
 import json
 import re
@@ -54,16 +55,12 @@ def redirect(S: requests.session, name: str, redirect: str=None):
         exit(0)
 
 def main():
-    if len(argv) != 2:
-        print("Enter a start time")
-        exit(1)
-
     try:
         result = requests.get(url=URL, params={
             "action": "query",
             "list": "allimages",
             "aisort": "timestamp",
-            "aistart": argv[1],
+            "aistart": argv[1] if len(argv) == 2 else datetime.utcnow().strftime('%Y-%m-%dT00:00:00Z'),
             "aiprop": "",
             "ailimit": "max",
             "format": "json"
@@ -72,29 +69,31 @@ def main():
         S = util.fehBotLogin()
 
         for image in result['query']['allimages']:
-            if re.compile(r"Map[_ ][A-Z]\w\d{3}\.webp").match(image['name']):
+            if re.match(r"Map[_ ][A-Z]\w\d{3}\.webp", image['name']):
                 redirect(S, image['title'])
-            elif re.compile(r"TT[_ ]\d{6}(\s\d{2}|)\.webp").match(image['name']):
+            elif re.match(r"TT[_ ]\d{6}(\s\d{2})?\.webp", image['name']):
                 print(TODO + "TT banner: " + image['title'])
-            elif re.compile(r"Wep[_ ][a-z]{2}\d{3}([_ ]up|)\.webp").match(image['name']):
+            elif re.match(r"Wep[_ ][a-z]{2}\d{3}([_ ]up)?\.webp", image['name']):
                 wp = getWeaponName(image['name'])
-                if wp and re.compile(r"Wep[_ ]\w{2}\d{3}[_ ]up\.webp").match(image['name']) or re.compile(r"Wep[_ ]mg\d{3}\.webp").match(image['name']):
+                if wp and re.match(r"Wep[_ ]\w{2}\d{3}[_ ]up\.webp", image['name']) or re.match(r"Wep[_ ]mg\d{3}\.webp", image['name']):
                     print(TODO + image['name'] + " to " + wp)
                 elif wp:
                     redirect(S, image['title'], wp)
                 else:
                     print(TODO + "Weapon with unknow name: " + image['title'])
-            elif re.compile(r"Acc[_ ][1-4][_ ]\d{4}[_ ]\d\.webp").match(image['name']):
+            elif re.match(r"Acc[_ ][1-4][_ ]\d{4}[_ ]\d\.webp", image['name']):
                 acc = getAccessoryName(image['name'])
                 if acc:
                     redirect(S, image['title'], acc)
                 else:
                     print(TODO + "Accessory with unknow name: " + image['title'])
-            elif re.compile(r"\w*[_ ](Btl|)Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger|)\.webp").match(image['name']):
+            elif re.match(r"\w*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger)?\.webp", image['name']):
                 redirect(S, image['title'])
-            elif re.compile(r"GC[_ ]\d{6}([_ ]\d{2}|)\.webp").match(image['name']):
+            elif re.match(r"GC[_ ]\d{6}([_ ]\d{2})?\.webp", image['name']):
                 print(TODO + "Grand conquest map: " + image['title'])
-            elif re.compile(r".*\.webp").match(image['name']):
+            elif re.match(r"Talk[_ ].+\.webp", image['name']):
+                redirect(S, image['title'])
+            elif image['name'][-5:] == '.webp':
                 print("Other webp file: " + image['title'])
 
     except util.LoginError:
