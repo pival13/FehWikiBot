@@ -133,7 +133,7 @@ def BHBMap(mapId: str):
 
     content = ""
     content += HBMapInfobox(StageEvent, "Bound Hero Battle", SRPGMap) + "\n"
-    content += mapUtil.MapAvailability(StageEvent['avail'], f"Bound Hero Battle: {DATA['MID_STAGE_'+mapId]} (Notification)", "map was a [[Bound Hero Battle]] map which")
+    content += mapUtil.MapAvailability(StageEvent['avail'], f"Bound Hero Battle: {DATA['M'+heroes[0]['id_tag']]} & {DATA['M'+heroes[1]['id_tag']]} (Notification)", "map was a [[Bound Hero Battle]] map which")
     content += HBUnitData(StageEvent, SRPGMap, heroes) + '\n'
     content += Story(mapId) + "\n"
     content += "==Trivia==\n*\n"
