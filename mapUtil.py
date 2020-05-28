@@ -53,7 +53,9 @@ def needBackdrop(mapId):
 
     with Image.open(path + mapId + '.png') as im:
         if 'a' in im.mode or 'A' in im.mode:
-            return True
+            mina, maxa = im.getextrema()[-1]
+            if (maxa-mina)/256 > 0.1:
+                return True
     return False
 
 def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
@@ -81,13 +83,13 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
         for ally in field['player_pos']:
             if ally != field['player_pos'][0]:
                 allyPos += ','
-            allyPos += str(chr(ally['x'] + 97)) + str(ally['y'] + 1)
+            allyPos += (str(chr(ally['x'] + 97)) + str(ally['y'] + 1)) if 'x' in ally and 'y' in ally else ''
     if 'enemy_pos' in field and field['enemy_pos']:
         enemyPos = "\n|enemyPos="
         for enemy in field['enemy_pos']:
             if enemy != field['enemy_pos'][0]:
                 enemyPos += ','
-            enemyPos += str(chr(enemy['x'] + 97)) + str(enemy['y'] + 1)
+            enemyPos += (str(chr(enemy['x'] + 97)) + str(enemy['y'] + 1)) if 'x' in enemy and 'y' in enemy else ''
 
     terrain = None
     if 'terrain' in field and wallStyle != '':
@@ -98,7 +100,7 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
                 terrain[i] += [mapTerrain(field['terrain'], wallStyle, j, i, useDebris)]
 
     return f"{{{{{simpleMap and 'MapLayout' or '#invoke:MapLayout|initTabber'}" + \
-           f"\n|baseMap={'id' in field and field['id'] or ''}\n|backdrop={backdrop if needBackdrop(field['id']) else ''}{mapType}".replace("\n", "" if simpleMap else "\n") + \
+           f"\n|baseMap={'id' in field and field['id'] or ''}\n|backdrop={backdrop if 'id' in field and needBackdrop(field['id']) else ''}{mapType}".replace("\n", "" if simpleMap else "\n") + \
            f"{allyPos}{enemyPos}\n" + \
            f"| a8={terrain and terrain[7][0] or ''} | b8={terrain and terrain[7][1] or ''} | c8={terrain and terrain[7][2] or ''} | d8={terrain and terrain[7][3] or ''} | e8={terrain and terrain[7][4] or ''} | f8={terrain and terrain[7][5] or ''}\n" + \
            f"| a7={terrain and terrain[6][0] or ''} | b7={terrain and terrain[6][1] or ''} | c7={terrain and terrain[6][2] or ''} | d7={terrain and terrain[6][3] or ''} | e7={terrain and terrain[6][4] or ''} | f7={terrain and terrain[6][5] or ''}\n" + \
@@ -111,6 +113,8 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
            "}}"
 
 def MapInfobox(obj: dict, restricted: bool=False):
+    """obj: {'lvl': {'diff': ..., ...}, 'rarity': {'diff': ..., ...}, 'lvl': {'stam': ..., ...}, 'lvl': {'reward': ..., ...},
+             'id_tag', ('name', 'title', 'epiteth'), 'banner', 'book', 'group', 'mode', 'map': SRPGMap(['field']+['allypos'])}"""
     rarity = ""
     stam = ""
     lvl = ""

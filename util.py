@@ -79,7 +79,8 @@ def fetchFehData(path: str=None, easySort="id_tag"):
 
     data = []
     for file in files:
-        data += readFehData(file, isFull=True)
+        d = readFehData(file, isFull=True)
+        data += d if isinstance(d, list) else [d]
 
     if not path:
         return { data[i]['key'] : data[i]['value'] for i in range(len(data)) }
@@ -233,5 +234,5 @@ if __name__ == "__main__":
     print(cleanStr("Sæhrímnir"))
     print(cleanStr("Hliðskjálf"))
     print(cleanStr("Vafþrúðnir"))"""
-    #print(json.dumps(otherLanguages(), indent=2))
-    #print(json.dumps(DATA, indent=2))
+    #json.dump(otherLanguages(), open("otherLanguages.json", 'w'), indent=2)
+    #json.dump(DATA, open('data.json', 'w'), indent=2)
