@@ -100,15 +100,15 @@ def otherLanguages():
     TWZH = fetchFehData("TWZH/Message/Data", "key")
     USPT = fetchFehData("USPT/Message/Data", "key")
 
-    language = { key:  {'USEN': USEN[key]['value'],
-                        'JPJA': JPJA[key]['value'],
-                        'EUDE': EUDE[key]['value'],
-                        'EUES': EUES[key]['value'],
-                        'USES': USES[key]['value'],
-                        'EUFR': EUFR[key]['value'],
-                        'EUIT': EUIT[key]['value'],
-                        'TWZH': TWZH[key]['value'],
-                        'USPT': USPT[key]['value']} for key in USEN}
+    language = { key:  {'USEN': USEN[key]['value'] if key in USEN else '',
+                        'JPJA': JPJA[key]['value'] if key in JPJA else '',
+                        'EUDE': EUDE[key]['value'] if key in EUDE else '',
+                        'EUES': EUES[key]['value'] if key in EUES else '',
+                        'USES': USES[key]['value'] if key in USES else '',
+                        'EUFR': EUFR[key]['value'] if key in EUFR else '',
+                        'EUIT': EUIT[key]['value'] if key in EUIT else '',
+                        'TWZH': TWZH[key]['value'] if key in TWZH else '',
+                        'USPT': USPT[key]['value'] if key in USPT else ''} for key in USEN}
 
     USEN = fetchFehData("USEN/Message/Menu", "key")
     JPJA = fetchFehData("JPJA/Message/Menu", "key")
@@ -121,15 +121,15 @@ def otherLanguages():
     USPT = fetchFehData("USPT/Message/Menu", "key")
 
     for key in USEN:
-        language[key] = {'USEN': USEN[key]['value'],
-                         'JPJA': JPJA[key]['value'],
-                         'EUDE': EUDE[key]['value'],
-                         'EUES': EUES[key]['value'],
-                         'USES': USES[key]['value'],
-                         'EUFR': EUFR[key]['value'],
-                         'EUIT': EUIT[key]['value'],
-                         'TWZH': TWZH[key]['value'],
-                         'USPT': USPT[key]['value']}
+        language[key] = {'USEN': USEN[key]['value'] if key in USEN else '',
+                         'JPJA': JPJA[key]['value'] if key in JPJA else '',
+                         'EUDE': EUDE[key]['value'] if key in EUDE else '',
+                         'EUES': EUES[key]['value'] if key in EUES else '',
+                         'USES': USES[key]['value'] if key in USES else '',
+                         'EUFR': EUFR[key]['value'] if key in EUFR else '',
+                         'EUIT': EUIT[key]['value'] if key in EUIT else '',
+                         'TWZH': TWZH[key]['value'] if key in TWZH else '',
+                         'USPT': USPT[key]['value'] if key in USPT else ''}
 
     return language
 

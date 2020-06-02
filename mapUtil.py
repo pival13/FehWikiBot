@@ -58,7 +58,7 @@ def needBackdrop(mapId):
                 return True
     return False
 
-def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
+def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: dict=None):
     mapType = ""
     wallStyle = ""
     backdrop = ""
@@ -78,7 +78,7 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
             wallStyle = 'normal' if extraField['wall']['filename'] == 'Wallpattern.png' else extraField['wall']['filename'][12:-4]
         backdrop = extraField['backdrop']['filename'][:-11] if extraField['backdrop']['filename'][-11:] == "Pattern.jpg" else extraField['backdrop']['filename'][:-4]
 
-    if 'player_pos' in field:
+    if 'player_pos' in field and (not simpleMap or field['player_pos']):
         allyPos = "\n|allyPos="
         for ally in field['player_pos']:
             if ally != field['player_pos'][0]:
@@ -92,12 +92,19 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False):
             enemyPos += (str(chr(enemy['x'] + 97)) + str(enemy['y'] + 1)) if 'x' in enemy and 'y' in enemy else ''
 
     terrain = None
-    if 'terrain' in field and wallStyle != '':
+    if 'terrain' in field:
         terrain = []
         for i in range(len(field['terrain'])):
             terrain += [[]]
             for j in range(len(field['terrain'][i])):
-                terrain[i] += [mapTerrain(field['terrain'], wallStyle, j, i, useDebris)]
+                terrain[i] += [mapTerrain(field['terrain'], wallStyle, j, i, useDebris)] if wallStyle != '' else ''
+    if units and terrain:
+        for unit in units:
+            if unit['spawn_count'] == -1:
+                name = util.getName(unit['id_tag'])
+                terrain[unit['pos']['y']][unit['pos']['x']] += ('{{Enemy|' if unit['is_enemy'] else '{{Ally|') + \
+                                                                ('generic=' if name.find(':') == -1 else 'hero=') + \
+                                                                name + '}}'
 
     return f"{{{{{simpleMap and 'MapLayout' or '#invoke:MapLayout|initTabber'}" + \
            f"\n|baseMap={'id' in field and field['id'] or ''}\n|backdrop={backdrop if 'id' in field and needBackdrop(field['id']) else ''}{mapType}".replace("\n", "" if simpleMap else "\n") + \

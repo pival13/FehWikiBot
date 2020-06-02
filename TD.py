@@ -26,8 +26,10 @@ def TDMapInfobox(stage: dict, field: dict):
     return mapUtil.MapInfobox(map)
 
 def TDText(mapId: str):
-    messageEn = util.readFehData("USEN/Message/Scenario/" + mapId + ".json")[0]['value'].replace('\n', '<br>')
-    messageJp = util.readFehData("JPJA/Message/Scenario/" + mapId + ".json")[0]['value'].replace('\n', '<br>')
+    fileUSEN = util.readFehData("USEN/Message/Scenario/" + mapId + ".json")
+    fileJPJA = util.readFehData("JPJA/Message/Scenario/" + mapId + ".json")
+    messageEn = fileUSEN[0]['value'].replace('\n', '<br>') if len(fileUSEN) > 0 else ''
+    messageJp = fileJPJA[0]['value'].replace('\n', '<br>') if len(fileJPJA) > 0 else ''
     return "==Text==\n{{TDMessage|" + \
           f"{messageEn}|{messageJp}}}}}\n"
 
@@ -41,7 +43,7 @@ def TDUnitData(SRPGMap: dict, StageEvent):
 def Solution(SRPGMap: dict):
     return "==Solutions==\n===Text===\n#\n" + \
            "{| class=\"wikitable default mw-collapsed mw-collapsible\"\n! Map visual after the ? enemy phase\n|-\n|" + \
-            mapUtil.MapImage(SRPGMap['field'], True) + "\n|}\n"
+            mapUtil.MapImage(SRPGMap['field'], simpleMap=True, units=SRPGMap['units']) + "\n|}\n"
 
 def TDmap(mapId: str):
     SRPGMap = util.readFehData("Common/SRPGMap/" + mapId + ".json")
