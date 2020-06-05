@@ -93,11 +93,10 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
 
     terrain = None
     if 'terrain' in field:
-        terrain = []
+        terrain = list(['' for _ in range(len(field['terrain'][i]))] for i in range(len(field['terrain'])))
         for i in range(len(field['terrain'])):
-            terrain += [[]]
             for j in range(len(field['terrain'][i])):
-                terrain[i] += [mapTerrain(field['terrain'], wallStyle, j, i, useDebris)] if wallStyle != '' else ''
+                terrain[i][j] += mapTerrain(field['terrain'], wallStyle, j, i, useDebris) if wallStyle != '' else ''
     if units and terrain:
         for unit in units:
             if unit['spawn_count'] == -1:

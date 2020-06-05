@@ -11,7 +11,7 @@ UNIT_IMAGE.update({"ch00_00_Eclat_X_Normal": {'name': "Kiran"},
                     "ch00_16_Freeze_M_Normal": {'name': "Hríd"},
                     "ch00_22_Tor_F_Normal": {'name': "Thórr", 'id_tag': 'PID_トール'},
                     "ch00_26_Froda_M_Normal": {'name': "Freyr", 'id_tag': 'PID_フロージ'},
-                    "ch00_28_Lupine_F_Normal": {'name': "Mirabilis", 'id_tag': 'PID_ルピナス'},
+                    "ch00_27_Freya_F_Normal": {'name': 'Freyja'},
                     "ch00_29_Hood_N_Normal": {'name': "Hood"},
                     "ch90_02_FighterAX_M_Normal": {'name': ''}})
 

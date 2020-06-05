@@ -7,10 +7,14 @@ from os.path import isfile
 from sys import stdin, stderr
 import re
 
-URL = "https://feheroes.gamepedia.com/api.php"
+JSON_ASSETS_DIR_PATH = "../feh-assets-json/files/assets/"
+WEBP_ASSETS_DIR_PATH = "../MEmu Download/Data/assets/"
+BINLZ_ASSETS_DIR_PATH = WEBP_ASSETS_DIR_PATH
 USER = "Pival13"
 BOT = "Pival13Test"
 PASSWD = "hfq8oig3rcdrsro9jpnp7seko7k3hm7e"
+
+URL = "https://feheroes.gamepedia.com/api.php"
 TODO = "\33[1;101mTODO\33[0m: "
 ERROR = "\33[1;101mERROR\33[0m: "
 DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
@@ -57,7 +61,7 @@ def cleanStr(string: str):
 
 def readFehData(path: str, isFull: bool=False):
     if not isFull:
-        path = "../feh-assets-json/files/assets/" + path
+        path = JSON_ASSETS_DIR_PATH + path
     data = {}
     try:
         f = open(path)
@@ -70,11 +74,11 @@ def readFehData(path: str, isFull: bool=False):
 def fetchFehData(path: str=None, easySort="id_tag"):
     files = []
     if not path:
-        directory = "../feh-assets-json/files/assets/USEN/Message"
+        directory = JSON_ASSETS_DIR_PATH + "USEN/Message"
         files = [directory + "/Data/" + f for f in listdir(directory + "/Data") if isfile(directory + "/Data/" + f)]
         files += [directory + "/Menu/" + f for f in listdir(directory + "/Menu") if isfile(directory + "/Menu/" + f)]
     else:
-        directory = "../feh-assets-json/files/assets/" + path
+        directory = JSON_ASSETS_DIR_PATH + path
         files = [directory + "/" + f for f in listdir(directory) if isfile(directory + "/" + f)]
 
     data = []
@@ -234,5 +238,5 @@ if __name__ == "__main__":
     print(cleanStr("Sæhrímnir"))
     print(cleanStr("Hliðskjálf"))
     print(cleanStr("Vafþrúðnir"))"""
-    #json.dump(otherLanguages(), open("otherLanguages.json", 'w'), indent=2)
-    #json.dump(DATA, open('data.json', 'w'), indent=2)
+    #json.dump(otherLanguages(), open("otherLanguages.json", 'w'), indent=2, ensure_ascii=False)
+    #json.dump(DATA, open('data.json', 'w'), indent=2, ensure_ascii=False)

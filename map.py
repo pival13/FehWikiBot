@@ -136,6 +136,18 @@ def parseTagUpdate(tag: str):
     for Stages in [StagePuzzle, StageScenario, StageEvent, StageBG, StageSA, StageCCS, StageCCX]:
         for stage in Stages:
             parseMapId(stage['id_tag'])
+    findUpcoming()
+
+from datetime import datetime
+from mapUtil import MapAvailability
+
+def findUpcoming():
+    StageEvent = util.fetchFehData("Common/SRPG/StageEvent/", False)
+    print('Upcoming special maps:')
+    for stage in StageEvent:
+        datetime.fromordinal
+        if datetime.strptime(stage['avail']['start'], "%Y-%m-%dT%H:%M:%SZ") > datetime.now():
+            print(stage['id_tag'], util.getName(stage['id_tag']), MapAvailability(stage['avail'], "")[72:-17])
 
 def main():
     if len(argv) < 2:
@@ -143,6 +155,8 @@ def main():
         exit(0)
     elif len(argv) == 2 and re.match(r"\d+_\w+", argv[1]):
         parseTagUpdate(argv[1])
+    elif len(argv) == 2 and argv[1] == 'upcoming':
+        findUpcoming()
     else:
         for arg in argv:
             if arg == argv[0]:
