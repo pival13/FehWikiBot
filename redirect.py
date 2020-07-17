@@ -43,7 +43,7 @@ def redirect(S: requests.session, name: str, redirect: str=None):
         "bot": True,
         "tags": "automated",
         "watchlist": "nochange",
-        "token": util.getToken(S),
+        "token": util.getToken(),
         "format": "json"
     }).json()
     if 'error' in result and result['error']['code'] == 'articleexists':
@@ -72,7 +72,10 @@ def main():
             if re.match(r"Map[_ ][A-Z]\w\d{3}\.webp", image['name']):
                 redirect(S, image['title'])
             elif re.match(r"TT[_ ]\d{6}(\s\d{2})?\.webp", image['name']):
-                print(TODO + "TT banner: " + image['title'] + ('MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5] in DATA and (" to " + DATA['MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5]]) or ''))
+                if 'MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5] in DATA:
+                    redirect(S, image['title'], "File:Banner " + util.cleanStr(DATA['MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5]]) + ".png")
+                else:
+                    print(TODO + "TT banner: " + image['title'] + ('MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5] in DATA and (" to " + DATA['MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5]]) or ''))
             elif re.match(r"Wep[_ ][a-z]{2}\d{3}([_ ]up)?\.webp", image['name']):
                 wp = getWeaponName(image['name'])
                 if wp and re.match(r"Wep[_ ]\w{2}\d{3}[_ ]up\.webp", image['name']) or re.match(r"Wep[_ ]mg\d{3}\.webp", image['name']):

@@ -2,6 +2,7 @@
 
 from PIL import Image
 from datetime import datetime, timedelta
+import re
 
 from util import DATA, DIFFICULTIES
 from reward import parseReward
@@ -11,13 +12,20 @@ USE_ALLY_STATS = ['PID_ヘルビンディ味方', 'PID_レーギャルン味方'
 USE_ENEMY_STATS = ['EID_ヘルビンディ', 'EID_レーギャルン', 'EID_レーヴァテイン', 'EID_ロキ', 'EID_スルト', 'EID_スラシル', 'EID_リーヴ']
 
 REFINED = util.fetchFehData("Common/SRPG/WeaponRefine", "refined")
+SKILLS = util.fetchFehData("Common/SRPG/Skill")
 
 def mapTerrain(terrain: list, wallStyle: str, x: int, y: int, useDebris: bool):
     walls = [8,9,10,11,12,13,14,19,20,33,34]
     debris = [[8],[9,11,13,19,33],[10,12,14,20,34]]
+    other = {
+        36: "{{RBTerrain}}", 37: "{{RBTerrain}}", 38: "{{RBTerrain}}", 39: "{{RBTerrain}}",
+    }
     if not terrain or len(terrain) < y or len(terrain[y]) < x:
         return ""
     t = terrain[y][x]
+    if t in other:
+        return other[t]
+
     wallType = ""
     if y != len(terrain) -1 and terrain[y+1][x] in walls and (not useDebris or terrain[y+1][x] in debris[0]):
         wallType += "N"
@@ -72,7 +80,10 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
         elif 'id' in field and field['id'][0] == 'H':
             mapType = "\n|type=HO"
             backdrop = 'Wave'
-    elif 'id' in field:
+        elif 'id' in field and field['id'][0] == 'Y':
+            mapType = "\n|type=RD"
+            backdrop = 'Wave'
+    elif 'id' in field and field['id'][0] != 'V':
         extraField = util.fetchFehData("Common/SRPG/Field", "map_id")[field['id']]
         if 'terrain' in field and containDebris(field['terrain']):
             wallStyle = 'normal' if extraField['wall']['filename'] == 'Wallpattern.png' else extraField['wall']['filename'][12:-4]
@@ -91,7 +102,7 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
                 enemyPos += ','
             enemyPos += (str(chr(enemy['x'] + 97)) + str(enemy['y'] + 1)) if 'x' in enemy and 'y' in enemy else ''
 
-    terrain = None
+    terrain = [[]]
     if 'terrain' in field:
         terrain = list(['' for _ in range(len(field['terrain'][i]))] for i in range(len(field['terrain'])))
         for i in range(len(field['terrain'])):
@@ -105,18 +116,15 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
                                                                 ('generic=' if name.find(':') == -1 else 'hero=') + \
                                                                 name + '}}'
 
-    return f"{{{{{simpleMap and 'MapLayout' or '#invoke:MapLayout|initTabber'}" + \
-           f"\n|baseMap={'id' in field and field['id'] or ''}\n|backdrop={backdrop if 'id' in field and needBackdrop(field['id']) else ''}{mapType}".replace("\n", "" if simpleMap else "\n") + \
-           f"{allyPos}{enemyPos}\n" + \
-           f"| a8={terrain and terrain[7][0] or ''} | b8={terrain and terrain[7][1] or ''} | c8={terrain and terrain[7][2] or ''} | d8={terrain and terrain[7][3] or ''} | e8={terrain and terrain[7][4] or ''} | f8={terrain and terrain[7][5] or ''}\n" + \
-           f"| a7={terrain and terrain[6][0] or ''} | b7={terrain and terrain[6][1] or ''} | c7={terrain and terrain[6][2] or ''} | d7={terrain and terrain[6][3] or ''} | e7={terrain and terrain[6][4] or ''} | f7={terrain and terrain[6][5] or ''}\n" + \
-           f"| a6={terrain and terrain[5][0] or ''} | b6={terrain and terrain[5][1] or ''} | c6={terrain and terrain[5][2] or ''} | d6={terrain and terrain[5][3] or ''} | e6={terrain and terrain[5][4] or ''} | f6={terrain and terrain[5][5] or ''}\n" + \
-           f"| a5={terrain and terrain[4][0] or ''} | b5={terrain and terrain[4][1] or ''} | c5={terrain and terrain[4][2] or ''} | d5={terrain and terrain[4][3] or ''} | e5={terrain and terrain[4][4] or ''} | f5={terrain and terrain[4][5] or ''}\n" + \
-           f"| a4={terrain and terrain[3][0] or ''} | b4={terrain and terrain[3][1] or ''} | c4={terrain and terrain[3][2] or ''} | d4={terrain and terrain[3][3] or ''} | e4={terrain and terrain[3][4] or ''} | f4={terrain and terrain[3][5] or ''}\n" + \
-           f"| a3={terrain and terrain[2][0] or ''} | b3={terrain and terrain[2][1] or ''} | c3={terrain and terrain[2][2] or ''} | d3={terrain and terrain[2][3] or ''} | e3={terrain and terrain[2][4] or ''} | f3={terrain and terrain[2][5] or ''}\n" + \
-           f"| a2={terrain and terrain[1][0] or ''} | b2={terrain and terrain[1][1] or ''} | c2={terrain and terrain[1][2] or ''} | d2={terrain and terrain[1][3] or ''} | e2={terrain and terrain[1][4] or ''} | f2={terrain and terrain[1][5] or ''}\n" + \
-           f"| a1={terrain and terrain[0][0] or ''} | b1={terrain and terrain[0][1] or ''} | c1={terrain and terrain[0][2] or ''} | d1={terrain and terrain[0][3] or ''} | e1={terrain and terrain[0][4] or ''} | f1={terrain and terrain[0][5] or ''}\n" + \
-           "}}"
+    s = f"{{{{{simpleMap and 'MapLayout' or '#invoke:MapLayout|initTabber'}" + \
+        f"\n|baseMap={'id' in field and field['id'] or ''}\n|backdrop={backdrop if backdrop != '' and 'id' in field and needBackdrop(field['id']) else ''}{mapType}".replace("\n", "" if simpleMap else "\n") + \
+        f"{allyPos}{enemyPos}\n"
+    for y in range(len(terrain)-1, -1, -1):
+        for x in range(len(terrain[y])):
+            s += "| " + chr(x+97) + str(y+1) + "=" + terrain[y][x] + " "
+        s = s[:-1] + "\n"
+    s += "}}"
+    return s
 
 def MapInfobox(obj: dict, restricted: bool=False):
     """obj: {'lvl': {'diff': ..., ...}, 'rarity': {'diff': ..., ...}, 'lvl': {'stam': ..., ...}, 'lvl': {'reward': ..., ...},
@@ -210,23 +218,15 @@ def UnitData(SRPGMap):
         s += f"level={unit['true_lv']};" if 'true_lv' in unit else "level=;"
         s += f"stats=[{unit['stats']['hp']};{unit['stats']['atk']};{unit['stats']['spd']};{unit['stats']['def']};{unit['stats']['res']}];" if 'stats' in unit else "stats=[;;;;];"
 
-        weapon = util.getName(unit['skills'][0]) if 'skills' in unit else None
-        if weapon and weapon == unit['skills'][0]:
-            weapon = util.getName(REFINED[unit['skills'][0]]['orig']) + ";refine="
-            if unit['skills'][0][-3:] == "ATK":
-                weapon += 'Atk'
-            elif unit['skills'][0][-3:] == "AGI":
-                weapon += 'Spd'
-            elif unit['skills'][0][-3:] == "DEF":
-                weapon += 'Def'
-            elif unit['skills'][0][-3:] == "RES":
-                weapon += 'Res'
-            elif unit['skills'][0][-2:] == "_幻":
-                weapon += 'Skill2'
-            else:
-                weapon += 'Skill1'
-        elif not weapon and 'refine' in unit:
-            weapon = ";refine="
+        weaponId = unit['skills'][0] if 'skills' in unit else unit['weapon'] if 'weapon' in unit else ''
+        weapon = util.getName(SKILLS[weaponId]['name_id']) if weaponId in SKILLS else None
+        if weapon and "M" + weaponId != SKILLS[weaponId]['name_id']:
+            weapon += ';refine=' + ("Atk" if weaponId[-3:] == 'ATK' else
+                                    "Spd" if weaponId[-3:] == 'SPD' else
+                                    'Def' if weaponId[-3:] == 'DEF' else
+                                    'Res' if weaponId[-3:] == 'RES' else
+                                    'Skill2' if weaponId[-2:] == "_幻" else 'Skill1')
+
         s += f"weapon={weapon or '-'};" if weapon else "weapon=;"
         s += f"assist={util.getName(unit['skills'][1]) or '-'};" if 'skills' in unit else "assist=;"
         s += f"special={util.getName(unit['skills'][2]) or '-'};" if 'skills' in unit else "special=;"
@@ -302,4 +302,11 @@ from sys import argv
 if __name__ == '__main__':
     #for i in range(75,30,-1):
     #    print(InOtherLanguage(["MID_STAGE_T00"+str(i),"MID_STAGE_HONOR_T00"+str(i)], "a"))
-    print(InOtherLanguage([argv[1],argv[2]] if len(argv) > 2 else argv[1], "a"))
+    if len(argv) == 2 and len(argv[1]) == 5 and argv[1][0] == 'Y':
+        maps = util.fetchFehData('Common/SRPGMap')
+        for m in maps:
+            if m['field']['id'] == argv[1]:
+                m['field']['player_pos'] = m['player_pos']
+                print(re.sub("hero=[^}]+", "hero=", MapImage(m['field'], simpleMap=True, units=m['units'])).replace("Red Thief", "Thief").replace("Blue Thief", "Thief").replace("Green Thief", "Thief"))
+    else:
+        print(InOtherLanguage([argv[1],argv[2]] if len(argv) > 2 else argv[1], "a"))

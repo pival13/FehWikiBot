@@ -11,7 +11,7 @@ UNIT_IMAGE.update({"ch00_00_Eclat_X_Normal": {'name': "Kiran"},
                     "ch00_16_Freeze_M_Normal": {'name': "Hríd"},
                     "ch00_22_Tor_F_Normal": {'name': "Thórr", 'id_tag': 'PID_トール'},
                     "ch00_26_Froda_M_Normal": {'name': "Freyr", 'id_tag': 'PID_フロージ'},
-                    "ch00_27_Freya_F_Normal": {'name': 'Freyja'},
+                    "ch00_27_Freya_F_Normal": {'name': 'Freyja', 'id_tag': 'EID_フレイヤ'},
                     "ch00_29_Hood_N_Normal": {'name': "Hood"},
                     "ch90_02_FighterAX_M_Normal": {'name': ''}})
 
@@ -31,7 +31,7 @@ def parseScenario(s: str, lang: str):
     expr = ""
     for section in sections:
         if section[0] != '$' and len(section) > 0:
-            nameplate = "|" if 'id_tag' in heroJSON and name == data['M'+heroJSON['id_tag']] else f"|duo={name}|" if 'legendary' in heroJSON and heroJSON['legendary'] and heroJSON['legendary']['kind'] == 2 else f"|nameplate={name}|"
+            nameplate = "|" if 'id_tag' in heroJSON and name == data['M'+heroJSON['id_tag']] else f"|duo={name}|" if 'legendary' in heroJSON and heroJSON['legendary'] and (heroJSON['legendary']['kind'] == 2 or heroJSON['legendary']['kind'] == 3) else f"|nameplate={name}|"
             wikitext += ["{{StoryTextTable" + nameplate +
                         (util.getName(heroJSON['id_tag']) if not 'name' in heroJSON else heroJSON['name']) +
                         (f"|expression={expr[5:]}|" if expr != 'Face' else '|') +

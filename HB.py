@@ -55,7 +55,7 @@ def HBMapInfobox(StageEvent: dict, group: str, SRPGMap: dict=None):
     info['requirement'] += (info['requirement'] != '' and '<br>' or '') + "Cannot use {{It|Light's Blessing}}." if StageEvent['scenarios'][-1]['no_lights_blessing'] else ''
     info['requirement'] += (info['requirement'] != '' and '<br>' or '') + f"Turns to win: {StageEvent['scenarios'][-1]['turns_to_win']}" if StageEvent['scenarios'][-1]['turns_to_win'] != 0 else ''
     info['requirement'] += (info['requirement'] != '' and '<br>' or '') + f"Turns to defend: {StageEvent['scenarios'][-1]['turns_to_defend']}" if StageEvent['scenarios'][-1]['turns_to_defend'] != 0 else ''
-    
+
     if StageEvent['scenarios'][-1]['reinforcements']:
         info['mode'] = 'Reinforcement Map'
     for index in range(len(StageEvent['scenarios'])):
@@ -64,7 +64,7 @@ def HBMapInfobox(StageEvent: dict, group: str, SRPGMap: dict=None):
         info['rarity'].update({diff: StageEvent['scenarios'][index]['stars']})
         info['stam'].update({diff: StageEvent['scenarios'][index]['stamina']})
         info['reward'].update({diff: StageEvent['scenarios'][index]['reward']})
-   
+
     if SRPGMap and SRPGMap != {}:
         "Toto"
     return mapUtil.MapInfobox(info)

@@ -5,7 +5,7 @@ import requests
 import json
 import re
 
-from util import URL, TODO, ERROR, DATA
+from util import URL, TODO, ERROR, DATA, TIME_FORMAT
 import util
 from TD import TDmap
 from HO import HOmap
@@ -13,16 +13,13 @@ from StoryParalogue import ParalogueMap, ParalogueGroup, StoryGroup, StoryMap
 from DerivedMap import SquadAssault, ChainChallengeGroup, ChainChallengeMap
 from HB import BHBMap, LHBMap, GHBMap
 from RD import RDmap
-
-SESSION = None
+from EventMap import exportEventMap
 
 def exportMap(name: str, content: str):
-    global SESSION
-    if not SESSION:
-        SESSION = util.fehBotLogin()
+    S = util.fehBotLogin()
 
     try:
-        result = SESSION.post(url=URL, data={
+        result = S.post(url=URL, data={
             "action": "edit",
             "title": name,
             "text": content,
@@ -31,7 +28,7 @@ def exportMap(name: str, content: str):
             "tags": "automated",
             "summary": "bot: new map",
             "watchlist": "nochange",
-            "token": util.getToken(SESSION),
+            "token": util.getToken(),
             "format": "json"
         }).json()
         if 'error' in result and result['error']['code'] == 'articleexists':
@@ -59,7 +56,7 @@ def parseMapId(mapId: str):
         name = DATA["MID_CHAPTER_"+mapId]
     elif mapId[0] == "Q":
         name = DATA["MID_STAGE_OCCUPATION"] + ": " + DATA["MID_STAGE_HONOR_OCCUPATION"]
-    elif not mapId[0] == "H":
+    elif not mapId[0] == "H" and not re.fullmatch(r"V\d{4}-V\d{4}", mapId):
         print(ERROR + "Unknow map " + mapId)
         return
 
@@ -99,8 +96,11 @@ def parseMapId(mapId: str):
         exportMap(name + " (" + str(int(mapId.replace("Q", ""))) + ")", RDmap(mapId))
         print(TODO + "Edit Grand Conquests Trivia")
 
-    elif re.match(r"V\d{4}", mapId): #TODO
-        print(TODO + "Special map: " + name)
+    elif re.match(r"V\d{4}-V\d{4}", mapId):
+        exportEventMap(mapId[:5], mapId[-5:])
+
+    elif re.match(r"V\d{4}", mapId):
+        exportEventMap(mapId)
 
 
     elif re.match(r"SB_\d{4}", mapId):
@@ -130,7 +130,7 @@ def parseTagUpdate(tag: str):
     StagePuzzle = util.readFehData("Common/SRPG/StagePuzzle/"+tag+".json")
     StageScenario = util.readFehData("Common/SRPG/StageScenario/"+tag+".json")
     StagePerson = util.readFehData("Common/SRPG/Person/"+tag+".json")
-    
+
     for stage in StagePerson:
         parseMapId(f"H{stage['id_num']:04}")
     for Stages in [StagePuzzle, StageScenario, StageEvent, StageBG, StageSA, StageCCS, StageCCX]:
@@ -146,7 +146,7 @@ def findUpcoming():
     print('Upcoming special maps:')
     for stage in StageEvent:
         datetime.fromordinal
-        if datetime.strptime(stage['avail']['start'], "%Y-%m-%dT%H:%M:%SZ") > datetime.now():
+        if datetime.strptime(stage['avail']['start'], TIME_FORMAT) > datetime.now():
             print(stage['id_tag'], util.getName(stage['id_tag']), MapAvailability(stage['avail'], "")[72:-17])
 
 def main():

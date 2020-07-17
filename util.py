@@ -5,6 +5,7 @@ import json
 from os import listdir
 from os.path import isfile
 from sys import stdin, stderr
+from datetime import datetime
 import re
 
 JSON_ASSETS_DIR_PATH = "../feh-assets-json/files/assets/"
@@ -19,6 +20,11 @@ TODO = "\33[1;101mTODO\33[0m: "
 ERROR = "\33[1;101mERROR\33[0m: "
 DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
 ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
+TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+MIN_TIME = datetime.utcfromtimestamp(0).strftime(TIME_FORMAT)
+MAX_TIME = datetime.utcfromtimestamp(0x7FFFFFFF).strftime(TIME_FORMAT)
+
+SESSION = None
 
 # ð á ø þ í ú
 REMOVE_ACCENT = {
@@ -184,16 +190,35 @@ DATA.update({
     "MID_STAGE_X0041": "Legendary Hero (map)"
 })
 
-def askFor(pattern: str=None, intro=None):
+def askFor(pattern: str=None, intro=None, ignoreCase=False):
     if intro:
-        stderr.write(intro + '\n')
+        print(intro, file=stderr, end=" ", flush=True)
     s = stdin.readline()
     if s and s[-1] == '\n':
         s = s[:-1]
-    if s != None and (not pattern or re.fullmatch(pattern, s)):
+    if s != None and (not pattern or re.fullmatch(pattern, s, re.IGNORECASE if ignoreCase else 0)):
         return s
+    
+def askAgreed(intro, askYes: str=None, askNo: str=None, defaultTrue=None, defaultFalse=None, useTrueDefault=True):
+    answer = askFor(None, intro)
+    if not answer and useTrueDefault:
+        return defaultTrue
+    elif not answer and not useTrueDefault:
+        return defaultFalse
+    if answer and re.fullmatch("no|n", answer, re.IGNORECASE):
+        if askNo:
+            answer = askFor(intro=askNo)
+        else:
+            return defaultFalse
+    elif answer or re.fullmatch("yes|y|o|", answer, re.IGNORECASE):
+        if askYes:
+            answer = askFor(intro=askYes)
+        else:
+            return defaultTrue
+    return answer
 
-def getToken(S: requests.session):
+def getToken():
+    S = fehBotLogin()
     result = S.get(url=URL, params={
         "action": "query",
         "meta": "tokens",
@@ -203,17 +228,20 @@ def getToken(S: requests.session):
     return result['query']['tokens']['csrftoken']
 
 def fehBotLogin():
+    global SESSION
+    if SESSION:
+        return SESSION
     try:
-        S = requests.Session()
+        SESSION = requests.Session()
 
-        result = S.get(url=URL, params={
+        result = SESSION.get(url=URL, params={
             "action": "query",
             "meta": "tokens",
             "type": "login",
             "format": "json"
         }).json()
 
-        result = S.post(url=URL, data={
+        result = SESSION.post(url=URL, data={
             "action": "login",
             "lgname": USER + "@" + BOT,
             "lgpassword": PASSWD,
@@ -223,7 +251,7 @@ def fehBotLogin():
 
         if result['login']['result'] != 'Success':
             raise LoginError(result['login']['reason'])
-        return S
+        return SESSION
 
     except LoginError:
         print("Error during login")

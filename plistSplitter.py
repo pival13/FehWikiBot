@@ -19,7 +19,7 @@ for filename in argv[1:]:
 
     xml = parseXml(cElementTree.parse(filename).getroot()[0])
     img = Image.open(imgName)
-    
+
     for subImage in xml['frames']:
         coords = re.match(r"\{\{(\d+),(\d+)\},\{(\d+),(\d+)\}\}", xml['frames'][subImage]['textureRect'])
         coords = [int(coords[i]) for i in range(1,5)]

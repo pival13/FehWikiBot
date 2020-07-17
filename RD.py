@@ -36,7 +36,7 @@ def drawRDMapLayout(mapLayout: dict):
     enemyCamp = re.compile(r"\{\{RDTerrain\|color=Enemy\|type=Camp( Spawn)?\}\}")
     enemyWarpSpawn = re.compile(r"\{\{RDTerrain\|color=Enemy\|type=Warp Spawn\}\}")
     cellIsKind = lambda a, b, regex: a >= 0 and b >= 0 and a < len(mapNormal) and b < len(mapNormal[a]) and regex.search(mapLayout['map'][a][b])
-    
+
     if sum([sum([bool(enemySpawn.search(cell)) for cell in line]) for line in mapNormal]) == 2:
         mapNormal = [[enemySpawn.sub("", cell) if enemySpawn.search(cell) else cell for cell in line] for line in mapNormal]
     elif sum([sum([bool(enemyCamp.search(cell)) for cell in line]) for line in mapNormal]) == 2:
@@ -46,7 +46,7 @@ def drawRDMapLayout(mapLayout: dict):
     elif sum([sum([bool(enemyWarpSpawn.search(cell)) for cell in line]) for line in mapNormal]) == 6:
         mapNormal = [[re.sub("Warp Spawn", "Warp", mapNormal[i][j]) if cellIsKind(i, j, enemyWarpSpawn) and
             any([cellIsKind(x, y, enemyCamp) and cellIsKind(x2, y2, enemyWarpSpawn) for (x, y, x2, y2) in [(i, j-1, i, j-2), (i, j+1, i, j+2), (i-1, j, i-2, j), (i+1, j, i+2, j)]])
-                else mapNormal[i][j] for j in range(len(mapNormal[i]))] for i in range(len(mapNormal))]    
+                else mapNormal[i][j] for j in range(len(mapNormal[i]))] for i in range(len(mapNormal))]
 
     content = "|version1=Standard\n|mapImage={{MapLayout|type=RD|baseMap=" + mapLayout['basemap'] + "|backdrop=" + mapLayout['backdrop'] + "\n"
     for i in range(len(mapLayout['map'])):
@@ -88,7 +88,7 @@ def RDMapLayout(mapId: str):
         return
     else:
         GCLayout = GCLayout[0]
-    
+
     duplicate[mapId] = [dupMap, re.findall(r"^(\d+)", GCLayout)[0]]
     result = {
         'basemap': mapId,
@@ -113,12 +113,12 @@ def RDMapInfobox(StageEvent: dict):
         diff = DIFFICULTIES[StageEvent['scenarios'][index]['difficulty']]
         info['stam'].update({diff: StageEvent['scenarios'][index]['stamina']})
         info['reward'].update({diff: StageEvent['scenarios'][index]['reward']})
-   
+
     return re.sub(r"\|mapImage[^}]+\}\}", RDMapLayout(StageEvent['id_tag']), mapUtil.MapInfobox(info))
 
 def RDmap(mapId: str):
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent")[mapId]
-    
+
     content = RDMapInfobox(StageEvent) + '\n'
     content += mapUtil.MapAvailability(StageEvent['avail'], "Update - Special Maps: Rival Domains (Week "+str(int(mapId[1:]))+") (Notification)")
     content += "==Unit data==\n===Enemy AI Settings===\n{{EnemyAI|activeall}}\n===Stats===\n{{RivalDomainsEnemyStats}}\n"
