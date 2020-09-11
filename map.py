@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 from sys import argv
+from os.path import isfile
 import requests
 import json
 import re
@@ -14,6 +15,7 @@ from DerivedMap import SquadAssault, ChainChallengeGroup, ChainChallengeMap
 from HB import BHBMap, LHBMap, GHBMap
 from RD import RDmap
 from EventMap import exportEventMap
+from MS import MjolnirsStrike
 
 def exportMap(name: str, content: str):
     S = util.fehBotLogin()
@@ -24,6 +26,7 @@ def exportMap(name: str, content: str):
             "title": name,
             "text": content,
             "createonly": True,
+            #"nocreate": True,
             "bot": True,
             "tags": "automated",
             "summary": "bot: new map",
@@ -132,14 +135,44 @@ def parseTagUpdate(tag: str):
     StagePerson = util.readFehData("Common/SRPG/Person/"+tag+".json")
 
     for stage in StagePerson:
-        parseMapId(f"H{stage['id_num']:04}")
+        try:
+            parseMapId(f"H{stage['id_num']:04}")
+        except:
+            print(ERROR + "Failed to parse " + f"H{stage['id_num']:04}")
     for Stages in [StagePuzzle, StageScenario, StageEvent, StageBG, StageSA, StageCCS, StageCCX]:
         for stage in Stages:
-            parseMapId(stage['id_tag'])
+            try:
+                parseMapId(stage['id_tag'])
+            except:
+                print(ERROR + "Failed to parse " + stage['id_tag'])
+    findEvents(tag)
     findUpcoming()
 
 from datetime import datetime
 from mapUtil import MapAvailability
+
+def findEvents(tag: str):
+    lastTBRevival = 6#Here to change
+    lastTB = 19#Here to change
+
+    #if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Tournament' + tag + '.bin.lz'): print(TODO + "New Voting Gauntlet")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tag + '.bin.lz'): print(TODO + "New Tempest Trials")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + f'Common/TapAction/TapBattleData/TDID_{lastTB+1:04}.bin.lz'):
+        print(TODO + "New Tap Battle")
+        with open(__file__, 'r') as f: __file__Content = f.read()
+        with open(__file__, 'w') as f: f.write(re.sub(r"lastTB = \d+#Here to change", f"lastTB = {lastTB+1}#Here to change", __file__Content))
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + f'Common/TapAction/TapBattleData/TDID_{lastTBRevival+1:04}_01.bin.lz'):
+        print(TODO + "New Tap Battle Revival")
+        with open(__file__, 'r') as f: __file__Content = f.read()
+        with open(__file__, 'w') as f: f.write(re.sub(r"lastTBRevival = \d+#Here to change", f"lastTBRevival = {lastTBRevival+1}#Here to change", __file__Content))
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Occupation/Data/' + tag + '.bin.lz'): print(TODO + "New Grand Conquests")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'): print(TODO + "New Forging Bonds")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'): print(TODO + "New Rokkr Sieges")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'): print(TODO + "New Lost Lore")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/IdolTower/' + tag + '.bin.lz'): print(TODO + "New Hall of Forms")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Mjolnir/BattleData/' + tag + '.bin.lz'):
+        exportGroup(MjolnirsStrike(tag))
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Encourage/' + tag + '.bin.lz'): print(TODO + "New Frontline Phalanx")
 
 def findUpcoming():
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent/", False)

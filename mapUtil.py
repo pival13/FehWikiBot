@@ -13,6 +13,7 @@ USE_ENEMY_STATS = ['EID_ヘルビンディ', 'EID_レーギャルン', 'EID_レ�
 
 REFINED = util.fetchFehData("Common/SRPG/WeaponRefine", "refined")
 SKILLS = util.fetchFehData("Common/SRPG/Skill")
+SKILLS = {skillTag: SKILLS[skillTag] for skillTag in SKILLS if SKILLS[skillTag]['might'] != 0}
 
 def mapTerrain(terrain: list, wallStyle: str, x: int, y: int, useDebris: bool):
     walls = [8,9,10,11,12,13,14,19,20,33,34]
@@ -38,10 +39,15 @@ def mapTerrain(terrain: list, wallStyle: str, x: int, y: int, useDebris: bool):
     if wallType == "":
         wallType = "Pillar"
     if t in walls:
+        template = "Wall"
+        if wallStyle[:3] == 'Box':
+            template = "Box"
+            wallStyle = wallStyle[3:] or "Normal"
+            wallType = 'Regular'
         if useDebris:
-            return "{{Wall|style=" + wallStyle + "|type=" + (t in debris[0] and wallType or ("Debris_" + ((x+y) % 2 == 0 and "A" or "B"))) + "|hp=" + (t in debris[0] and "U" or "0") + "}}"
+            return "{{"+template+"|style=" + wallStyle + "|type=" + (t in debris[0] and wallType or ("Debris_" + ((x+y) % 2 == 0 and "A" or "B"))) + "|hp=" + (t in debris[0] and "U" or "0") + "}}"
         else:
-            return "{{Wall|style=" + wallStyle + "|type=" + wallType + "|hp=" + (t in debris[1] and "1" or t in debris[2] and "2" or "U") + "}}"
+            return "{{"+template+"|style=" + wallStyle + "|type=" + wallType + "|hp=" + (t in debris[1] and "1" or t in debris[2] and "2" or "U") + "}}"
     return ""
 
 def containDebris(terrain: list):
@@ -86,7 +92,10 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
     elif 'id' in field and field['id'][0] != 'V':
         extraField = util.fetchFehData("Common/SRPG/Field", "map_id")[field['id']]
         if 'terrain' in field and containDebris(field['terrain']):
-            wallStyle = 'normal' if extraField['wall']['filename'] == 'Wallpattern.png' else extraField['wall']['filename'][12:-4]
+            wallStyle = 'normal' if extraField['wall']['filename'] == 'Wallpattern.png' else \
+                        'Box' if extraField['wall']['filename'] == 'Boxpattern.png' else \
+                        extraField['wall']['filename'][11:-4] if extraField['wall']['filename'][:4] != 'Wall' else \
+                        extraField['wall']['filename'][12:-4]
         backdrop = extraField['backdrop']['filename'][:-11] if extraField['backdrop']['filename'][-11:] == "Pattern.jpg" else extraField['backdrop']['filename'][:-4]
 
     if 'player_pos' in field and (not simpleMap or field['player_pos']):
@@ -102,7 +111,7 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
                 enemyPos += ','
             enemyPos += (str(chr(enemy['x'] + 97)) + str(enemy['y'] + 1)) if 'x' in enemy and 'y' in enemy else ''
 
-    terrain = [[]]
+    terrain = [['']*6]*8
     if 'terrain' in field:
         terrain = list(['' for _ in range(len(field['terrain'][i]))] for i in range(len(field['terrain'])))
         for i in range(len(field['terrain'])):
@@ -302,7 +311,7 @@ from sys import argv
 if __name__ == '__main__':
     #for i in range(75,30,-1):
     #    print(InOtherLanguage(["MID_STAGE_T00"+str(i),"MID_STAGE_HONOR_T00"+str(i)], "a"))
-    if len(argv) == 2 and len(argv[1]) == 5 and argv[1][0] == 'Y':
+    if len(argv) == 2 and len(argv[1]) == 5 and re.match(r"[A-Z]\d{4}", argv[1]):
         maps = util.fetchFehData('Common/SRPGMap')
         for m in maps:
             if m['field']['id'] == argv[1]:

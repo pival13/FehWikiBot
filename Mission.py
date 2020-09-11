@@ -72,7 +72,7 @@ def parseQuests(questDiffs: dict, startTime: str):
     for qDiff in questDiffs:
         for quest in qDiff['quests']:
             qu = "{name=" + util.getName('MID_MISSION_' + (quest['common_id'] or quest['quest_id'])) + \
-                ";description=" + util.getName('MID_MISSION_H_' + (quest['common_id'] or quest['quest_id']))
+                ";description=" + util.getName('MID_MISSION_H_' + (quest['common_id'] or quest['quest_id'])).replace("\\n", "<br>")
             if quest['times'] != 1:
                 qu += f";times={quest['times']}"
             qu += ";reward=" + parseReward(quest['reward']) + parseStage(quest, startTime)

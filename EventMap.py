@@ -64,25 +64,25 @@ def getDefaultWeapon(unit: dict, diff: int, level: int):
     if diff == 0 and level == 5:
         if weapon < len(WEAPON_TYPE):
             return "SID_鉄の"+WEAPON_TYPE[weapon]
+        elif weapon >= 11 and weapon <= 14:
+            return "SID_"+MAGIC_TYPE[unit['tome_class']][0]
         elif weapon == 15:#Staff
-            return "SID_アトラース"
+            return "SID_アサルト"
         elif weapon >= 16 and weapon <= 19:#Breath
             return "SID_火のブレス"
         elif weapon >= 20 and weapon <= 23:#Beast
             return "SID_幼獣の化身・" + BEAST_TYPE[unit['move_type']]
-        elif unit['tome_class'] != 0:
-            return "SID_"+MAGIC_TYPE[unit['tome_class']][0]
     elif diff == 1 and level == 15:
         if weapon < len(WEAPON_TYPE):
             return "SID_鋼の"+WEAPON_TYPE[weapon]
+        elif weapon >= 11 and weapon <= 14:
+            return "SID_"+MAGIC_TYPE[unit['tome_class']][1]
         elif weapon == 15:#Staff
-            return "SID_アトラース"
+            return "SID_アサルト"
         elif weapon >= 16 and weapon <= 19:#Breath
             return "SID_火炎のブレス"#SID_灼熱のブレス
         elif weapon >= 20 and weapon <= 23:#Beast
             return "SID_若獣の化身・" + BEAST_TYPE[unit['move_type']]#成獣の化身・
-        elif unit['tome_class'] != 0:
-            return "SID_"+MAGIC_TYPE[unit['tome_class']][1]
     return ""
 
 def EventMapInfobox(StageEvent: dict, group: str):
@@ -137,7 +137,7 @@ def EventUnitData(StageEvent: dict, weaponKind):
         for i in range(len(askedUnits)):
             units += [{'id_tag': UNITS[askedUnits[i]['unit']]['id_tag'], 'rarity': StageEvent['scenarios'][idiff]['stars'], 'true_lv': StageEvent['scenarios'][idiff]['true_lv']}]
             u = UNITS[askedUnits[i]['unit']]
-            units[i]['weapon'] = u['skills'][4][0] if 'skills' in u and weaponKind == 'P' else \
+            units[i]['weapon'] = u['skills'][4][0] if 'skills' in u and (weaponKind == 'P' or (weaponKind == 'D' and len(util.cargoQuery("Units", where="_pageName='"+askedUnits[i]['unit'].replace("'", "\\'")+"' AND (Properties__full LIKE \"%special%\" OR Properties__full LIKE \"%specDisplay%\")")) != 0)) else \
                                  util.askFor("", f"Weapon for \"{askedUnits[i]['unit']}\" at difficulty {DIFFICULTIES[StageEvent['scenarios'][idiff]['difficulty']]}:") if weaponKind == 'C' else \
                                  getDefaultWeapon(u, StageEvent['scenarios'][idiff]['difficulty'], StageEvent['scenarios'][idiff]['true_lv'])
         if StageEvent['scenarios'][idiff]['reinforcements']:
@@ -151,16 +151,16 @@ def EventUnitData(StageEvent: dict, weaponKind):
 def EventMap(mapId: str, kindUnitWeapon=None, event=None, notif=None):
     if event is None:
         event = util.askAgreed(f"Is \"{util.getName(mapId)}\" ({mapId}) related to the event \"{util.getName('MID_STAGE_HONOR_'+mapId)}\"?", defaultTrue=util.getName('MID_STAGE_HONOR_'+mapId), askNo="Then what is it related to?")
-    while not kindUnitWeapon:
-        kindUnitWeapon = util.askFor(r"Personal|Default|Custom|P|D|C", f"How should be interpreted units weapon on \"{util.getName(mapId)}\" ({mapId})? Enter one of: Personal (Use their unique weapon), Default (Use their rank 1 and 2 weapon), Custom.", 1)
-    kindUnitWeapon = kindUnitWeapon[0].upper()
     if notif is None:
         notif = util.askFor(r".+ \(Notification\)", f"Which notification is \"{util.getName(mapId)}\" ({mapId}) related to?") or ""
+    while not kindUnitWeapon:
+        kindUnitWeapon = util.askFor(r"Personal|Default|Full Default|Custom|P|D|C|F", f"How should be interpreted units weapon on \"{util.getName(mapId)}\" ({mapId})? Enter one of: Personal / P (Use their unique personal weapon), Default / D (Use rank 1 and 2 weapon for regular units, personal weapon for special units), Full Default / F (Use their rank 1 and 2 weapon), Custom / C.", 1)
+    kindUnitWeapon = kindUnitWeapon[0].upper()
     
     StageEvent = util.fetchFehData('Common/SRPG/StageEvent')[mapId]
 
     content = EventMapInfobox(StageEvent, event) + "\n"
-    content += mapUtil.MapAvailability(StageEvent['avail'], notif, f"map is a part of the [[{event} (Event)|{event}]] event and")
+    content += mapUtil.MapAvailability(StageEvent['avail'], notif, f"map is part of the [[{event} (Event)|{event}]] event and")
     content += EventUnitData(StageEvent, kindUnitWeapon)
     content += mapUtil.InOtherLanguage(["MID_STAGE_"+mapId, "MID_STAGE_HONOR_"+mapId], util.getName("MID_STAGE_"+mapId)+": "+event)
     content += "{{Special Maps Navbox}}\n[[Category:Event maps]]"
@@ -174,7 +174,7 @@ def EventGroup(mapId1: str, mapId2: str):
     notif = util.askFor(r".+ \(Notification\)", "Which notification are they related to?") or ""
     weaponKind = None
     while not weaponKind:
-        weaponKind = util.askFor(r"Personal|Default|Custom|P|D|C", f"How should be interpreted units weapon on those maps ({mapId1}-{mapId2})? Enter one of: Personal (Use their unique personal weapon), Default (Use their rank 1 and 2 weapon), Custom.", 1)
+        weaponKind = util.askFor(r"Personal|Default|Full Default|Custom|P|D|C|F", f"How should be interpreted units weapon on those maps ({mapId1}-{mapId2})? Enter one of: Personal / P (Use their unique personal weapon), Default / D (Use rank 1 and 2 weapon for regular units, personal weapon for special units), Full Default / F (Use their rank 1 and 2 weapon), Custom / C.", 1)
     weaponKind = weaponKind[0].upper()
 
     content = {}
@@ -183,11 +183,27 @@ def EventGroup(mapId1: str, mapId2: str):
             EventMap(f"V{mId:04}", weaponKind, event, notif)})
     return content
 
+def readPersonalJson(file: str):
+    js = json.load(open(file))
+    print(js['event'])
+    print(js['notification'])
+    print(js['weaponType'])
+    for m in js['maps']:
+        print(m['pos'])
+        print(m['backdrop'])
+        for u in m["units"]:
+            print(u['name'] + " " + u['pos'])
+        print("")
+    return
+
 from sys import argv
 
 if __name__ == '__main__':
-    #json.dump(UNITS, open('units.json', 'w'), indent=2, ensure_ascii=False)
+    #
+    # json.dump(UNITS, open('units.json', 'w'), indent=2, ensure_ascii=False)
     if len(argv) == 3 and len(argv[1]) == 5 and len(argv[2]) == 5 and argv[1][0] == 'V' and argv[2][0] == 'V' and int(argv[1][1:]) < int(argv[2][1:]):
-        print(EventGroup(argv[1], argv[2]))
+        print(json.dumps(EventGroup(argv[1], argv[2]), indent=2))
     elif len(argv) == 2 and len(argv[1]) == 5 and argv[1][0] == 'V':
-        print(EventMap(argv[1]))
+        print(json.dumps(EventMap(argv[1]), indent=2))
+    elif len(argv) == 2:
+        readPersonalJson(argv[1])

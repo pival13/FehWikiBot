@@ -11,7 +11,9 @@ ITEM_KIND = [
     "Blessing", "Conquest Lance","Accessory","FB Conversation",	"",
     "Arena Crown", "Heroic Grail","Aether Stone","Throne","Summoning Ticket",
     "Dragonflower","","","","Havoc Axe",
-    "Music", "", "Midgard Gem", "", "Divine Code"
+    "Music", "", "Midgard Gem", "", "Divine Code",
+    "", "", "", "", "Guardian Shield",
+    "Trait Fruit"
 ]
 
 COLOR = [
@@ -52,14 +54,6 @@ AETHER_STONE = {
     '202002': 'SP Aether Stones',
 }
 
-SUMMONING_TICKET = {
-    'TRIAL_Summon_822_legend16_02': 'First Summon Ticket: Year-Two CYL Hero Fest',
-    'TRIAL_Summon_822_legend16_03': 'First Summon Ticket: Year-One CYL Hero Fest',
-    'TRIAL_Summon_191204_newyear_01': 'First Summon Ticket: Renewed Spirit',
-    'TRIAL_Summon_191204_newyear_02': 'First Summon Ticket: Happy New Year!: 1',
-    'TRIAL_Summon_191204_newyear_03': 'First Summon Ticket: Happy New Year!: 2'
-}
-
 DIVINE_CODES = {
     '2020': ": Part 1",
     '202003': ": Ephemera 3",
@@ -79,7 +73,7 @@ def parseReward(rewards: list):
     for reward in rewards:
         if reward != rewards[0]:
             s += ';'
-        kind = ITEM_KIND[reward['kind']]
+        kind = ITEM_KIND[reward['kind']] if len(ITEM_KIND) > reward['kind'] and ITEM_KIND[reward['kind']] != "" else (f"<!--{reward['_type']}-->")
 
         if kind == "Hero":
             s += "{hero=" + util.getName(reward['id_tag']) + ";rarity=" + str(reward['rarity']) + "}"
@@ -97,7 +91,7 @@ def parseReward(rewards: list):
             elif kind == 'Aether Stone':
                 kind = AETHER_STONE[reward['id_tag']] or (reward['id_tag'] + 'Aether Stone')
             elif kind == 'Summoning Ticket':
-                kind = SUMMONING_TICKET[reward['id_tag']]
+                kind = f"<!--Summoning Ticket: {[reward['id_tag']]}-->"
             elif kind == 'Dragonflower':
                 kind = 'Dragonflower (' + MOVE[reward['move_type']][0] + ')'
             elif kind == 'Blessing':

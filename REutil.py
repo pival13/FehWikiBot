@@ -129,12 +129,20 @@ def getStat(data, idx):
     }
 
 def getAvail(data, idx):
-    result = {
-        "start": datetime.utcfromtimestamp(getLong(data, idx, 0xDC0DA236C537F660)).isoformat() + "Z" if getLong(data, idx+0x00) ^ 0xDC0DA236C537F660 != 0xFFFFFFFFFFFFFFFF else None,
-        "finish": (datetime.utcfromtimestamp(getLong(data, idx+0x08, 0xC8AD692AFABD56E9)).isoformat() + "Z") if getLong(data, idx+0x08) ^ 0xC8AD692AFABD56E9 != 0xFFFFFFFFFFFFFFFF else None,
-        "avail_sec": getSLong(data, idx+0x10, 0x7311F0404108A6E0),
-        "cycle_sec": getSLong(data, idx+0x18, 0x6B227EC9D51B5721),
-    }
+    try:
+        result = {
+            "start": datetime.utcfromtimestamp(getLong(data, idx, 0xDC0DA236C537F660)).isoformat() + "Z" if getLong(data, idx+0x00) ^ 0xDC0DA236C537F660 != 0xFFFFFFFFFFFFFFFF else None,
+            "finish": (datetime.utcfromtimestamp(getLong(data, idx+0x08, 0xC8AD692AFABD56E9) - 1).isoformat() + "Z") if getLong(data, idx+0x08) ^ 0xC8AD692AFABD56E9 != 0xFFFFFFFFFFFFFFFF else None,
+            "avail_sec": getSLong(data, idx+0x10, 0x7311F0404108A6E0),
+            "cycle_sec": getSLong(data, idx+0x18, 0x6B227EC9D51B5721),
+        }
+    except:
+        result = {
+            "start": hex(getLong(data, idx+0x00, 0xDC0DA236C537F660)),
+            "finish": hex(getLong(data, idx+0x08, 0xC8AD692AFABD56E9)),
+            "avail_sec": hex(getSLong(data, idx+0x10, 0x7311F0404108A6E0)),
+            "cycle_sec": hex(getSLong(data, idx+0x18, 0x6B227EC9D51B5721)),
+        }
     return result
 
 def xorString(data, xor):
@@ -194,6 +202,12 @@ rewardParser = [
     lambda data, idx: ({"kind": 0x25, "_type": "midgard_gem", "count": getShort(data, idx+1)}, idx+3),
     lambda data, idx: ({"kind": 0x26, "_type": "unknow"}, idx+1),
     lambda data, idx: ({"kind": 0x27, "_type": "divine_code", "count": getShort(data, idx+1), "len": getByte(data, idx+3), "id_tag": xorString(data[idx+4:idx+4+getByte(data, idx+3)], [0])}, idx+4+getByte(data, idx+3)),
+    lambda data, idx: ({"kind": 0x28, "_type": "unknow"}, idx+1),
+    lambda data, idx: ({"kind": 0x29, "_type": "unknow"}, idx+1),
+    lambda data, idx: ({"kind": 0x2A, "_type": "unknow"}, idx+1),
+    lambda data, idx: ({"kind": 0x2B, "_type": "unknow"}, idx+1),
+    lambda data, idx: ({"kind": 0x2C, "_type": "guardian_shield", "count": getShort(data, idx+1)}, idx+3),
+    lambda data, idx: ({"kind": 0x2D, "_type": "trait_fruit", "count": getShort(data, idx+1)}, idx+3),
     #lambda data, idx: ({"kind": 0x25, "_type": "", "count": getShort(data, idx+1)}, idx+3),
 ]
 

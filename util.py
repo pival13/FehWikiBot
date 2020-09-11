@@ -16,7 +16,7 @@ BOT = "Pival13Test"
 PASSWD = "hfq8oig3rcdrsro9jpnp7seko7k3hm7e"
 
 URL = "https://feheroes.gamepedia.com/api.php"
-TODO = "\33[1;101mTODO\33[0m: "
+TODO = "\33[1;30;103mTODO\33[0m: "
 ERROR = "\33[1;101mERROR\33[0m: "
 DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
 ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
@@ -205,12 +205,12 @@ def askAgreed(intro, askYes: str=None, askNo: str=None, defaultTrue=None, defaul
         return defaultTrue
     elif not answer and not useTrueDefault:
         return defaultFalse
-    if answer and re.fullmatch("no|n", answer, re.IGNORECASE):
+    if re.fullmatch("no|n", answer, re.IGNORECASE):
         if askNo:
             answer = askFor(intro=askNo)
         else:
             return defaultFalse
-    elif answer or re.fullmatch("yes|y|o|", answer, re.IGNORECASE):
+    elif re.fullmatch("yes|y|o|", answer, re.IGNORECASE):
         if askYes:
             answer = askFor(intro=askYes)
         else:
@@ -257,6 +257,37 @@ def fehBotLogin():
         print("Error during login")
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         return fehBotLogin()
+
+def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: str=None, group: str=None, order: str="_ID", limit: int="max"):
+    ret = []
+    offset = 0
+    try:
+        S = fehBotLogin()
+        while True:
+            result = S.get(url=URL, params={
+                "action": "cargoquery",
+                "tables": tables,
+                "fields": fields,
+                "where": where,
+                "join_on": join,
+                "group_by": group,
+                "limit": limit,
+                "offset": offset,
+                "order_by": order,
+                "format": "json"
+            }).json()
+            if not 'cargoquery' in result:
+                print(result['error']['info'], file=stderr)
+                raise Exception
+            Rlimit = result['limits']['cargoquery'] if 'limits' in result else 0
+            offset += len(result['cargoquery'])
+            ret += [m['title'] for m in result['cargoquery']]
+            if limit != "max" or len(result['cargoquery']) < Rlimit:
+                break
+        return ret
+        
+    except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
+        return cargoQuery(tables, fields, where, join, group, order, limit)
 
 from sys import argv
 

@@ -96,6 +96,8 @@ def main():
                 print(TODO + "Grand conquest map: " + image['title'])
             elif re.match(r"Talk[_ ].+\.webp", image['name']):
                 redirect(S, image['title'])
+            elif re.match(r"EvBg[_ ].+\.webp", image['name']):
+                redirect(S, image['title'], "File:Talk " + image['name'].replace(".webp", ".png"))
             elif image['name'][-5:] == '.webp':
                 print("Other webp file: " + image['title'])
 
