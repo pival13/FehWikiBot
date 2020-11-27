@@ -58,6 +58,7 @@ def getByte(data, idx, xor=None):
     v = 0
     for i in range(1):
         v += data[i+idx] << 8*i
+        #data[i+idx] = 0x00
     if xor:
         return v ^ xor
     return v
@@ -74,6 +75,7 @@ def getShort(data, idx, xor=None):
     v = 0
     for i in range(2):
         v += data[i+idx] << 8*i
+        #data[i+idx] = 0x00
     if xor:
         return v ^ xor
     return v
@@ -90,6 +92,7 @@ def getInt(data, idx, xor=None):
     v = 0
     for i in range(4):
         v += data[i+idx] << 8*i
+        #data[i+idx] = 0x00
     if xor:
         return v ^ xor
     return v
@@ -106,6 +109,7 @@ def getLong(data, idx, xor=None):
     v = 0
     for i in range(8):
         v += data[i+idx] << 8*i
+        #data[i+idx] = 0x00
     if xor:
         return v ^ xor
     return v
@@ -132,7 +136,7 @@ def getAvail(data, idx):
     try:
         result = {
             "start": datetime.utcfromtimestamp(getLong(data, idx, 0xDC0DA236C537F660)).isoformat() + "Z" if getLong(data, idx+0x00) ^ 0xDC0DA236C537F660 != 0xFFFFFFFFFFFFFFFF else None,
-            "finish": (datetime.utcfromtimestamp(getLong(data, idx+0x08, 0xC8AD692AFABD56E9) - 1).isoformat() + "Z") if getLong(data, idx+0x08) ^ 0xC8AD692AFABD56E9 != 0xFFFFFFFFFFFFFFFF else None,
+            "finish": (datetime.utcfromtimestamp(getLong(data, idx+0x08, 0xC8AD692AFABD56E9)).isoformat() + "Z") if getLong(data, idx+0x08) ^ 0xC8AD692AFABD56E9 != 0xFFFFFFFFFFFFFFFF else None,
             "avail_sec": getSLong(data, idx+0x10, 0x7311F0404108A6E0),
             "cycle_sec": getSLong(data, idx+0x18, 0x6B227EC9D51B5721),
         }
@@ -147,11 +151,13 @@ def getAvail(data, idx):
 
 def xorString(data, xor):
     s = []
-    for i in range(min(len(data), (data.index(0) if 0 in data else len(data)))):
+    size = min(len(data), (data.index(0) if 0 in data else len(data)))
+    for i in range(size):
         if data[i] != xor[i%len(xor)]:
             s += [(data[i] ^ xor[i%len(xor)])]
         else:
             s += [(data[i])]
+        #data[i] = 0x00
     return bytes(s).decode('utf8', 'replace')
 
 def getString(data, idx, xor=ID_XORKEY):
@@ -168,7 +174,7 @@ rewardParser = [
     lambda data, idx: ({"kind": 0x03, "_type": "stamina_potion", "count": getShort(data, idx+1)}, idx+3),
     lambda data, idx: ({"kind": 0x04, "_type": "dueling_crest", "count": getShort(data, idx+1)}, idx+3),
     lambda data, idx: ({"kind": 0x05, "_type": "lights_blessing", "count": getShort(data, idx+1)}, idx+3),
-    lambda data, idx: ({"kind": 0x06, "_type": "exp_resource", "count": getShort(data, idx+1), "great": not getBool(data, idx+3), "shard_color": getByte(data, idx+4)}, idx+5),
+    lambda data, idx: ({"kind": 0x06, "_type": "exp_resource", "count": getShort(data, idx+1), "great": getBool(data, idx+3), "shard_color": getByte(data, idx+4)}, idx+5),
     lambda data, idx: ({"kind": 0x07, "_type": "unknow"}, idx+1),
     lambda data, idx: ({"kind": 0x08, "_type": "unknow"}, idx+1),
     lambda data, idx: ({"kind": 0x09, "_type": "unknow"}, idx+1),
