@@ -58,8 +58,7 @@ def HOmap(mapId: str):
         'stam': {diff: 0},
         'reward': {diff: [{"kind": 30, "move_type": hero['move_type'], "count": (heroId < 191 and 2 or heroId < 317 and 8 or 40)}]},
         'requirement': "The ordeal challenger must<br>defeat at least 2 foes.<br>All allies must survive.<br>Turns to win: 20",
-        'bgm': SERIES_BGM[hero['series']][0],
-        'bgm2': SERIES_BGM[hero['series']][1]
+        'bgms': [SERIES_BGM[hero['series']][0], SERIES_BGM[hero['series']][1]]
     }) + "\n"
     content += mapUtil.MapAvailability({ 'start': ((release + 'T07:00:00Z') if release else None) })
     content += "==Unit data==\n{{#invoke:UnitData|main\n|" + diff + "=" + mapUtil.UnitData(SRPGMap) + "\n}}\n"

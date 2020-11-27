@@ -54,13 +54,13 @@ def redirect(S: requests.session, name: str, redirect: str=None):
         print(json.dumps(result, indent=2))
         exit(0)
 
-def main():
+def main(start=None):
     try:
         result = requests.get(url=URL, params={
             "action": "query",
             "list": "allimages",
             "aisort": "timestamp",
-            "aistart": argv[1] if len(argv) == 2 else datetime.utcnow().strftime('%Y-%m-%dT00:00:00Z'),
+            "aistart": start if start else datetime.utcnow().strftime('%Y-%m-%dT00:00:00Z'),
             "aiprop": "",
             "ailimit": "max",
             "format": "json"
@@ -77,6 +77,8 @@ def main():
                 else:
                     print(TODO + "TT banner: " + image['title'] + ('MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5] in DATA and (" to " + DATA['MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5]]) or ''))
             elif re.match(r"Wep[_ ][a-z]{2}\d{3}([_ ]up)?\.webp", image['name']):
+                if not re.match(r"Wep[ _](bw|ar|mg).+\.webp", image['name']):
+                    continue
                 wp = getWeaponName(image['name'])
                 if wp and re.match(r"Wep[_ ]\w{2}\d{3}[_ ]up\.webp", image['name']) or re.match(r"Wep[_ ]mg\d{3}\.webp", image['name']):
                     print(TODO + image['name'] + " to " + str(wp))
@@ -90,8 +92,8 @@ def main():
                     redirect(S, image['title'], acc)
                 else:
                     print(TODO + "Accessory with unknow name: " + image['title'])
-            elif re.match(r".*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger)?\.webp", image['name']):
-                redirect(S, image['title'])
+            #elif re.match(r".*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger)?\.webp", image['name']):
+            #    redirect(S, image['title'])
             elif re.match(r"GC[_ ]\d{6}([_ ]\d{2})?\.webp", image['name']):
                 print(TODO + "Grand conquest map: " + image['title'])
             elif re.match(r"Talk[_ ].+\.webp", image['name']):
@@ -110,4 +112,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(argv[1] if len(argv) == 2 else None)

@@ -4,12 +4,12 @@ from PIL import Image
 from datetime import datetime, timedelta
 import re
 
-from util import DATA, DIFFICULTIES
+from util import DATA, DIFFICULTIES, TIME_FORMAT
 from reward import parseReward
 import util
 
-USE_ALLY_STATS = ['PID_ヘルビンディ味方', 'PID_レーギャルン味方', 'PID_レーヴァテイン味方', 'PID_ロキ味方', 'PID_スルト味方', 'PID_スラシル味方', 'PID_リーヴ味方']
-USE_ENEMY_STATS = ['EID_ヘルビンディ', 'EID_レーギャルン', 'EID_レーヴァテイン', 'EID_ロキ', 'EID_スルト', 'EID_スラシル', 'EID_リーヴ']
+USE_ALLY_STATS = ['PID_ヘルビンディ味方', 'PID_レーギャルン味方', 'PID_レーヴァテイン味方', 'PID_ロキ味方', 'PID_スルト味方', 'PID_スラシル味方', 'PID_リーヴ味方', 'PID_ヘル味方', 'PID_プルメリア味方']
+USE_ENEMY_STATS = ['EID_ヘルビンディ', 'EID_レーギャルン', 'EID_レーヴァテイン', 'EID_ロキ', 'EID_スルト', 'EID_スラシル', 'EID_リーヴ', 'EID_ヘル', 'EID_プルメリア']
 
 REFINED = util.fetchFehData("Common/SRPG/WeaponRefine", "refined")
 SKILLS = util.fetchFehData("Common/SRPG/Skill")
@@ -136,8 +136,9 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
     return s
 
 def MapInfobox(obj: dict, restricted: bool=False):
-    """obj: {'lvl': {'diff': ..., ...}, 'rarity': {'diff': ..., ...}, 'lvl': {'stam': ..., ...}, 'lvl': {'reward': ..., ...},
-             'id_tag', ('name', 'title', 'epiteth'), 'banner', 'book', 'group', 'mode', 'map': SRPGMap(['field']+['allypos'])}"""
+    """obj: {'lvl': {diff: ..., ...}, 'rarity': {diff: ..., ...}, 'stam': {diff: ..., ...}, 'reward': {diff: ..., ...},
+             'id_tag', ('name', 'title', 'epiteth'), 'banner', 'book', 'group', 'mode',
+             'map': SRPGMap(['field']+['allypos']), 'bgms': [...]}"""
     rarity = ""
     stam = ""
     lvl = ""
@@ -152,6 +153,11 @@ def MapInfobox(obj: dict, restricted: bool=False):
         if 'reward' in obj and diff in obj['reward']:
             reward += "  " + diff + "=" + parseReward(obj['reward'][diff]) + ";\n"
     reward += "}"
+    bgms = "|BGM="
+    for i in range(len(obj["bgms"] if "bgms" in obj else [])):
+        if i == 0: bgms += obj["bgms"][i]
+        else: bgms += f"\n|BGM{i+1}=" + obj["bgms"][i]
+    bgms += "\n"
     prevNext = ""
 
     name = obj['name'] if 'name' in obj else 'id_tag' in obj and 'MID_STAGE_' + obj['id_tag'] in DATA and DATA['MID_STAGE_' + obj['id_tag']] or ''
@@ -172,20 +178,19 @@ def MapInfobox(obj: dict, restricted: bool=False):
            f"{lvl}{rarity}{stam}" + \
            f"|reward={reward}\n" + \
            (f"|winReq={'requirement' in obj and obj['requirement'] or ''}\n" if 'requirement' in obj or not restricted else "") + \
-           (f"|BGM={'bgm' in obj and obj['bgm'] or ''}\n" if 'bgm' in obj or not restricted else "") + \
-           (f"|BGM2={'bgm2' in obj and obj['bgm2'] or ''}\n" if 'bgm2' in obj else "") + \
+           f"{bgms}" + \
            f"{prevNext}" + \
            "}}\n"
 
 def MapAvailability(avail: dict, notification: str=None, type: str="map"):
     endTime = None
     if 'finish' in avail and avail['finish']:
-        endTime = datetime.strptime(avail['finish'], '%Y-%m-%dT%H:%M:%SZ') - timedelta(seconds=1)
+        endTime = datetime.strptime(avail['finish'], TIME_FORMAT) - timedelta(seconds=1)
 
     return "==Map availability==\n" + \
           f"This {type} was made available on:\n" + \
           f"* {{{{MapDates|start={'start' in avail and avail['start'] or ''}" + \
-          f"{endTime and ('|end=' + endTime.strftime('%Y-%m-%dT%H:%M:%SZ')) or ''}" + \
+          f"{endTime and ('|end=' + endTime.strftime(TIME_FORMAT)) or ''}" + \
           f"{notification != None and ('|notification=' + notification) or ''}}}}}\n"
 
 def UnitData(SRPGMap):

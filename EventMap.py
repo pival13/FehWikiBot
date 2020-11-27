@@ -93,6 +93,7 @@ def EventMapInfobox(StageEvent: dict, group: str):
         'requirement': '',
         'lvl': {}, 'rarity': {}, 'stam': {}, 'reward': {},
         'map': {'id': StageEvent['id_tag'], 'player_pos': []},
+        'bgms': util.getBgm(StageEvent['id_tag'])
     }
     info['requirement'] += 'All allies must survive.' if StageEvent['scenarios'][-1]['survives'] else ''
     info['requirement'] += (info['requirement'] != '' and '<br>' or '') + "Cannot use {{It|Light's Blessing}}." if StageEvent['scenarios'][-1]['no_lights_blessing'] else ''
@@ -146,7 +147,7 @@ def EventUnitData(StageEvent: dict, weaponKind):
         for i in range(len(askedUnits)):
             s = s.replace(";pos=;", ";pos="+(askedUnits[i]['pos'] or '@@@')+";", 1)
                  #.replace(";weapon=;", ";weapon="++";", 1)
-    return s.replace('@@@', '').replace('+;', ';') + "\n}}\n"
+    return s.replace('@@@', '').replace('Fire Breath+', 'Fire Breath-').replace('+;', ';').replace('Fire Breath-', 'Fire Breath+') + "\n}}\n"
 
 def EventMap(mapId: str, kindUnitWeapon=None, event=None, notif=None):
     if event is None:

@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-from sys import argv
 from os.path import isfile
 import requests
 import json
@@ -15,7 +14,8 @@ from DerivedMap import SquadAssault, ChainChallengeGroup, ChainChallengeMap
 from HB import BHBMap, LHBMap, GHBMap
 from RD import RDmap
 from EventMap import exportEventMap
-from MS import MjolnirsStrike
+from TT import TTMap
+from MS import MjolnirsStrike as MSMap
 
 def exportMap(name: str, content: str):
     S = util.fehBotLogin()
@@ -152,11 +152,12 @@ from datetime import datetime
 from mapUtil import MapAvailability
 
 def findEvents(tag: str):
-    lastTBRevival = 6#Here to change
+    lastTBRevival = 7#Here to change
     lastTB = 19#Here to change
 
     #if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Tournament' + tag + '.bin.lz'): print(TODO + "New Voting Gauntlet")
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tag + '.bin.lz'): print(TODO + "New Tempest Trials")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tag + '.bin.lz'):
+        exportGroup(TTMap(tag))
     if isfile(util.BINLZ_ASSETS_DIR_PATH + f'Common/TapAction/TapBattleData/TDID_{lastTB+1:04}.bin.lz'):
         print(TODO + "New Tap Battle")
         with open(__file__, 'r') as f: __file__Content = f.read()
@@ -171,7 +172,7 @@ def findEvents(tag: str):
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'): print(TODO + "New Lost Lore")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/IdolTower/' + tag + '.bin.lz'): print(TODO + "New Hall of Forms")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Mjolnir/BattleData/' + tag + '.bin.lz'):
-        exportGroup(MjolnirsStrike(tag))
+        exportGroup(MSMap(tag))
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Encourage/' + tag + '.bin.lz'): print(TODO + "New Frontline Phalanx")
 
 def findUpcoming():
@@ -182,21 +183,19 @@ def findUpcoming():
         if datetime.strptime(stage['avail']['start'], TIME_FORMAT) > datetime.now():
             print(stage['id_tag'], util.getName(stage['id_tag']), MapAvailability(stage['avail'], "")[72:-17])
 
-def main():
-    if len(argv) < 2:
+def main(arg):
+    if len(arg) < 2:
         print("Enter at least one map id")
         exit(0)
-    elif len(argv) == 2 and re.match(r"\d+_\w+", argv[1]):
-        parseTagUpdate(argv[1])
-    elif len(argv) == 2 and argv[1] == 'upcoming':
+    elif len(arg) == 2 and re.match(r"\d+_\w+", arg[1]):
+        parseTagUpdate(arg[1])
+    elif len(arg) == 2 and arg[1] == 'upcoming':
         findUpcoming()
     else:
-        for arg in argv:
-            if arg == argv[0]:
-                continue
-
-            parseMapId(arg)
+        for a in arg[1:]:
+            parseMapId(a)
 
 
+from sys import argv
 if __name__ == "__main__":
-    main()
+    main(argv)

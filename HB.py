@@ -49,7 +49,7 @@ def HBMapInfobox(StageEvent: dict, group: str, SRPGMap: dict=None):
         'requirement': '',
         'lvl': {}, 'rarity': {}, 'stam': {}, 'reward': {},
         'map': SRPGMap and 'field' in SRPGMap and SRPGMap['field'] or {'id': StageEvent['id_tag'], 'player_pos': []},
-        'bgm2': ""
+        'bgms': util.getBgm(StageEvent['id_tag'])
     }
     info['requirement'] += 'All allies must survive.' if StageEvent['scenarios'][-1]['survives'] else ''
     info['requirement'] += (info['requirement'] != '' and '<br>' or '') + "Cannot use {{It|Light's Blessing}}." if StageEvent['scenarios'][-1]['no_lights_blessing'] else ''

@@ -7,6 +7,29 @@ import util
 from reward import parseReward
 from datetime import datetime, timedelta
 
+SORTING_PATTERN = [
+    {'value': 1, 'pattern': r'YEAR'},
+    {'value': 2, 'pattern': r'^W?_?M'}, # Monthly
+    {'value': 3, 'pattern': r'^WEEK_'},
+    {'value': 4, 'pattern': r'^DAILY_'},
+    {'value': 10, 'pattern': r'STORY', 'nbQuests': 5}, # Story maps
+    {'value': 11, 'pattern': r'STORY', 'nbQuests': 3}, # Paralogue maps
+    {'value': 15, 'pattern': r'VOTE'}, # Voting Gauntlet
+    {'value': 16, 'pattern': r'SENKA'}, # Tempest Trials
+    {'value': 17, 'pattern': r'TAPBTL'}, # Tap Battle
+    {'value': 18, 'pattern': r'DAISEIATU'}, # Grand Conquests
+    {'value': 20, 'pattern': r'SHADOW'}, # Rokkr Sieges
+    {'value': 31, 'pattern': r'HERO'}, # Grand Hero
+    {'value': 32, 'pattern': r'KIZUNA'}, # Bound Hero
+    #[] = {'pattern': r'CHARA'}, # Three Heroes
+    #[] = {'pattern': r'SKY'}, # Aether Raids
+    #[] = {'pattern': r'ARENA'}, # Coliseum
+    #[] = {'pattern': r'BRAVE'}, # Unit specific (Alfonse, Ljosalfar & Heroes, etc)
+    #[] = {'pattern': r'ADVANCE'} # Movetype 'Strike'
+    #[] = {'pattern': r'BIND'} # Movetype 'Mastery'
+    {'value': 50, 'pattern': r'SUBSC'}, # FeH Pass
+]
+
 def groupQuestJsonToStr(groups: list):
     groups = parseQuestGroup(groups)
     if len(groups) == 0:
@@ -39,12 +62,16 @@ def groupQuestJsonToStr(groups: list):
             gr.pop('cycleTime')
 
     return json.dumps(mergeGroup, indent=2, ensure_ascii=False)\
-        .replace(",\n", ";\n").replace("\\\"", "\\@").replace("\": ", "=").replace("\"", "").replace("\\@", "\"")
+        .replace(",\n", ";\n").replace("\\\"", "\\@").replace("\": ", "=").replace("\"", "").replace("\\@", "\"").replace("\\n", "<br>")
 
 def parseSortValue(quests: dict):
-    return 0 #TODO
+    for cond in SORTING_PATTERN:
+        if  (not 'pattern' in cond or re.findall(cond['pattern'], quests['id_tag'])) and \
+            (not 'nbQuests' in cond or cond['nbQuests'] == quests['lists'][0]['quest_count']):
+            return cond['value']
+    return 40
 
-def parseStage(quest: dict, startTime: str):
+def parseStage(quest: dict, startTime: str):#TODO
     if quest['game_mode'] == 7:#VG
         return ";stage="
         #query
@@ -61,7 +88,7 @@ def parseStage(quest: dict, startTime: str):
         #query
     elif quest['map_group']:
         if quest['map_group'][0] == 'T':
-            return ";stage="
+            return ";stage=" + util.cargoQuery('Maps', where=f"Map='{quest['map_group']}'")[0]['Page']
         else:
             return ";stage=" + util.getName(quest['map_group'])
     else:

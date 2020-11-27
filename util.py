@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
 
+from PersonalData import JSON_ASSETS_DIR_PATH, WEBP_ASSETS_DIR_PATH, BINLZ_ASSETS_DIR_PATH, USER, BOT, PASSWD
+
 import requests
 import json
 from os import listdir
@@ -7,13 +9,6 @@ from os.path import isfile
 from sys import stdin, stderr
 from datetime import datetime
 import re
-
-JSON_ASSETS_DIR_PATH = "../feh-assets-json/files/assets/"
-WEBP_ASSETS_DIR_PATH = "../MEmu Download/Data/assets/"
-BINLZ_ASSETS_DIR_PATH = WEBP_ASSETS_DIR_PATH
-USER = "Pival13"
-BOT = "Pival13Test"
-PASSWD = "hfq8oig3rcdrsro9jpnp7seko7k3hm7e"
 
 URL = "https://feheroes.gamepedia.com/api.php"
 TODO = "\33[1;30;103mTODO\33[0m: "
@@ -53,6 +48,8 @@ REMOVE_ACCENT = {
     "Ý": "Y", "Ŷ": "Y", "Ÿ": "Y", "Ỹ": "Y", "Ȳ": "Y", "ý": "y", "ŷ": "y", "ÿ": "y", "ỹ": "y", "ȳ": "y",
     "Ź": "Z", "Ż": "Z", "Ž": "Z", "ź": "z", "ż": "z", "ž": "z"
 }
+
+BGM_FILEPATH = __file__[:__file__.rfind('/')] + '/bgm.json'
 
 class LoginError(RuntimeError):
     def __init__(self, arg):
@@ -144,6 +141,16 @@ def otherLanguages():
     return language
 
 DATA = fetchFehData()
+DATA.update({
+    "MSID_ファルシオン": "Falchion (Mystery)",
+    "MSID_ファルシオン外伝": "Falchion (Gaiden)",
+    "MSID_ファルシオン覚醒": "Falchion (Awakening)",
+    "MSID_レーヴァテイン": "Laevatein (weapon)",
+    "MSID_ミステルトィン": "Missiletainn (sword)",
+    "MSID_魔書ミステルトィン": "Missiletainn (tome)",
+    "MSID_ナーガ": "Naga (tome)",
+    "MID_STAGE_X0041": "Legendary Hero (map)"
+})
 
 def getName(id: str, complete=True):
     if not id:
@@ -179,16 +186,78 @@ def getHeroName(heroId: int):
         return ""
     return getName(hero['id_tag'])
 
-DATA.update({
-    "MSID_ファルシオン": "Falchion (Mystery)",
-    "MSID_ファルシオン外伝": "Falchion (Gaiden)",
-    "MSID_ファルシオン覚醒": "Falchion (Awakening)",
-    "MSID_レーヴァテイン": "Laevatein (weapon)",
-    "MSID_ミステルトィン": "Missiletainn (sword)",
-    "MSID_魔書ミステルトィン": "Missiletainn (tome)",
-    "MSID_ナーガ": "Naga (tome)",
-    "MID_STAGE_X0041": "Legendary Hero (map)"
-})
+BGM = {
+    "BGM_BATTLE_BOSS_01": "bgm_battle_boss.ogg",
+    "BGM_BATTLE_BOSS_02": "bgm_menu_theme01.ogg",
+    "BGM_BATTLE_BOSS_03": "bgm_boss3.ogg",
+    "BGM_BATTLE_BOSS_04": "bgm_boss4.ogg",
+    "BGM_BATTLE_BOSS_05": "bgm_boss5.ogg",
+    "BGM_BATTLE_BOSS_06": "bgm_boss6.ogg",
+    "BGM_BATTLE_BOSS_07": "bgm_boss7.ogg",
+    "BGM_MAP_BRAVE_01": "bgm_map_Brave_01.ogg",
+    "BGM_MAP_BRAVE_02": "bgm_map_Brave_02.ogg",
+    "BGM_MAP_BRAVE_03": "bgm_map_Brave_03.ogg",
+    "BGM_MAP_BRAVE_03_SAME": "bgm_map_Brave_03.ogg",
+    "BGM_MAP_BRAVE_04": "bgm_map_FEH_04.ogg",
+    "BGM_MAP_BRAVE_05": "bgm_map_FEH_05.ogg",
+    "BGM_MAP_BRAVE_06": "bgm_map_FEH_06.ogg",
+    "BGM_MAP_EVT_SERIOUS_01": "bgm_event_serious1.ogg",
+    "BGM_MAP_EVT_SERIOUS_02": "bgm_event_serious2.ogg",
+    "BGM_MAP_EVT_SERIOUS_03": "bgm_event_serious3.ogg",
+    "BGM_MAP_EVT_SERIOUS_04": "bgm_event_serious4.ogg",
+    "BGM_MAP_FES_01_SAME": "bgm_map_fes_01.ogg",
+    "BGM_MAP_FES_02_SAME": "bgm_map_fes_02.ogg",
+    "BGM_MAP_FES_03_SAME": "bgm_map_fes_03.ogg",
+    "BGM_MAP_FES_04_SAME": "bgm_map_fes_04.ogg",
+    "BGM_MAP_FE08_04": "bgm_mns_FE08_04.ogg",
+    "BGM_MAP_FE10_07": "bgm_mns_FE10_01.ogg",
+    "BGM_MAP_FE10_09": "bgm_mns_FE10_03.ogg",
+    "BGM_MAP_FE10_10": "bgm_mns_FE10_04.ogg",
+    "BGM_MAP_FE11_02": "bgm_mns_FE11_03.ogg",
+    "BGM_MAP_FE13_14": "bgm_mns_FE13_06.ogg",
+    "BGM_MAP_FE14_05_SAME": "bgm_map_FE14_05.ogg",
+    "BGM_MAP_FE14_14_SAME": "bgm_mns_FE14_07.ogg",
+    "BGM_MAP_FE14_16": "bgm_mns_FE14_06.ogg",
+    "BGM_MAP_FE14_17": "bgm_mns_FE14_09.ogg",
+}
+
+bgmNames = []
+bgms = {}
+def getBgm(mapId: str):
+    global bgmNames
+    if len(bgmNames) == 0: bgmNames = [m['Filename'] for m in cargoQuery('BackgroundMusic', fields='Filename')]
+    global bgms
+    if len(bgms) == 0: bgms = readFehData(BGM_FILEPATH, True)
+
+    if not mapId in bgms:
+        return []
+    tmp = bgms[mapId]
+    bgm = ""
+    if tmp["unknow_id"]:
+        askFor("", "Map "+mapId+" has 'unknow_id': "+tmp["unknow_id"])
+    if tmp["bgm2_id"]:
+        if tmp["bgm2_id"] in BGM: bgm = BGM[tmp["bgm2_id"]]
+        else: bgm = tmp["bgm2_id"].lower().replace('fe','FE')+".ogg"
+        if not bgm in bgmNames: bgm = '<!--'+bgm+'-->'
+        bgm += '<!--'+(BGM[tmp["bgm_id"]] if tmp["bgm_id"] in BGM else (tmp["bgm_id"].lower().replace('fe','FE')+".ogg"))+'-->'
+    else:
+        if tmp["bgm_id"] in BGM: bgm = BGM[tmp["bgm_id"]]
+        else: bgm = tmp["bgm_id"].lower().replace('fe','FE')+".ogg"
+        if not bgm in bgmNames: bgm = '<!--'+bgm+'-->'
+    if tmp["useGenericBossMusic"]:
+        return [bgm, BGM["BGM_BATTLE_BOSS_01"]]
+    elif tmp["nbBossMusic"] > 0:
+        boss = []
+        for b in tmp["bossMusics"]:
+            if not b["bgm"] in boss: boss += [b["bgm"]]
+        for i in range(len(boss)):
+            if boss[i] in BGM: boss[i] = BGM[boss[i]]
+            else: boss[i] = boss[i].lower().replace('fe','FE')+".ogg"
+            if not boss[i] in bgmNames: boss[i] = '<!--'+boss[i]+'-->'; print(TODO + "Unknow boss: " + boss[i] + " on " + mapId)
+        return [bgm] + boss
+    else:
+        return [bgm]
+
 
 def askFor(pattern: str=None, intro=None, ignoreCase=False):
     if intro:
@@ -277,6 +346,18 @@ def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: 
                 "format": "json"
             }).json()
             if not 'cargoquery' in result:
+                print({
+                    "action": "cargoquery",
+                    "tables": tables,
+                    "fields": fields,
+                    "where": where,
+                    "join_on": join,
+                    "group_by": group,
+                    "limit": limit,
+                    "offset": offset,
+                    "order_by": order,
+                    "format": "json"
+                })
                 print(result['error']['info'], file=stderr)
                 raise Exception
             Rlimit = result['limits']['cargoquery'] if 'limits' in result else 0

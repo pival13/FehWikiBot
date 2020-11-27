@@ -16,7 +16,8 @@ def MSInfobox(data: dict, nb: int):
     return "{{Mjolnirs Strike Infobox\n" + \
         f"|image=Mjolnirs Strike {nb}.jpg\n" + \
         "|mapImage={{MapLayout " + data['map_id'] + "}}\n" + \
-        f"|startTime={data['shield_avail']['start']}\n|endTime={data['event_avail']['finish']}\n" + \
+        f"|startTime={data['shield_avail']['start']}\n" + \
+        f"|endTime={(datetime.strptime(data['event_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}\n" + \
         f"|leader={util.getName(data['unit_id'])}\n|bonusStructure={util.getName('MID_MF_'+data['bonus_structure'][:-1])}\n" + \
         f"|askrLV={askrlv}\n|strikeLV={enemylv}\n|askrScore=\n|strikeScore=\n|timesStronger=\n" + \
         "|season=" + ("LightDark" if data['season'] == 0 else 'DarkLight' if data['season'] == 1 else 'HeavenLogic' if data['season'] == 2 else 'LogicHeaven') + "\n}}"
@@ -26,10 +27,10 @@ def MSAvailability(data: dict, nb: int, isStart: bool):
     notifTime = datetime.strptime(data['shield_avail']['start'], util.TIME_FORMAT) - timedelta(days=2)
     braceEnd = notifTime + timedelta(days=2) - timedelta(seconds=1)
     return "==Availability==\nThis [[Mjölnir's Strike]] event was made available:\n" + \
-        f"* {{{{HT|{start}}}}} – {{{{HT|{data['event_avail']['finish']}}}}} ([[Brace Yourselves - Mjölnir's Strike Begins ({notifTime.strftime('%b %d, %Y').replace(' 0', ' ')}) (Notification)|Notification]])\n" + \
+        f"* {{{{HT|{start}}}}} – {{{{HT|{(datetime.strptime(data['event_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}}}}} ([[Brace Yourselves - Mjölnir's Strike Begins ({notifTime.strftime('%b %d, %Y').replace(' 0', ' ')}) (Notification)|Notification]])\n" + \
         "** Brace Phase: {{HT|" + start + "}} – {{HT|" + braceEnd.strftime(util.TIME_FORMAT) + '}}\n' + \
-        "** Shield Phase: {{HT|" + data['shield_avail']['start'] + "}} – {{HT|" + data['shield_avail']['finish'] + '}}\n' + \
-        "** Counter Phase: {{HT|" + data['counter_avail']['start'] + "}} – {{HT|" + data['counter_avail']['finish'] + '}}'
+        "** Shield Phase: {{HT|" + data['shield_avail']['start'] + "}} – {{HT|" + (datetime.strptime(data['shield_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT) + '}}\n' + \
+        "** Counter Phase: {{HT|" + data['counter_avail']['start'] + "}} – {{HT|" + (datetime.strptime(data['counter_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT) + '}}'
 
 def MSRewards(data: dict):
     rewardsTier = [r for r in data['rewards'] if r['kind'] == 2]

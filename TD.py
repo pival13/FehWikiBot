@@ -20,7 +20,7 @@ def TDMapInfobox(stage: dict, field: dict):
     map['stam'] = {diff: 0}
     map['reward'] = {diff: stage['scenario']['reward']}
     map['requirement'] = "Phases to win: " + str(stage['scenario']['turns_to_win'] * 2 - 1 + stage['scenario']['last_enemy_phase'])
-    map['bgm'] = "bgm_map_FE14_t.ogg"
+    map['bgms'] = ["bgm_map_FE14_t.ogg"]
     map['map'] = field
 
     return mapUtil.MapInfobox(map)

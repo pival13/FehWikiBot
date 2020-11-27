@@ -33,7 +33,7 @@ def StoryMapInfobox(stage: dict, field: dict, mapId: str, index: int):
     map['requirement'] += (map['requirement'] != '' and '<br>' or '') + "Cannot use {{It|Light's Blessing}}." if stage['maps'][0]['scenarios'][index]['no_lights_blessing'] else ''
     map['requirement'] += (map['requirement'] != '' and '<br>' or '') + f"Turns to win: {stage['maps'][0]['scenarios'][index]['turns_to_win']}" if stage['maps'][0]['scenarios'][index]['turns_to_win'] != 0 else ''
     map['requirement'] += (map['requirement'] != '' and '<br>' or '') + f"Turns to defend: {stage['maps'][0]['scenarios'][index]['turns_to_defend']}" if stage['maps'][0]['scenarios'][index]['turns_to_defend'] != 0 else ''
-   # map['bgm'] = "bgm_map_FE14_t.ogg"
+    map['bgms'] = util.getBgm(mapId)
 
     return mapUtil.MapInfobox(map)
 
