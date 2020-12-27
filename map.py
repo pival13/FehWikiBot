@@ -15,7 +15,9 @@ from HB import BHBMap, LHBMap, GHBMap
 from RD import RDmap
 from EventMap import exportEventMap
 from TT import TTMap
+from LL import LostLore as LLMap
 from MS import MjolnirsStrike as MSMap
+from PoL import PawnsOfLoki as PoLMap
 
 def exportMap(name: str, content: str):
     S = util.fehBotLogin()
@@ -157,7 +159,8 @@ def findEvents(tag: str):
 
     #if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Tournament' + tag + '.bin.lz'): print(TODO + "New Voting Gauntlet")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tag + '.bin.lz'):
-        exportGroup(TTMap(tag))
+        try: exportGroup(TTMap(tag))
+        except: print(TODO + "Tempest Trials")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + f'Common/TapAction/TapBattleData/TDID_{lastTB+1:04}.bin.lz'):
         print(TODO + "New Tap Battle")
         with open(__file__, 'r') as f: __file__Content = f.read()
@@ -169,11 +172,14 @@ def findEvents(tag: str):
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Occupation/Data/' + tag + '.bin.lz'): print(TODO + "New Grand Conquests")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'): print(TODO + "New Forging Bonds")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'): print(TODO + "New Rokkr Sieges")
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'): print(TODO + "New Lost Lore")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'):
+        exportGroup(LLMap(tag))
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/IdolTower/' + tag + '.bin.lz'): print(TODO + "New Hall of Forms")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Mjolnir/BattleData/' + tag + '.bin.lz'):
         exportGroup(MSMap(tag))
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Encourage/' + tag + '.bin.lz'): print(TODO + "New Frontline Phalanx")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/BoardGame/' + tag + '.bin.lz'):
+        exportGroup(PoLMap(tag))
 
 def findUpcoming():
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent/", False)

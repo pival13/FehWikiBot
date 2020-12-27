@@ -125,7 +125,7 @@ def parseSkill(data):
     result = []
     nbGroup = util.getLong(data,0x08, 0x7fecc7074adee9ad)
     for iGr in range(nbGroup):
-        offGr = util.getLong(data, 0x00) + 0x140*iGr
+        offGr = util.getLong(data, 0x00) + 0x148*iGr
         result += [{
             "id_tag": util.getString(data, offGr+0x00),
             "refine_base": util.getString(data, offGr+0x08),
@@ -136,7 +136,7 @@ def parseSkill(data):
             #"prerequisites": [util.getString(data, offGr+0x30+0x08*i) for i in range(2)],
             "next_skill": util.getString(data, offGr+0x40),
             "sprites": [util.getString(data, offGr+0x48+0x08*i, util.NONE_XORKEY) for i in range(4)],
-
+            "might": util.getByte(data, offGr+0xD5, 0xD2),
         }]
     return result
 
@@ -695,12 +695,6 @@ def parseShadow(data):#Rokkr Siege #TODO
     return result
 
 def parseTrip(data):#Lost Lore #TODO
-    # FE8 09 6F C2 AD 84 60 DB 7D A7 AB 53 B4 61 2A D3 8A A6 90 9F 52 A4 90 9F 52 A2 90 9F 52 A9 9C E6 E4 29 0C E6 E4 A9 BD E7 E4 4C 74 36 78 CC 26 34 78 12 28 3F CB EC 00 00 00 00 00 00 00 BF FE C6 6C 76 D5 08 9F 7E CC DB C5
-    # FEH 09 6F C2 AD 84 60 DB 7D A7 AB 53 B4 61 2A D3 8A A6 90 9F 52 A4 90 9F 52 A2 90 9F 52 A9 9C E6 E4 29 0C E6 E4 A9 BD E7 E4 4C 74 36 78 CC 26 34 78 12 28 3F CB ED 00 00 00 00 00 00 00 B8 FE C6 6C 76 D5 08 9F 7E CC DB C5
-    # FE4 09 6F C2 AD 84 60 DB 7D A7 AB 53 B4 61 2A D3 8A A6 90 9F 52 A4 90 9F 52 A2 90 9F 52 A9 9C E6 E4 29 0C E6 E4 A9 BD E7 E4 4C 74 36 78 CC 26 34 78 12 28 3F CB EC 00 00 00 00 00 00 00 BF FE C6 6C 75 D5 08 9F 7E CC DB C5
-
-    # EA EA 32 87 6D 6E 68 69
-    # EA EA 32 87 6D 6E 68 69
     result = []
     nbGroup = util.getLong(data,0x08, 0xBBC1712B8390494C)
     for iGr in range(nbGroup):
@@ -708,26 +702,32 @@ def parseTrip(data):#Lost Lore #TODO
         result += [{
             'id_tag': util.getString(data, offGr+0x00),
             'avail': util.getAvail(data, offGr+0x08),
-            # util.getLong(data, offGr+0x40),
+            # util.getLong(data, offGr+0x40), #0x34
+            # scoutRewardCount
+            'isSpoil': util.getBool(data, offGr+0x64, 0xEC),
+            '_unknow1': util.getInt(data, offGr+0x68),
+            'rewardCount': util.getInt(data, offGr+0x6C, 0x6CC6FEB1),
+            'entryCount': util.getInt(data, offGr+0x70, 0x9F08D577),
+            'mapCount': util.getInt(data, offGr+0x74, 0xC5DBCC7B),
             'loreRewards': [{
                 "reward": util.getReward(data, util.getLong(data, offGr+0x78)+0x10*i, util.getInt(data, util.getLong(data, offGr+0x78)+0x10*i+0x08, 0x83E17EF2)),
                 "payload": util.getInt(data, util.getLong(data, offGr+0x78)+0x10*i+0x08, 0x83E17EF2),
                 "lines": util.getInt(data, util.getLong(data, offGr+0x78)+0x10*i+0x0C, 0x37c353d3)
-            } for i in range(14)],
-            'bonusTitle': [util.getByte(data, util.getLong(data, offGr+0x80)+i, 0x14) if util.getByte(data, util.getLong(data, offGr+0x80)+i) != 0x09 else -1 for i in range(8)],
+            } for i in range(util.getInt(data, offGr+0x6C, 0x6CC6FEB1))],
+            'bonusEntry': [util.getByte(data, util.getLong(data, offGr+0x80)+i, 0x14) if util.getByte(data, util.getLong(data, offGr+0x80)+i) != 0x09 else -1 for i in range(8)],
             'maps': [{
                 "id_tag": util.getString(data, util.getLong(data, offGr+0x88)+0x48*i+0x00),
                 "backgroundPath": util.getString(data, util.getLong(data, offGr+0x88)+0x48*i+0x08),
-                "unknow1": util.getString(data, util.getLong(data, offGr+0x88)+0x48*i+0x10),
-                "unknowPtr": util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x18),
+                "_unknow1": util.getString(data, util.getLong(data, offGr+0x88)+0x48*i+0x10),
+                "_unknowPtr": util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x18),
                 "clearReward": util.getReward(data, util.getLong(data, offGr+0x88)+0x48*i+0x20, util.getInt(data, util.getLong(data, offGr+0x88)+0x48*i+0x28, 0x356ebeca)),
                 "payload": util.getInt(data, util.getLong(data, offGr+0x88)+0x48*i+0x28, 0x356ebeca),
                 "lines": util.getInt(data, util.getLong(data, offGr+0x88)+0x48*i+0x2C, 0x97e16af8),
                 "required": [{
                     "map_idx": util.getSByte(data, util.getLong(data, offGr+0x88)+0x48*i+0x30+0x2*j, 0x1D),
                     "unknow": util.getByte(data, util.getLong(data, offGr+0x88)+0x48*i+0x30+0x2*j+0x1, 0xF1)
-                }for j in range(3)],
-                #0x02 unknow
+                } for j in range(3)],
+                "_unknow2": hex(util.getShort(data, util.getLong(data, offGr+0x88)+0x48*i+0x36)),
                 "scoutReward": [{
                     "reward": util.getReward(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x38)+0x10*j, util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x38)+0x10*j+0x08, 0x941587cf)),
                     "payload": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x38)+0x10*j+0x08, 0x941587cf),
@@ -735,10 +735,10 @@ def parseTrip(data):#Lost Lore #TODO
                 } for j in range(18)],
                 "combatUnits": {
                     'id_tag': util.getString(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)),
-                    '_unknow': util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x08, 0x69686E6D8732EAEA),
+                    '_unknow': hex(util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x08)),
                     'units': [{
                         'facePath': util.getString(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x10+0x20*j),
-                        '_unknow1': hex(util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x18+0x20*j)),
+                        'name_id': util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x18+0x20*j, 0xFF),
                         'rarity': util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x19+0x20*j, 0x3B),
                         'weapon': util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x1A+0x20*j, 0xA9),
                         'move': util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x1B+0x20*j, 0xE3),
@@ -753,7 +753,6 @@ def parseTrip(data):#Lost Lore #TODO
                 } if util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40) else None,
             } for i in range(5)],
         }]
-    #print(data[0x40:])
     return result
 
 def parseMjolnir(data):
@@ -839,20 +838,20 @@ def parseEncourage(data):#Frontline Phalanx#TODO
 
 def parseBoardGame(data):#TODO
     result = []
-    nbGroup = 1#util.getLong(data,0x08, 0x28d64acc)
-    for iGr in range(nbGroup):
+    for iGr in range(util.getLong(data, 0x08, 0x8C04448B9C6192D6)):
         offGr = util.getLong(data, 0x00)+iGr*0x90
+        nbRound = util.getByte(data, offGr+0x78, 0xEF)
         result += [{
             "id_tag": util.getString(data, offGr+0x00),
             "event_avail": util.getAvail(data, offGr+0x08),
-            "round_avails": [util.getAvail(data, util.getLong(data, offGr+0x30)+0x28*i) for i in range(3)],
+            "round_avails": [util.getAvail(data, util.getLong(data, offGr+0x30)+0x28*i) for i in range(nbRound)],
             "rounds": [{
                 "id": util.getString(data, util.getLong(data, util.getLong(data, offGr+0x38)+0x08*i)),
                 "_unknow1": util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x38)+0x08*i)+0x08, 0xA384B52D),
                 "weapons": bin(util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x38)+0x08*i)+0x10, 0x8175f760)),
                 "weaponsShort": bin(util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x38)+0x08*i)+0x14, 0xFA3F)),
                 "_unknow2": util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x38)+0x08*i)+0x16, 0x130C),
-            } for i in range(3)],
+            } for i in range(nbRound)],
             "_unknow1": {
                 #C8 F6 B3 00 00 00 00 00 C9 ED B2 00 00 00 00 00 CE E0 B5 00 00 00 00 00 CF E7 B4 00 00 00 00 00 CC DA B4 00 00 00 00 00 CD D1 B4 00 00 00 00 00 C2 D4 B4 00 00 00 00 00
                 #DB D4 D9 1C 55 F9 00 00 DE 2B B0 E3 5F F8 00 00 B2 2B 6D E3 4A FF 00 00
@@ -862,9 +861,9 @@ def parseBoardGame(data):#TODO
                 #CFAD 111110101101
                 #C9AC 100110101100
                 "_unknow1": {},
-                "_unknow2": [hex(util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x40)+0x08)+0x08*i)) for i in range(3)],
+                "_unknow2": [hex(util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x40)+0x08)+0x08*i)) for i in range(nbRound)],
                 "_unknow3": {},
-                "_unknow4": [(util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x40)+0x18)+0x08*i, 0xCD00)) for i in range(3)],
+                "_unknow4": [(util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x40)+0x18)+0x08*i, 0xCD00)) for i in range(nbRound)],
                 #A6 34 6B 18 3E B4 57 33 C9 5B 2F E1 18 3C 8B 58 3B 9C 30 1E 2F EC 00 00
             },#"12F8->13B0"
             "bonusDefinition": [{
@@ -968,7 +967,8 @@ def parseBoardGame(data):#TODO
                 } for j in range(4)],
                 "tier": util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x70))+0x28*+i+0x20, 0xC476),
             } for i in range(util.getLong(data, util.getLong(data, offGr+0x70)+0x08, 0x58902F22))],
-            "": util.getShort(data, offGr+0x78),
+            "nbRound": util.getByte(data, offGr+0x78, 0xEF),
+            "": util.getByte(data, offGr+0x79),#F9
         }]
     return result
 
@@ -1031,16 +1031,15 @@ def reverseFile(file: str):
         print(json.dumps(parseShadow(s), indent=2, ensure_ascii=False))
         return
     elif file.find("/Trip/Terms/") != -1:
-        print(json.dumps(parseTrip(s), indent=2, ensure_ascii=False))
-        return
+        #print(json.dumps(parseTrip(s), indent=2, ensure_ascii=False))
+        return parseTrip(s)
     elif file.find("/Mjolnir/BattleData/") != -1:
         return parseMjolnir(s)
     elif file.find("/Encourage/") != -1:
         print(json.dumps(parseEncourage(s), indent=2, ensure_ascii=False))
         return
     elif file.find("/SRPG/BoardGame/") != -1:
-        print(json.dumps(parseBoardGame(s), indent=2, ensure_ascii=False))
-        return
+        return parseBoardGame(s)
     else:
         print(file + ": Unknow reversal method")
         return
@@ -1072,12 +1071,13 @@ if __name__ == "__main__":
         for i in range(1, len(argv)):
             s = reverseFile(argv[i])
             if s:
-                try:
-                    newFile = "../feh-assets-json/extras/" + argv[i][argv[i].find("assets")+7:].replace(".bin.lz", ".json")
-                    json.dump(s, open(newFile, 'x'), indent=2, ensure_ascii=False)
-                    print("File " + newFile + " create")
-                except FileExistsError:
-                    print("File already exist")
+                print(json.dumps(s, indent=2, ensure_ascii=False))
+                #try:
+                #    newFile = "../feh-assets-json/files/assets/" + argv[i][argv[i].find("assets")+7:].replace(".bin.lz", ".json")
+                #    json.dump(s, open(newFile, 'x'), indent=2, ensure_ascii=False)
+                #    print("File " + newFile + " create")
+                #except FileExistsError:
+                #    print("File already exist")
 
 
 # MS 3
