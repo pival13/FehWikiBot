@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from PersonalData import JSON_ASSETS_DIR_PATH, WEBP_ASSETS_DIR_PATH, BINLZ_ASSETS_DIR_PATH, USER, BOT, PASSWD
+from PersonalData import JSON_ASSETS_DIR_PATH, WEBP_ASSETS_DIR_PATH, APK_ASSETS_DIR_PATH, BINLZ_ASSETS_DIR_PATH, USER, BOT, PASSWD
 
 import requests
 import json
@@ -60,7 +60,7 @@ class LoginError(RuntimeError):
 def cleanStr(string: str):
     for accent in REMOVE_ACCENT:
         string = string.replace(accent, REMOVE_ACCENT[accent])
-    return re.compile(r"[^A-Za-z0-9 ._-]").sub("", string)
+    return re.sub(r"[^A-Za-z0-9 ._-]", "", string)
 
 def readFehData(path: str, isFull: bool=False):
     if not isFull:
@@ -194,6 +194,7 @@ BGM = {
     "BGM_BATTLE_BOSS_05": "bgm_boss5.ogg",
     "BGM_BATTLE_BOSS_06": "bgm_boss6.ogg",
     "BGM_BATTLE_BOSS_07": "bgm_boss7.ogg",
+    "BGM_BATTLE_BOSS_08": "bgm_boss8.ogg",
     "BGM_MAP_BRAVE_01": "bgm_map_Brave_01.ogg",
     "BGM_MAP_BRAVE_02": "bgm_map_Brave_02.ogg",
     "BGM_MAP_BRAVE_03": "bgm_map_Brave_03.ogg",
@@ -201,6 +202,7 @@ BGM = {
     "BGM_MAP_BRAVE_04": "bgm_map_FEH_04.ogg",
     "BGM_MAP_BRAVE_05": "bgm_map_FEH_05.ogg",
     "BGM_MAP_BRAVE_06": "bgm_map_FEH_06.ogg",
+    "BGM_MAP_BRAVE_07": "bgm_map_FEH_07.ogg",
     "BGM_MAP_EVT_SERIOUS_01": "bgm_event_serious1.ogg",
     "BGM_MAP_EVT_SERIOUS_02": "bgm_event_serious2.ogg",
     "BGM_MAP_EVT_SERIOUS_03": "bgm_event_serious3.ogg",
@@ -213,6 +215,7 @@ BGM = {
     "BGM_MAP_FE10_07": "bgm_mns_FE10_01.ogg",
     "BGM_MAP_FE10_09": "bgm_mns_FE10_03.ogg",
     "BGM_MAP_FE10_10": "bgm_mns_FE10_04.ogg",
+    "BGM_MAP_FE10_11": "bgm_mns_FE10_05.ogg",
     "BGM_MAP_FE11_02": "bgm_mns_FE11_03.ogg",
     "BGM_MAP_FE13_14": "bgm_mns_FE13_06.ogg",
     "BGM_MAP_FE14_05_SAME": "bgm_map_FE14_05.ogg",

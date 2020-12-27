@@ -41,6 +41,16 @@ MOVE = [
     "Infantry", "Armored", "Cavalry", "Flying"
 ]
 
+WEAPON = [
+    "Sword", "Lance", "Axe",
+    "Red Bow", "Blue Bow", "Green Bow", "Colorless Bow",
+    "Red Dagger", "Blue Dagger", "Green Dagger", "Colorless Dagger",
+    "Red Tome", "Blue Tome", "Green Tome", "Colorless Tome",
+    "Staff",
+    "Red Breath", "Blue Breath", "Green Breath", "Colorless Breath",
+    "Red Beast", "Blue Beast", "Green Beast", "Colorless Beast",
+]
+
 AETHER_STONE = {
     'STONE': 'Aether Stone',
     '201811': 'SP Aether Stone',
@@ -52,10 +62,12 @@ AETHER_STONE = {
     '201910': 'Fall Aether Stone',
     '202001': 'Frosty Aether Stone',
     '202002': 'SP Aether Stones',
+    '202012': 'Frosty Aether Stones',
 }
 
 DIVINE_CODES = {
     '2020': ": Part 1",
+    '2021': ": Part 2",
     '202003': ": Ephemera 3",
     '202004': ": Ephemera 4",
     '202005': ": Ephemera 5",
@@ -73,7 +85,10 @@ def parseReward(rewards: list):
     for reward in rewards:
         if reward != rewards[0]:
             s += ';'
-        kind = ITEM_KIND[reward['kind']] if len(ITEM_KIND) > reward['kind'] and ITEM_KIND[reward['kind']] != "" else (f"<!--{reward['_type']}-->")
+        kind = ""
+        if reward['kind'] == -1: kind = reward['_type']
+        elif len(ITEM_KIND) > reward['kind'] and ITEM_KIND[reward['kind']] != "": kind = ITEM_KIND[reward['kind']]
+        else: kind = f"<!--{reward['_type']}-->"
 
         if kind == "Hero":
             s += "{hero=" + util.getName(reward['id_tag']) + ";rarity=" + str(reward['rarity']) + "}"

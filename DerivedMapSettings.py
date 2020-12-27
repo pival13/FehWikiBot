@@ -174,6 +174,45 @@ DERIVED_SETTINGS = [
         'extraCond': [ lambda groupId, index : groupId[3:5] == 'S1' and index == 9 ]
     },
     {
+        'value': [
+            {'name': 'cc_story_even1_double_book5', 'diff': ['Normal', 'Hard', 'Lunatic']},
+            {'name': 'cc_story_even2_double_book5', 'diff': ['Normal', 'Hard', 'Lunatic']}
+        ],
+        'mapCond': [
+            {'true_lv': 37, 'rarity': 4, 'promotion_tier': 1, 'hp_factor': 120},
+            {'true_lv': 42, 'rarity': 5, 'promotion_tier': 1, 'hp_factor': 130},
+            {'true_lv': 47, 'rarity': 5, 'promotion_tier': 1, 'hp_factor': 150}
+        ],
+        'extraCond': [
+            lambda groupId, index : groupId[3:5] == 'S1' and index == 5,
+            lambda groupId, index : groupId[3:5] == 'S1' and index == 6,
+        ]
+    },
+    {
+        'value': [
+            {'name': 'cc_story_even3_double_book5', 'diff': ['Normal', 'Hard', 'Lunatic']},
+            {'name': 'cc_story_even4_double_book5', 'diff': ['Normal', 'Hard', 'Lunatic']}
+        ],
+        'mapCond': [
+            {'true_lv': 38, 'rarity': 4, 'promotion_tier': 1, 'hp_factor': 120},
+            {'true_lv': 43, 'rarity': 5, 'promotion_tier': 1, 'hp_factor': 130},
+            {'true_lv': 48, 'rarity': 5, 'promotion_tier': 1, 'hp_factor': 150}
+        ],
+        'extraCond': [
+            lambda groupId, index : groupId[3:5] == 'S1' and index == 7,
+            lambda groupId, index : groupId[3:5] == 'S1' and index == 8,
+        ]
+    },
+    {
+        'value': [ {'name': 'cc_story_even5_double_book5', 'diff': ['Normal', 'Hard', 'Lunatic']} ],
+        'mapCond': [
+            {'true_lv': 40, 'rarity': 4, 'promotion_tier': 1, 'hp_factor': 120},
+            {'true_lv': 45, 'rarity': 5, 'promotion_tier': 1, 'hp_factor': 130},
+            {'true_lv': 50, 'rarity': 5, 'promotion_tier': 1, 'hp_factor': 150}
+        ],
+        'extraCond': [ lambda groupId, index : groupId[3:5] == 'S1' and index == 9 ]
+    },
+    {
         'value': [ {'name': 'cc_paralogue_even1_double', 'diff': ['Normal', 'Hard', 'Lunatic']} ],
         'mapCond': [
             {'true_lv': 37, 'rarity': 4, 'promotion_tier': 1, 'hp_factor': 110},

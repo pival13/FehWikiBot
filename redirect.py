@@ -77,8 +77,8 @@ def main(start=None):
                 else:
                     print(TODO + "TT banner: " + image['title'] + ('MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5] in DATA and (" to " + DATA['MID_SEQUENTIAL_MAP_TERM_' + image['name'][3:-5]]) or ''))
             elif re.match(r"Wep[_ ][a-z]{2}\d{3}([_ ]up)?\.webp", image['name']):
-                if not re.match(r"Wep[ _](bw|ar|mg).+\.webp", image['name']):
-                    continue
+                #if not re.match(r"Wep[ _](bw|ar|mg).+\.webp", image['name']):
+                #    continue
                 wp = getWeaponName(image['name'])
                 if wp and re.match(r"Wep[_ ]\w{2}\d{3}[_ ]up\.webp", image['name']) or re.match(r"Wep[_ ]mg\d{3}\.webp", image['name']):
                     print(TODO + image['name'] + " to " + str(wp))
@@ -92,8 +92,8 @@ def main(start=None):
                     redirect(S, image['title'], acc)
                 else:
                     print(TODO + "Accessory with unknow name: " + image['title'])
-            #elif re.match(r".*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger)?\.webp", image['name']):
-            #    redirect(S, image['title'])
+            elif re.match(r".*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger)?\.webp", image['name']):
+                redirect(S, image['title'])
             elif re.match(r"GC[_ ]\d{6}([_ ]\d{2})?\.webp", image['name']):
                 print(TODO + "Grand conquest map: " + image['title'])
             elif re.match(r"Talk[_ ].+\.webp", image['name']):
