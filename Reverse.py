@@ -618,6 +618,79 @@ def parseTapAction(data):
     #json.dump(data, open('a', 'w'), indent=2)
     return result
 
+def parsePortrait(data):
+    result = []
+    nbGroup = util.getLong(data, 0x00, 0x00)
+    for iGr in range(1):
+        offGr = util.getLong(data, 0x08) + 0xF8*iGr
+        result += [{
+            'id_tag': util.getString(data, offGr+0x00, util.PORTRAIT_XORKEY),
+            'id_tag2': util.getString(data, offGr+0x08, util.PORTRAIT_XORKEY),
+            'title': util.getString(data, offGr+0x10, util.PORTRAIT_XORKEY),
+            'original_id_tag': util.getString(data, offGr+0x18, util.PORTRAIT_XORKEY),
+            'heartsPath': util.getString(data, offGr+0x20, util.PORTRAIT_XORKEY),
+            'units': [util.getString(data, util.getLong(data, offGr+0x28)+0x08*i, util.PORTRAIT_XORKEY) for i in range(4)],
+            'unknow1': [util.getLong(data, util.getLong(data, offGr+0x30)+0x08*i, 0x88DBEFAC) for i in range(util.getInt(data, offGr+0xBC, 0xECA8A241))],
+            'stages': [{
+                'base_point': util.getInt(data, util.getLong(data, offGr+0x38)+0x10*i, 0x615CDAF3),
+                'unknow1': util.getInt(data, util.getLong(data, offGr+0x38)+0x10*i+0x04, 0x09B40F9D),
+                'difficulty': util.getShort(data, util.getLong(data, offGr+0x38)+0x10*i+0x08, 0x5B22),
+                'rarity': util.getShort(data, util.getLong(data, offGr+0x38)+0x10*i+0x0A, 0x471D),
+                'delta_level': util.getSShort(data, util.getLong(data, offGr+0x38)+0x10*i+0x0C, 0xA671),
+                'unknow2': util.getShort(data, util.getShort(data, offGr+0x38)+0x10*i+0x0E, 0xD84B),
+            } for i in range(util.getInt(data, offGr+0xC0, 0xE8559E6C))],
+            'unknow3': {
+                'unknwo1': hex(util.getLong(data, util.getLong(data, offGr+0x40), 0xE649FB65D07C8FB9)),
+                'unknwo2': hex(util.getInt(data, util.getLong(data, offGr+0x40)+0x08, 0x377815DC)),
+                'unknow3': [{
+                    #TODO percentage rate of time mult?
+                    'unknow1': hex(util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x40)+0x10)+0x08*i, 0x2E833190)),
+                    'unknow2': hex(util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x40)+0x10)+0x08*i+0x04, 0x51220200)),
+                } for i in range(3)],
+            },
+            'bonus_units': [util.getLong(data, util.getLong(data, offGr+0x48)+0x08*i, 0x5B08CD8C) for i in range(util.getInt(data, offGr+0xC8, 0x52974491))],
+            'score_mult': [{
+                'drops': util.getInt(data, util.getLong(data, offGr+0x50)+0x08*i, 0x5F1684B1),
+                'mult': util.getInt(data, util.getLong(data, offGr+0x50)+0x08*i+0x04, 0x9225CDF9)
+            } for i in range(util.getInt(data, offGr+0xCC, 0x07C5C47C))],
+            'unknow5': [util.getInt(data, util.getLong(data, offGr+0x58)+0x08*i, 0xD07D040F) for i in range(util.getInt(data, offGr+0xD0, 0x66A383C2))],
+            'bonus_accessories': [util.getString(data, util.getLong(data, offGr+0x60)+0x08*i, util.PORTRAIT_XORKEY) for i in range(util.getInt(data, offGr+0xD4, 0x54236634))],
+            'hero_rewards': [{
+                'unit': util.getLong(data, util.getLong(data, offGr+0x68)+0x28*i+0x00, 0x0100) >> 3,
+                'score': util.getInt(data, util.getLong(data, offGr+0x68)+0x28*i+0x08, 0x37CB7986),
+                'payload_size': util.getInt(data, util.getLong(data, offGr+0x68)+0X28*i+0x0C, 0x3B9EB0D7),
+                'reward': util.getReward(data, util.getLong(data, offGr+0x68)+0x28*i+0x10, util.getInt(data, util.getLong(data, offGr+0x68)+0X28*i+0x0C, 0x3B9EB0D7)),
+                'id_tag': util.getString(data, util.getLong(data, offGr+0x68)+0x28*i+0x18, util.PORTRAIT_XORKEY),
+                'id_tag2': util.getString(data, util.getLong(data, offGr+0x68)+0x28*i+0x20, util.PORTRAIT_XORKEY),
+            } for i in range(util.getInt(data, offGr+0xD8, 0x7AA1F6C2)*util.getInt(data, offGr+0xB8, 0xBA6E2D66))],
+            'daily_rewards': [{
+                #Unknow 0x14
+                'day': util.getInt(data, util.getLong(data, offGr+0x70)+0x30*i+0x14, 0xA3F0477C),
+                'reward': util.getReward(data, util.getLong(data, offGr+0x70)+0x30*i+0x18, 72),
+                'id_tag': util.getString(data, util.getLong(data, offGr+0x70)+0x30*i+0x20, util.PORTRAIT_XORKEY),
+                'id_tag2': util.getString(data, util.getLong(data, offGr+0x70)+0x30*i+0x28, util.PORTRAIT_XORKEY),
+            } for i in range(util.getInt(data, offGr+0xDC, 0xDD5F9DF4))],
+            'unknow6': [],#x4
+            'unknow7': [],#x4
+            'unknow8': [],#x?
+            'event_avail': util.getAvail(data, offGr+0x90),
+            'units_count': util.getInt(data, offGr+0xB8, 0xBA6E2D66),
+            'unknow1_count': util.getInt(data, offGr+0xBC, 0xECA8A241),
+            'stages_count': util.getInt(data, offGr+0xC0, 0xE8559E6C),
+            'unknow3_count': util.getInt(data, offGr+0xC4, 0x6F889C0C),#TODO
+            'bonus_count': util.getInt(data, offGr+0xC8, 0x52974491),
+            'score_mult_count': util.getInt(data, offGr+0xCC, 0x07C5C47C),
+            'unknow5_count': util.getInt(data, offGr+0xD0, 0x66A383C2),
+            'accessory_count': util.getInt(data, offGr+0xD4, 0x54236634),
+            'hero_reward_count': util.getInt(data, offGr+0xD8, 0x7AA1F6C2),
+            'daily_reward_count': util.getInt(data, offGr+0xDC, 0xDD5F9DF4),
+
+            #D2 44 A9 89  64 98 A1 55  76 EA B2 CA 6B 58 31 5B 3D 9D 0B BB F4 BD D0 FF
+            #D2 44 A9 89  64 98 A1 55  76 EA B2 CA 6B 58 31 5B 3D 9D 0B BB F4 BD D0 FF
+            #D2 44 A9 89  64 98 A1 55  77 EA B2 CA 6B 58 31 5B 3D 9D 0B BB F4 BD D0 FF
+        }]
+    return result
+
 from util import getName
 def parseShadow(data):#Rokkr Siege #TODO
     result = []
@@ -808,6 +881,45 @@ def parseMjolnir(data):
         }]
     return result
 
+def parseIdolTower(data):
+    result = []
+    for iGr in range(util.getLong(data, 0x08, 0x037CFEE6C5195437)):
+        offGr = util.getLong(data, 0x00) + 0x00*iGr
+        result += [{
+            "id_tag": util.getString(data, offGr+0x00),
+            "avail": util.getAvail(data, offGr+0x08),
+            "forma_soul_avail": util.getAvail(data, offGr+0x30),
+            "forma": {
+                "heroes": [util.getString(data, util.getLong(data, offGr+0x58)+0x08*i) for i in range(4)],
+                "rarity": util.getByte(data, util.getLong(data, offGr+0x58)+0x20, 0x9E),
+                "lv": util.getByte(data, util.getLong(data, offGr+0x58)+0x21, 0x2A),
+            },
+            "chambers": [{
+                #util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i
+                "id_tag": util.getString(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x00),
+                #"unknow": 0x06
+                "id_num": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x10, 0xAC3AB736),
+                "difficulty": util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x14, 0xCB),
+                "rarity": util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x15, 0x69),
+                "true_lv": util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x16, 0x6E),
+                "hp_factor": util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x18, 0x1618),
+                #"unknow": 0x06
+                "generic_foes": util.getBool(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x20, 0xd3),
+                "fixed_classes": util.getBool(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x21, 0x3B),
+                "allow_refines": util.getBool(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x22, 0x7F),
+                "reward": util.getReward(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x28, util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x30, 0xAE4D663F)),
+                "payload": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x30, 0xAE4D663F),
+                "reward_id_suffix": [util.getString(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x50*i+0x38+0x08*j) for j in range(3)],
+            } for i in range(util.getInt(data, util.getLong(data, offGr+0x60)+0x08, 0x6AC1C456))],
+            "daily_bonuses": [{
+                "reward": util.getReward(data, util.getLong(data, util.getLong(data, offGr+0x68))+0x28*i, util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x68))+0x28*i+0x08, 0x33287F60)),
+                "payload": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x68))+0x28*i+0x08, 0x33287F60),
+                "reward_id_suffix": [util.getString(data, util.getLong(data, util.getLong(data, offGr+0x68))+0x28*i+0x10+0x08*j) for j in range(3)],
+            } for i in range(util.getInt(data, util.getLong(data, offGr+0x68)+0x08, 0x35F7601A))],
+            "unknown": hex(util.getLong(data, offGr+0x70)),
+        }]
+    return result
+
 def parseEncourage(data):#Frontline Phalanx#TODO
     result = []
     nbGroup = util.getLong(data,0x08, 0x28d64acc)
@@ -856,7 +968,7 @@ def parseBoardGame(data):#TODO
                 #C8 F6 B3 00 00 00 00 00 C9 ED B2 00 00 00 00 00 CE E0 B5 00 00 00 00 00 CF E7 B4 00 00 00 00 00 CC DA B4 00 00 00 00 00 CD D1 B4 00 00 00 00 00 C2 D4 B4 00 00 00 00 00
                 #DB D4 D9 1C 55 F9 00 00 DE 2B B0 E3 5F F8 00 00 B2 2B 6D E3 4A FF 00 00
                 #52 CC 00 00 00 00 00 00 AD CF 00 00 00 00 00 00 AC C9 00 00 00 00 00 00
-                
+
                 #CC52 110001010010
                 #CFAD 111110101101
                 #C9AC 100110101100
@@ -865,7 +977,7 @@ def parseBoardGame(data):#TODO
                 "_unknow3": {},
                 "_unknow4": [(util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x40)+0x18)+0x08*i, 0xCD00)) for i in range(nbRound)],
                 #A6 34 6B 18 3E B4 57 33 C9 5B 2F E1 18 3C 8B 58 3B 9C 30 1E 2F EC 00 00
-            },#"12F8->13B0"
+            },#"12F8->13B0" "CC8->D80"
             "bonusDefinition": [{
                 "_unknow1": util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x48))+0x10*i, 0xE5),
                 "_unknow2": util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x48))+0x10*i+0x01, 0xF7),
@@ -1027,6 +1139,8 @@ def reverseFile(file: str):
     elif file.find("/TapAction/TapBattleData/") != -1:
         print(json.dumps(parseTapAction(s), indent=2, ensure_ascii=False))
         return
+    elif file.find("/Portrait/") != -1:
+        return parsePortrait(s)
     elif file.find("/Shadow/") != -1:
         print(json.dumps(parseShadow(s), indent=2, ensure_ascii=False))
         return
@@ -1035,6 +1149,8 @@ def reverseFile(file: str):
         return parseTrip(s)
     elif file.find("/Mjolnir/BattleData/") != -1:
         return parseMjolnir(s)
+    elif file.find("/SRPG/IdolTower/") != -1:
+        return parseIdolTower(s)
     elif file.find("/Encourage/") != -1:
         print(json.dumps(parseEncourage(s), indent=2, ensure_ascii=False))
         return
