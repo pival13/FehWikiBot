@@ -44,6 +44,29 @@ LOGIN_XORKEY = [
     0xB7, 0x26, 0x68, 0x64
 ]
 
+PORTRAIT_XORKEY = [
+    0x2F, 0x08, 0x66, 0xED, 0x7C, 0x98, 0x34, 0x2A,
+    0xE4, 0xAC, 0x41, 0xD1, 0xE5, 0x1F, 0xD2, 0x5E,
+    0x28, 0x32, 0x76, 0xDE, 0x87, 0x0A, 0xA7, 0xF9,
+    0x44, 0x28, 0x26, 0xC7, 0x25, 0x21, 0x06, 0x68,
+    0xE3, 0x72, 0x96, 0x3A, 0x24, 0xEA, 0xA2, 0x4F,
+    0xDF, 0xEB, 0x11, 0xDC, 0x50, 0x26, 0x3C, 0x78,
+    0xD0, 0x89, 0x04, 0xA9, 0xF7, 0x4A, 0x26, 0x28,
+    0xC9, 0x2B
+]
+
+#TUTORIAL    8A FC FE 39 5A 45 98 8D 6E FE 80 CE 08 74 14 95 EF 7B 70 06 04 C3 A0 BF 62 77 94 04 7A 34 F2 8E EE 6F 15 81
+#VG          9A EC EE 29 81 9E C2 42 A1 8D F3 BD 7B 77 E3 F6 8C EC 3B 4D 4F 88 20 3F 63 E3 00 2C 52 1C DA D6 42 57 2D 4D
+#GC          17 FC C9 EA 79 69 24 BD A4 54 0E 58 BD 8B 36 CD AF B4 E2 09 3C 1F 8C 9C D1 48 51 A1 FB AD 48 7E C3 38 5A 41
+#SUMMON      24 38 F8 00 4C E0 2E 23 73 83 EF C4 84 8F F4 E9 D2 A5 22 3E FE 06 4A E6 28 25 75 85 E9 C2 82 89 F2 EF D4 A3	assets/Common/Summon/*.bin
+#HOME        19 0E C6 29 AE 2F 5E 0C B0 D6 EE 53 A8 F3 8A 7B 98 79 9A 8D 45 AA 2D AC DD 8F 33 55 6D D0 2B 70 09 F8 1B FA	assets/Common/Home/hQ2uT_yaiphg/*.bin
+#LOADING     9A EC 03 C4 01 1E 42 C2 21 51 2F 7C BA 6D F9 EC 96 F6 85 F3 1C DB 1E 01 5D DD 3E 4E 30 63 A5 72 E6 F3 89 E9	assets/Common/Loading/Data.bin
+#BATTLE      71 1E 04 F5 47 7A 1C A2 3E 48 3B D8 95 89 28 52 4F 0E 17 37 04 C2 47 E1 E0 8F 95 64 D6 EB 8D 33 AF D9 AA 49 04 18 B9 C3 DE 9F 86 A6 95 53 D6 70	assets/Common/Battle/Asset/*.bin
+#EFFECT_ARC  44 00 35 C1 FF 14 C8 91 F3 1E 1F 6B CC 64 59 D8 BC C0 CB 8F BA 4E 70 9B 47 1E 7C 91 90 E4 43 EB D6 57 33 4F	assets/Common/Effect/arc/*.bin
+#SOUND_ARC   5A 60 70 80 A1 92 0C F5 27 82 92 58 1A 8A 56 7A 46 C7 F7 CD DD 2D 0C 3F A1 58 8A 2F 3F F5 B7 27 FB D7 EB 6A	assets/Common/Sound/arc/*.bin
+#WB          7C 98 E2 55 A7 C1 ED BF 8E 61 87 51 D3 BC 53 2C 01 16 5A BE C4 73 81 E7 CB 99 A8 47 A1 77 F5 9A 75 0A 27 30	assets/Common/Wb-4glP03ab/*.bin
+#HP          88 00 7A 39 9C E4 45 69 F0 EC F7 C1 3A 9D 1F E5 D9 06 0C C9 E8 1C BD 2C CB BB E3 9C 0F 5E CE 46 3C 7F DA A2 03 2F B6 AA B1 87 7C DB 59 A3 9F 40 4A 8F AE 5A FB 6A 8D FD A5 DA 49 18	assets/Common/Home/9h-bR4lQy/*.bin
+
 ENCR_KEY = [
     0x4B, 0x0D, 0xB4, 0x88, 0x61, 0x7C, 0x60, 0xA1,
     0x2B, 0x09, 0x40, 0xE9, 0xED, 0x92, 0xA6, 0x8F
@@ -204,7 +227,7 @@ rewardParser = [
     lambda data, idx: ({"kind": 0x21, "_type": "unknow"}, idx+1),
     lambda data, idx: ({"kind": 0x22, "_type": "havoc_axe", "count": getShort(data, idx+1)}, idx+3),
     lambda data, idx: ({"kind": 0x23, "_type": "background_music", "len": getByte(data, idx+1), "id_tag": xorString(data[idx+2:idx+2+getByte(data, idx+1)], [0])}, idx+2+getByte(data, idx+1)),
-    lambda data, idx: ({"kind": 0x24, "_type": "unknow"}, idx+1),
+    lambda data, idx: ({"kind": 0x24, "_type": "forma_torch", "count": getShort(data, idx+1), "len": getByte(data, idx+3), "id_tag": xorString(data[idx+4:idx+4+getByte(data, idx+3)], [0])}, idx+4+getByte(data, idx+3)),
     lambda data, idx: ({"kind": 0x25, "_type": "midgard_gem", "count": getShort(data, idx+1)}, idx+3),
     lambda data, idx: ({"kind": 0x26, "_type": "unknow"}, idx+1),
     lambda data, idx: ({"kind": 0x27, "_type": "divine_code", "count": getShort(data, idx+1), "len": getByte(data, idx+3), "id_tag": xorString(data[idx+4:idx+4+getByte(data, idx+3)], [0])}, idx+4+getByte(data, idx+3)),

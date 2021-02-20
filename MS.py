@@ -14,7 +14,7 @@ def MSInfobox(data: dict, nb: int):
     askrlv = util.askFor(r'\d+', f'What is the Askr Level on "Mjölnir\'s Strike {nb}" ?') or ""
     enemylv = util.askFor(r'\d+', f'What is the Enemy Level on "Mjölnir\'s Strike {nb}" ?') or ""
     return "{{Mjolnirs Strike Infobox\n" + \
-        f"|image=Mjolnirs Strike {nb}.jpg\n" + \
+        f"|image=Mjolnirs Strike {util.cleanStr(util.getName(data['unit_id']))}.jpg\n" + \
         "|mapImage={{MapLayout " + data['map_id'] + "}}\n" + \
         f"|startTime={data['shield_avail']['start']}\n" + \
         f"|endTime={(datetime.strptime(data['event_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}\n" + \

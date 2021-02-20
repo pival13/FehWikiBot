@@ -81,9 +81,9 @@ def ParalogueMap(mapId: str, StageScenario: dict=None, index: int=None, notif: s
                 if m['id_tag'][:-1] == mapId:
                     StageScenario = scenario
                     index = scenario['maps'][0]['scenarios'].index(m)
-                    notif = "Special Heroes: " + util.getName('MID_CHAPTER_'+StageScenario['id_tag']) + " (Notification)"
+                    notif = "Special Heroes Summoning Event: " + util.getName('MID_CHAPTER_'+StageScenario['id_tag']) + " (Notification)"
                     answer = util.askFor(None, "Is the notification '"+notif+"'?")
-                    notif = (not answer or re.match('y|o|yes|oui|', answer, re.IGNORECASE)) and notif or answer
+                    notif = notif if (not answer or re.match('y|o|yes|oui|', answer, re.IGNORECASE)) else answer
 
     SRPGMap = [util.readFehData("Common/SRPGMap/" + Id + ".json") for Id in [StageScenario['maps'][i]['scenarios'][index]["id_tag"] for i in range(3)]]
 
@@ -113,9 +113,9 @@ def StoryGroup(groupId: str):
 
 def ParalogueGroup(groupId: str):
     StageScenario = util.fetchFehData("Common/SRPG/StageScenario")[groupId]
-    notif = "Special Heroes: " + util.getName('MID_CHAPTER_'+StageScenario['id_tag']) + " (Notification)"
+    notif = "Special Heroes Summoning Event: " + util.getName('MID_CHAPTER_'+StageScenario['id_tag']) + " (Notification)"
     answer = util.askFor(None, "Is the notification '"+notif+"'?")
-    notif = (not answer or re.match('y|o|yes|oui|', answer, re.IGNORECASE)) and notif or answer
+    notif = notif = notif if (not answer or re.match('y|o|yes|oui|', answer, re.IGNORECASE)) else answer
 
     ret = {}
     for i in range(StageScenario['maps'][0]['scenario_count']):

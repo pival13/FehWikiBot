@@ -6,11 +6,18 @@ import re
 UNIT_IMAGE = util.fetchFehData("Common/SRPG/Person", "face_name")
 UNIT_IMAGE.update(util.fetchFehData("Common/SRPG/Enemy", "face_name"))
 UNIT_IMAGE.update({"ch00_00_Eclat_X_Normal": {'name': "Kiran"},
+                    "ch00_00_Eclat_X_Avatar00": {'name': "Kiran: Hero Summoner", 'id_tag': "EID_アバター"},
+                    "ch00_00_Eclat_M_Avatar01": {'name': "Kiran: Hero Summoner M01"},
+                    "ch00_00_Eclat_M_Avatar02": {'name': "Kiran: Hero Summoner M02"},
+                    "ch00_00_Eclat_M_Avatar03": {'name': "Kiran: Hero Summoner M03"},
+                    "ch00_00_Eclat_F_Avatar01": {'name': "Kiran: Hero Summoner F01"},
+                    "ch00_00_Eclat_F_Avatar02": {'name': "Kiran: Hero Summoner F02"},
+                    "ch00_00_Eclat_F_Avatar03": {'name': "Kiran: Hero Summoner F03"},
                     "ch00_13_Gustaf_M_Normal": {'name': "Gustav", 'id_tag': 'PID_グスタフ'},
                     "ch00_14_Henriette_F_Normal": {'name': "Henriette", 'id_tag': 'PID_ヘンリエッテ'},
                     "ch00_16_Freeze_M_Normal": {'name': "Hríd"},
                     "ch00_22_Tor_F_Normal": {'name': "Thórr", 'id_tag': 'PID_トール'},
-                    "ch00_32_Fafnir_M_Normal": {'name': 'Fáfnir', 'id_tag': 'EID_ファフニール'},
+                    "ch00_35_Eitri_F_Normal": {'name': 'Eitri', 'id_tag': 'EID_エイトリ'},
                     "ch00_36_MysteryHood_X_Normal": {'name': 'Mystery Hood'},
                     "ch90_02_FighterAX_M_Normal": {'name': ''}})
 
@@ -98,6 +105,47 @@ def parseStructure(obj, lang):
         wikitext += ["===Ending===\n{{StoryTextTableHeader}}\n" + '\n'.join(ending) + "\n{{StoryTextTableEnd}}"]
     return wikitext
 
+def Conversation(mapId, tag):
+    enJSON = {a['key']: a['value'] for a in util.readFehData("USEN/Message/Scenario/" + mapId + ".json")}
+    jaJSON = {a['key']: a['value'] for a in util.readFehData("JPJA/Message/Scenario/" + mapId + ".json")}
+    wikiTextUSEN = []
+    wikiTextJPJA = []
+
+    if tag in enJSON:
+        if tag + "_BGM" in enJSON:
+            wikiTextUSEN += ["{{StoryBGM|" + enJSON[tag+"_BGM"] + "}}"]
+        if tag + "_IMAGE" in enJSON:
+            wikiTextUSEN += ["{{StoryImage|" + enJSON[tag+"_IMAGE"] + "}}"]
+        wikiTextUSEN += parseScenario(enJSON[tag], "en")
+    else:
+        wikiTextUSEN = ["{{StoryImage|}}", "{{StoryTextTable||}}"]
+
+    if tag in jaJSON:
+        if tag + "_BGM" in jaJSON:
+            wikiTextJPJA += ["{{StoryBGM|" + jaJSON[tag+"_BGM"] + "}}"]
+        if tag + "_IMAGE" in jaJSON:
+            wikiTextJPJA += ["{{StoryImage|" + jaJSON[tag+"_IMAGE"] + "}}"]
+        wikiTextJPJA += parseScenario(jaJSON[tag], "ja")
+    else:
+        wikiTextJPJA = ["{{StoryImage|}}", "{{StoryTextTable|||ja}}"]
+
+    return '\n'.join(['{{tab/start}}{{tab/header|English}}','{{StoryTextTableHeader}}'] + wikiTextUSEN +
+                     ['{{StoryTextTableEnd}}','{{tab/header|Japanese}}','{{StoryTextTableHeader}}'] +
+                     wikiTextJPJA + ['{{StoryTextTableEnd}}','{{tab/end}}'])
+
+def StoryNavBar(mapId, prev, next):
+    answer = util.askFor(None, f"{mapId}: Previous story{prev != '' and (' is ' + prev + '?') or ''}")
+    if answer and re.match('n|no', answer, re.IGNORECASE):
+        prev = ""
+    elif answer and not re.fullmatch('y|o|yes|oui|', answer, re.IGNORECASE):
+        prev = answer
+    answer = util.askFor(None, f"{mapId}: Next story{next != '' and (' is ' + next + '?') or ''}")
+    if answer and re.match('n|no', answer, re.IGNORECASE):
+        next = ""
+    elif answer and not re.fullmatch('y|o|yes|oui|', answer, re.IGNORECASE):
+        next = answer
+    return '{{Story Navbar|' + prev + '|' + next + '}}'
+
 def Story(mapId: str):
     enJSON = {a['key']: a['value'] for a in util.readFehData("USEN/Message/Scenario/" + mapId + ".json")}
     jaJSON = {a['key']: a['value'] for a in util.readFehData("JPJA/Message/Scenario/" + mapId + ".json")}
@@ -113,21 +161,10 @@ def Story(mapId: str):
 
     pmapid = mapId[:-1] + str(int(mapId[-1]) -1)
     pmapid = util.getName(pmapid) != pmapid and util.getName(pmapid) or ''
-    answer = util.askFor(None, f"{mapId}: Previous story{pmapid != '' and (' is ' + pmapid + '?') or ''}")
-    if answer and re.match('n|no', answer, re.IGNORECASE):
-        pmapid = ""
-    elif answer and not re.fullmatch('y|o|yes|oui|', answer, re.IGNORECASE):
-        pmapid = answer
-
     nmapid = mapId[:-1] + str(int(mapId[-1]) +1)
     nmapid = util.getName(nmapid) != nmapid and util.getName(nmapid) or ''
-    answer = util.askFor(None, f"{mapId}: Next story{nmapid != '' and (' is ' + nmapid + '?') or ''}")
-    if answer and re.match('n|no', answer, re.IGNORECASE):
-        nmapid = ""
-    elif answer and not re.fullmatch('y|o|yes|oui|', answer, re.IGNORECASE):
-        nmapid = answer
+    navbar = StoryNavBar(mapId, pmapid, nmapid) + "\n"
 
-    navbar = '{{Story Navbar|' + pmapid + '|' + nmapid + '}}\n'
     return '\n'.join(outputWikitext + ['{{tab/start}}{{tab/header|English}}'] + wikiTextUSEN +
                      ['{{tab/header|Japanese}}'] + wikiTextJPJA + ['{{tab/end}}\n'+navbar])
 

@@ -203,6 +203,7 @@ BGM = {
     "BGM_MAP_BRAVE_05": "bgm_map_FEH_05.ogg",
     "BGM_MAP_BRAVE_06": "bgm_map_FEH_06.ogg",
     "BGM_MAP_BRAVE_07": "bgm_map_FEH_07.ogg",
+    "BGM_MAP_EVT_HAPPY_01": "bgm_event_happy1.ogg",
     "BGM_MAP_EVT_SERIOUS_01": "bgm_event_serious1.ogg",
     "BGM_MAP_EVT_SERIOUS_02": "bgm_event_serious2.ogg",
     "BGM_MAP_EVT_SERIOUS_03": "bgm_event_serious3.ogg",
@@ -211,6 +212,7 @@ BGM = {
     "BGM_MAP_FES_02_SAME": "bgm_map_fes_02.ogg",
     "BGM_MAP_FES_03_SAME": "bgm_map_fes_03.ogg",
     "BGM_MAP_FES_04_SAME": "bgm_map_fes_04.ogg",
+    "BGM_MAP_FES_05_SAME": "bgm_map_fes_05.ogg",
     "BGM_MAP_FE08_04": "bgm_mns_FE08_04.ogg",
     "BGM_MAP_FE10_07": "bgm_mns_FE10_01.ogg",
     "BGM_MAP_FE10_09": "bgm_mns_FE10_03.ogg",
@@ -330,7 +332,7 @@ def fehBotLogin():
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         return fehBotLogin()
 
-def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: str=None, group: str=None, order: str="_ID", limit: int="max"):
+def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: str=None, group: str=None, order: str="_pageID", limit: int="max"):
     ret = []
     offset = 0
     try:

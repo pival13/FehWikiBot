@@ -15,7 +15,9 @@ from HB import BHBMap, LHBMap, GHBMap
 from RD import RDmap
 from EventMap import exportEventMap
 from TT import TTMap
+from FB import FBMap
 from LL import LostLore as LLMap
+from HoF import HallOfForms as HoFMap
 from MS import MjolnirsStrike as MSMap
 from PoL import PawnsOfLoki as PoLMap
 
@@ -78,7 +80,7 @@ def parseMapId(mapId: str):
         exportGroup(ParalogueGroup(mapId))
 
     elif re.match(r"H\d{4}", mapId):
-        hero = util.getHeroName(int(re.compile(r"H(\d+)").match(mapId)[1]))
+        hero = util.getHeroName(int(re.match(r"H(\d+)", mapId)[1]))
         if hero:
             exportMap("Heroic Ordeals: " + hero + "'s Trial", HOmap(mapId))
         else:
@@ -154,7 +156,7 @@ from datetime import datetime
 from mapUtil import MapAvailability
 
 def findEvents(tag: str):
-    lastTBRevival = 7#Here to change
+    lastTBRevival = 8#Here to change
     lastTB = 19#Here to change
 
     #if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Tournament' + tag + '.bin.lz'): print(TODO + "New Voting Gauntlet")
@@ -170,16 +172,23 @@ def findEvents(tag: str):
         with open(__file__, 'r') as f: __file__Content = f.read()
         with open(__file__, 'w') as f: f.write(re.sub(r"lastTBRevival = \d+#Here to change", f"lastTBRevival = {lastTBRevival+1}#Here to change", __file__Content))
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Occupation/Data/' + tag + '.bin.lz'): print(TODO + "New Grand Conquests")
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'): print(TODO + "New Forging Bonds")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'):
+        try: exportGroup(FBMap(tag))
+        except: print(TODO + "New Forging Bonds")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'): print(TODO + "New Rokkr Sieges")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'):
-        exportGroup(LLMap(tag))
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/IdolTower/' + tag + '.bin.lz'): print(TODO + "New Hall of Forms")
+        try: exportGroup(LLMap(tag))
+        except: print(TODO + "Lost Lore")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/IdolTower/' + tag + '.bin.lz'):
+        try: exportGroup(HoFMap(tag))
+        except: print(TODO + "Hall of Form")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Mjolnir/BattleData/' + tag + '.bin.lz'):
-        exportGroup(MSMap(tag))
+        try: exportGroup(MSMap(tag))
+        except: print(TODO + "Mjölnir's Strike")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Encourage/' + tag + '.bin.lz'): print(TODO + "New Frontline Phalanx")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/BoardGame/' + tag + '.bin.lz'):
-        exportGroup(PoLMap(tag))
+        try: exportGroup(PoLMap(tag))
+        except: print(TODO + "Pawns of Loki")
 
 def findUpcoming():
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent/", False)
@@ -199,7 +208,10 @@ def main(arg):
         findUpcoming()
     else:
         for a in arg[1:]:
-            parseMapId(a)
+            try:
+                parseMapId(a)
+            except:
+                print(ERROR + "Failed to parse map " + a)
 
 
 from sys import argv

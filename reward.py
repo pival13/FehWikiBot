@@ -11,8 +11,8 @@ ITEM_KIND = [
     "Blessing", "Conquest Lance","Accessory","FB Conversation",	"",
     "Arena Crown", "Heroic Grail","Aether Stone","Throne","Summoning Ticket",
     "Dragonflower","","","","Havoc Axe",
-    "Music", "", "Midgard Gem", "", "Divine Code",
-    "", "", "", "", "Guardian Shield",
+    "Music", "Forma Torch", "Midgard Gem", "", "Divine Code",
+    "", "", "", "Forma Soul", "Guardian Shield",
     "Trait Fruit"
 ]
 
@@ -68,16 +68,6 @@ AETHER_STONE = {
 DIVINE_CODES = {
     '2020': ": Part 1",
     '2021': ": Part 2",
-    '202003': ": Ephemera 3",
-    '202004': ": Ephemera 4",
-    '202005': ": Ephemera 5",
-    '202006': ": Ephemera 6",
-    '202007': ": Ephemera 7",
-    '202008': ": Ephemera 8",
-    '202009': ": Ephemera 9",
-    '202010': ": Ephemera 10",
-    '202011': ": Ephemera 11",
-    '202012': ": Ephemera 12",
 }
 
 def parseReward(rewards: list):
@@ -93,18 +83,18 @@ def parseReward(rewards: list):
         if kind == "Hero":
             s += "{hero=" + util.getName(reward['id_tag']) + ";rarity=" + str(reward['rarity']) + "}"
         elif kind == "FB Conversation":
-            s += "{hero=" + DATA['M' + reward['id_tag']] + ";fbrank=" + (FB_RANK[reward['support_rank']] or reward['support_rank']) + "}"
+            s += "{hero=" + util.getName(reward['id_tag']) + ";fbrank=" + (FB_RANK[reward['support_rank']] or reward['support_rank']) + "}"
         elif kind == "Accessory":
             s += "{accessory=" + util.getName(reward['id_tag']) + "}"
         elif kind == "Sacred Seal":
-            s += "{seal=" + DATA['M' + reward['id_tag']] + "}"
+            s += "{seal=" + util.getName(reward['id_tag']) + "}"
         else:
             if kind == "Shard":
                 kind = COLOR[reward['shard_color']] + (reward['great'] and ' Crystal' or ' Shard')
             elif kind == "Badge":
                 kind = (reward['great'] and 'Great ' or '') + COLOR[reward['badge_color']+1] + ' Badge'
             elif kind == 'Aether Stone':
-                kind = AETHER_STONE[reward['id_tag']] or (reward['id_tag'] + 'Aether Stone')
+                kind = AETHER_STONE[reward['id_tag']] if reward['id_tag'] in AETHER_STONE else ('<!--'+reward['id_tag'] + ' Aether Stone-->')
             elif kind == 'Summoning Ticket':
                 kind = f"<!--Summoning Ticket: {[reward['id_tag']]}-->"
             elif kind == 'Dragonflower':
@@ -112,7 +102,10 @@ def parseReward(rewards: list):
             elif kind == 'Blessing':
                 kind = ELEMENT[reward['element']] + ' Blessing'
             elif kind == 'Divine Code':
-                kind += DIVINE_CODES[reward['id_tag']]
+                if len(reward['id_tag']) == 6:
+                    kind += f": Ephemera {int(reward['id_tag'][-2:])}"
+                else:
+                    kind += DIVINE_CODES[reward['id_tag']]
             s += "{kind=" + kind + (reward['count'] != 1 and (";count=" + str(reward['count'])) or "") + "}"
 
     return len(rewards) > 1 and ('[' + s + ']') or s

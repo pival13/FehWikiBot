@@ -44,6 +44,7 @@ def PoLInfobox(data: dict):
         bonus += ["{{Cwti|" + WEAPON_CATEGORY[nbonus] + "}}"]
     if len(bonus) == 1: bonus = bonus[0]
     else: bonus = "<br><!--\n-->".join([f"'''Round {i+1}''': {bonus[i]}" for i in range(len(bonus))])
+    if bonus == "{{Cwti|None}}": bonus = "All"
     return "{{Pawns of Loki Infobox\n" + \
         f"|startTime={data['event_avail']['start']}\n" + \
         f"|endTime={(datetime.strptime(data['event_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}\n" + \

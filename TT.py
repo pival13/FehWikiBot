@@ -122,7 +122,7 @@ def TTUnitData(SRPGMaps: list, startTime: str):
     for i in range(len(randomUnit)):
         s += f"====Enemy {i+2}: {randomUnit[i]['weapon']} {randomUnit[i]['move'].lower()} unit====\n"
         s += f"{{{{RandomTTUnits|WeaponClass={randomUnit[i]['weapon']}|MoveType={randomUnit[i]['move']}|Date=" + startTime[:10] +\
-            (f"|boss={util.getName(boss['id_tag'])}" if boss['regular_hero'] and MOVE[boss['move_type']] == randomUnit[i]['move'] else "") +\
+            (f"|boss={util.getName(boss['id_tag'])}" if 'regular_hero' in boss and boss['regular_hero'] and MOVE[boss['move_type']] == randomUnit[i]['move'] else "") +\
             ("|NoStaves=1" if randomUnit[i]['weapon'] == 'Ranged' and randomUnit[-1]['staff'] == 0 else '') + "}}\n"
 
     return s

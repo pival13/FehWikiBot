@@ -92,7 +92,7 @@ def main(start=None):
                     redirect(S, image['title'], acc)
                 else:
                     print(TODO + "Accessory with unknow name: " + image['title'])
-            elif re.match(r".*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger)?\.webp", image['name']):
+            elif re.match(r".*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger|Cry)?\d?\.webp", image['name']):
                 redirect(S, image['title'])
             elif re.match(r"GC[_ ]\d{6}([_ ]\d{2})?\.webp", image['name']):
                 print(TODO + "Grand conquest map: " + image['title'])
