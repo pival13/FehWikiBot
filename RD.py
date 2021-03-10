@@ -37,12 +37,15 @@ def drawRDMapLayout(mapLayout: dict):
     enemyWarpSpawn = re.compile(r"\{\{RDTerrain\|color=Enemy\|type=Warp Spawn\}\}")
     cellIsKind = lambda a, b, regex: a >= 0 and b >= 0 and a < len(mapNormal) and b < len(mapNormal[a]) and regex.search(mapLayout['map'][a][b])
 
+    #Case 2 Spawn cell
     if sum([sum([bool(enemySpawn.search(cell)) for cell in line]) for line in mapNormal]) == 2:
         mapNormal = [[enemySpawn.sub("", cell) if enemySpawn.search(cell) else cell for cell in line] for line in mapNormal]
+    #Case 2 Camp
     elif sum([sum([bool(enemyCamp.search(cell)) for cell in line]) for line in mapNormal]) == 2:
         mapNormal = [[re.sub("Warp Spawn", "Warp", mapNormal[i][j]) if cellIsKind(i, j, enemyWarpSpawn) and
             any([cellIsKind(x, y, enemyCamp) for (x, y) in [(i, j-1), (i, j+1), (i-1, j), (i+1, j)]])
                 else mapNormal[i][j] for j in range(len(mapNormal[i]))] for i in range(len(mapNormal))]
+    #Case 6 Warp Spawn. In this case, Warp Spawn next to only one warp spawn are remove
     elif sum([sum([bool(enemyWarpSpawn.search(cell)) for cell in line]) for line in mapNormal]) == 6:
         mapNormal = [[re.sub("Warp Spawn", "Warp", mapNormal[i][j]) if cellIsKind(i, j, enemyWarpSpawn) and
             any([cellIsKind(x, y, enemyCamp) and cellIsKind(x2, y2, enemyWarpSpawn) for (x, y, x2, y2) in [(i, j-1, i, j-2), (i, j+1, i, j+2), (i-1, j, i-2, j), (i+1, j, i+2, j)]])

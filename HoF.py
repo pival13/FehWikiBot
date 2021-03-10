@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-from datetime import datetime, timedelta
 import json
 from os.path import isfile
 from num2words import num2words
@@ -16,7 +15,7 @@ def HoFInfobox(data: dict, nb: int):
         f"|promoArt=Hall of Forms {nb}.jpg\n" + \
         f"|forma={','.join([util.getName(unit) for unit in data['forma']['heroes']])}\n" + \
         f"|startTime={data['avail']['start']}\n" + \
-        f"|endTime={(datetime.strptime(data['avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}\n}}}}"
+        f"|endTime={util.timeDiff(data['avail']['finish'])}\n}}}}"
 
 def HoFRewards(data: dict):
     s = "==Rewards==\n===Daily rewards===\n{{#invoke:Reward/HallOfForms|daily\n"

@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 from datetime import datetime
+import re
 
 from util import DATA, DIFFICULTIES
 import util
@@ -41,20 +42,26 @@ def TDUnitData(SRPGMap: dict, StageEvent):
             mapUtil.UnitData(SRPGMap) + "}}\n"
 
 def Solution(SRPGMap: dict):
-    return "==Solutions==\n===Text===\n#\n" + \
-           "{| class=\"wikitable default mw-collapsed mw-collapsible\"\n! Map visual after the ? enemy phase\n|-\n|" + \
-            mapUtil.MapImage(SRPGMap['field'], simpleMap=True, units=SRPGMap['units']) + "\n|}\n"
+    layout = mapUtil.MapImage(SRPGMap['field'], simpleMap=True)
+    baseMap = re.search(r'baseMap=(\w*)', layout)
+    backdrop = re.search(r'backdrop=(\w*)', layout)
+    wallStyle = re.search(r'style=([^}|]*)', layout)
+    walls = re.findall(r'(\w{2})=\{\{Wall.*?hp=(.)', layout)
+    return "==Solutions==\n" + \
+           "{{#invoke:TacticsDrillsSolution|main\n" + \
+          f"|baseMap={baseMap and baseMap[1] or ''}|backdrop={backdrop and backdrop[1] or ''}\n" + \
+          f"|wallStyle={wallStyle and wallStyle[1] or ''}" + \
+          f"|wall={{{';'.join([wall[0]+'='+wall[1] for wall in walls])}}}\n" + \
+           "|turn1=[\n]\n}}\n"
 
 def TDmap(mapId: str):
     SRPGMap = util.readFehData("Common/SRPGMap/" + mapId + ".json")
     StageEvent = util.fetchFehData("Common/SRPG/StagePuzzle")[mapId]
 
-    startTime = datetime.strptime(StageEvent['avail']['start'], '%Y-%m-%dT%H:%M:%SZ')
     SRPGMap['field'].update({'player_pos': SRPGMap['player_pos']})
 
-    content = TDMapInfobox(StageEvent, SRPGMap['field'])
-    content += "\n"
-    content += mapUtil.MapAvailability(StageEvent['avail'] or {}, "New Tactics Drills! (" + startTime.strftime("%b %d, %Y").replace(" 0", " ") + ") (Notification)")
+    content = TDMapInfobox(StageEvent, SRPGMap['field']) + "\n"
+    content += mapUtil.MapAvailability(StageEvent['avail'] or {}, "New Tactics Drills! (" + datetime.strptime(StageEvent['avail']['start'], UTIL.TIME_FORMAT).strftime("%b %d, %Y").replace(" 0", " ") + ") (Notification)")
     content += TDText(mapId)
     content += TDUnitData(SRPGMap, StageEvent)
     content += Solution(SRPGMap)

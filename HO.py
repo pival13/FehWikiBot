@@ -23,27 +23,20 @@ SERIES_BGM = [
     ["bgm_map_FEG_01.ogg", "bgm_menu_theme01.ogg"],
 ]
 
-def getUnitRelease(heroID: int):
-    try:
-        result = requests.get(url=URL, params={
-            "action": "cargoquery",
-            "tables": "Units",
-            "fields": "ReleaseDate",
-            "where": "IntID=" + str(heroID),
-            "limit": 1,
-            "format": "json"
-        }).json()
-        return result['cargoquery'][0]['title']['ReleaseDate'] if 'cargoquery' in result and len(result['cargoquery']) else None
+def getHeroJson(heroId: int):
+    HERO = fetchFehData("Common/SRPG/Person", False)
 
-    except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        return getUnitRelease(heroID)
+    for hero in HERO:
+        if hero['id_num'] == heroId:
+            return hero
+    return {}
 
 def HOmap(mapId: str):
     heroId = int(mapId[1:])
-    hero = util.getHeroJson(heroId)
+    hero = getHeroJson(heroId)
     SRPGMap = util.readFehData("Common/SRPGMap/" + mapId + ".json")
     diff = heroId < 191 and 'Normal' or heroId < 317 and 'Hard' or 'Lunatic'
-    release = getUnitRelease(heroId)
+    release = util.cargoQuery("Units", "ReleaseDate", "IntID="+str(heroID), limit=1)[0]["ReleaseDate"]
 
     SRPGMap['field'].update({'player_pos': SRPGMap['player_pos']})
 
@@ -58,7 +51,7 @@ def HOmap(mapId: str):
         'stam': {diff: 0},
         'reward': {diff: [{"kind": 30, "move_type": hero['move_type'], "count": (heroId < 191 and 2 or heroId < 317 and 8 or 40)}]},
         'requirement': "The ordeal challenger must<br>defeat at least 2 foes.<br>All allies must survive.<br>Turns to win: 20",
-        'bgms': [SERIES_BGM[hero['series']][0], SERIES_BGM[hero['series']][1]]
+        'bgms': SERIES_BGM[hero['series']]
     }) + "\n"
     content += mapUtil.MapAvailability({ 'start': ((release + 'T07:00:00Z') if release else None) })
     content += "==Unit data==\n{{#invoke:UnitData|main\n|" + diff + "=" + mapUtil.UnitData(SRPGMap) + "\n}}\n"

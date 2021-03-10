@@ -90,15 +90,16 @@ def EventMapInfobox(StageEvent: dict, group: str):
         'id_tag': StageEvent['id_tag'],
         'banner': 'Banner ' + StageEvent['banner_id'] + '.webp',
         'group': group,
-        'requirement': '',
+        'requirement': [],
         'lvl': {}, 'rarity': {}, 'stam': {}, 'reward': {},
         'map': {'id': StageEvent['id_tag'], 'player_pos': []},
         'bgms': util.getBgm(StageEvent['id_tag'])
     }
-    info['requirement'] += 'All allies must survive.' if StageEvent['scenarios'][-1]['survives'] else ''
-    info['requirement'] += (info['requirement'] != '' and '<br>' or '') + "Cannot use {{It|Light's Blessing}}." if StageEvent['scenarios'][-1]['no_lights_blessing'] else ''
-    info['requirement'] += (info['requirement'] != '' and '<br>' or '') + f"Turns to win: {StageEvent['scenarios'][-1]['turns_to_win']}" if StageEvent['scenarios'][-1]['turns_to_win'] != 0 else ''
-    info['requirement'] += (info['requirement'] != '' and '<br>' or '') + f"Turns to defend: {StageEvent['scenarios'][-1]['turns_to_defend']}" if StageEvent['scenarios'][-1]['turns_to_defend'] != 0 else ''
+    if StageEvent['scenarios'][-1]['survives']:             info['requirement'] += ['All allies must survive.']
+    if StageEvent['scenarios'][-1]['no_lights_blessing']:   info['requirement'] += ["Cannot use {{It|Light's Blessing}}."]
+    if StageEvent['scenarios'][-1]['turns_to_win'] != 0:    info['requirement'] += [f"Turns to win: {StageEvent['scenarios'][-1]['turns_to_win']}"]
+    if StageEvent['scenarios'][-1]['turns_to_defend'] != 0: info['requirement'] += [f"Turns to defend: {StageEvent['scenarios'][-1]['turns_to_defend']}"]
+    info['requirement'] = '<br>'.join(info['requirement'])
 
     if StageEvent['scenarios'][-1]['reinforcements']:
         info['mode'] = 'Reinforcement Map'
@@ -200,11 +201,9 @@ def readPersonalJson(file: str):
 from sys import argv
 
 if __name__ == '__main__':
-    #
-    # json.dump(UNITS, open('units.json', 'w'), indent=2, ensure_ascii=False)
-    if len(argv) == 3 and len(argv[1]) == 5 and len(argv[2]) == 5 and argv[1][0] == 'V' and argv[2][0] == 'V' and int(argv[1][1:]) < int(argv[2][1:]):
+    if len(argv) == 3 and re.match(r"^V\d{4}$", argv[1]) and re.match(r"^V\d{4}$", argv[2]) and int(argv[1][1:]) < int(argv[2][1:]):
         print(json.dumps(EventGroup(argv[1], argv[2]), indent=2))
-    elif len(argv) == 2 and len(argv[1]) == 5 and argv[1][0] == 'V':
+    elif len(argv) == 2 and re.match(r"^V\d{4}$", argv[1]):
         print(json.dumps(EventMap(argv[1]), indent=2))
     elif len(argv) == 2:
         readPersonalJson(argv[1])

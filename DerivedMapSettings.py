@@ -311,7 +311,8 @@ DERIVED_SETTINGS = [
     }
 ]
 
-MY_DERIVED_SETTINGS = [
+# Possisbility of reorganization
+REORGANIZED_DERIVED_SETTINGS = [
     {
         'value': [ {'name': 'squad_assault', 'diff': ['Lunatic']} ],
         'mapCond': [ {'true_lv': 50, 'rarity': 5, 'promotion_tier': 1, 'hp_factor': 130} ],

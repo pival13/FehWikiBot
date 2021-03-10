@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 from os.path import isfile
 from num2words import num2words
@@ -47,18 +47,18 @@ def PoLInfobox(data: dict):
     if bonus == "{{Cwti|None}}": bonus = "All"
     return "{{Pawns of Loki Infobox\n" + \
         f"|startTime={data['event_avail']['start']}\n" + \
-        f"|endTime={(datetime.strptime(data['event_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}\n" + \
+        f"|endTime={util.timeDiff(data['event_avail']['finish'])}\n" + \
         "|bonus=" + bonus + "\n}}"
 
 def PoLAvailability(data: dict):
     s = "==Availability==\nThis [[Pawns of Loki]] event was made available:\n" + \
-        f"* {{{{HT|{data['event_avail']['start']}}}}} – {{{{HT|{(datetime.strptime(data['event_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}}}}} " + \
+        f"* {{{{HT|{data['event_avail']['start']}}}}} – {{{{HT|{util.timeDiff(data['event_avail']['finish'])}}}}} " + \
         f"([[Pawns of Loki Is Here! ({datetime.strptime(data['event_avail']['start'], util.TIME_FORMAT).strftime('%b %d, %Y').replace(' 0', ' ')}) (Notification)|Notification]])"
     if data['nbRound'] > 1:
         for r in range(data['nbRound']):
-            s += f"\n** '''Round {r+1}: " + \
+            s += f"\n** '''Round {r+1}''': " + \
                 f"{{{{HT|{data['round_avails'][r]['start']}}}}} – " + \
-                f"{{{{HT|{(datetime.strptime(data['round_avails'][r]['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}}}}}"
+                f"{{{{HT|{util.timeDiff(data['round_avails'][r]['finish'])}}}}}"
     return s
 
 def PoLRewards(data: dict):

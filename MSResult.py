@@ -31,12 +31,12 @@ if __name__ == '__main__':
 
 
         page = wikiUtil.getPageContent([f"Mjölnir's Strike {nb}"])[f"Mjölnir's Strike {nb}"]
-        page = re.sub(r'\|askrLV=.*\n', f'|askrLV={int(lvs[0])}\n', page)
-        page = re.sub(r'\|strikeLV=.*\n', f'|strikeLV={int(lvs[1])}\n', page)
-        page = re.sub(r'\|askrScore=.*\n', f'|askrScore={allyScore}\n', page)
-        page = re.sub(r'\|strikeScore=.*\n', f'|strikeScore={enemyScore}\n', page)
-        page = re.sub(r'\|timesStronger=.*\n', f'|timesStronger={timeStronger}\n', page)
-        page = re.sub(r'\{\{MjolnirStrikeResults[^}]*\}\}', s, page)
+        page = re.sub(r'\|askrLV=.*?\n', f'|askrLV={int(lvs[0])}\n', page)
+        page = re.sub(r'\|strikeLV=.*?\n', f'|strikeLV={int(lvs[1])}\n', page)
+        page = re.sub(r'\|askrScore=.*?\n', f'|askrScore={allyScore}\n', page)
+        page = re.sub(r'\|strikeScore=.*?\n', f'|strikeScore={enemyScore}\n', page)
+        page = re.sub(r'\|timesStronger=.*?\n', f'|timesStronger={timeStronger}\n', page)
+        page = re.sub(r'\{\{MjolnirStrikeResults[^}]*?\}\}', s, page)
 
         wikiUtil.waitSec(10)
         print(wikiUtil.exportPage(f"Mjölnir's Strike {nb}", page, "Bot: Mjölnir's Strike result", True))

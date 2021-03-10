@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-from datetime import datetime, timedelta
 import json
 import re
 from os.path import isfile
@@ -24,18 +23,13 @@ def LLInfobox(data: dict, enemies: list):
         f"|locations={','.join([util.getName('MID_TRIP_PLACE_'+d['id_tag']) for d in data['maps']])}\n" + \
         f"|strikeFoes=" + ",".join(list(dict.fromkeys(foes))) + "\n" + \
         f"|startTime={data['avail']['start']}\n" + \
-        f"|endTime={(datetime.strptime(data['avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}"+"\n}}"
-
-def LLAvailability(data: dict):
-    return "==Availability==\nThis [[Lost Lore]] event was made available:\n" + \
-        f"* {{{{HT|{data['avail']['start']}}}}} – " + \
-        f"{{{{HT|{(datetime.strptime(data['avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}}}}} " + \
-        f"([[Lost Lore ({util.getName('MID_TRIP_TITLE_' + data['id_tag'])}) (Notification)|Notification]])"
+        f"|endTime={util.timeDiff(data['avail']['finish'])}"+"\n}}"
 
 def LLRewards(data: dict):
     s = "==Rewards==\n{{#invoke:Reward/LostLore|lines|extraTeams=" + ",".join([str(t) for t in extraTeams]) + "\n"
     for r in data['loreRewards']:
         if int(r['lines'] / 3600) in extraTeams: r['reward'] += [{"kind": -1, "_type": "Lost Lore Team", "count": 1}]
+        #First format will transform it into {:<nb}, second format will return the number right padded to nb spaces
         score = "{{:<{}}}".format(len(str(int(data['loreRewards'][-1]['lines']/3600)))).format(int(r['lines']/3600))
         s += f" | {score} = " + parseReward(r['reward']) + "\n"
     return s + "}}"
@@ -66,6 +60,7 @@ def LLLocation(data: dict):
             ("linesReq" if location['lines'] != 0 else "isCombat"): int(location['lines'] / 3600) if location['lines'] != 0 else 1,
             "rewards": parseReward(location['clearReward'] + [{"kind": -1, "_type": "Saga's " + util.getName(f"MID_TRIP_SAGA_SECTION_{data['maps'].index(location)+1}"), "count": 1}])
         }
+        #Convert a json object into lua object
         loc = re.sub('": "?', "=", re.sub(r'"?, "', ";", json.dumps(loc).replace("{\"", "{").replace("\"}", "}")))
         req = ",".join([str(d["map_idx"]) for d in location['required'] if d["map_idx"] != -1])
         if (req or "") in require: require[req or ""] += [loc]
@@ -101,7 +96,7 @@ def LostLore(tag: str):
             continue
         enemies = [d['combatUnits'] for d in data['maps'] if d['combatUnits']]
         s = LLInfobox(data, enemies) + "\n"
-        s += LLAvailability(data) + "\n"
+        s += mapUtil.Availability(data['avail'], f"Lost Lore ({util.getName('MID_TRIP_TITLE_' + data['id_tag'])}) (Notification)", "[[Lost Lore]] event") + "\n"
         s += LLRewards(data) + "\n"
         s += LLSaga(data, tag) + "\n"
         s += LLLocation(data) + "\n"

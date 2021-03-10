@@ -16,8 +16,6 @@ def getRequiredStage(mapId: str):
     return {}
 
 def getDerivedSettings(dMap: list, groupId: str, index):
-    ok = True
- #   print(json.dumps((dMap, groupId, index), indent=2))
     for settings in DERIVED_SETTINGS:
         ok = True
         if len(settings['mapCond']) == len(dMap):
@@ -29,7 +27,6 @@ def getDerivedSettings(dMap: list, groupId: str, index):
                 for i in range(len(settings['extraCond'])):
                     if settings['extraCond'][i](groupId, index):
                         return settings['value'][i]
-
     return {'name': '', 'diff': []}
 
 def DerivedUnitData(derivedMap, i: int, newId: str):
@@ -38,24 +35,20 @@ def DerivedUnitData(derivedMap, i: int, newId: str):
     SRPGMap = util.readFehData("Common/SRPGMap/" + derivedMap[0]['map_id'] + ".json")
     dSett = getDerivedSettings(derivedMap, newId, i-1)
 
-    allyPos = ""
+    allyPos = []
     for ally in SRPGMap['player_pos']:
-        if ally != SRPGMap['player_pos'][0]:
-            allyPos += ','
-        allyPos += str(chr(ally['x'] + ord('a'))) + str(ally['y'] + 1)
+        allyPos += [str(chr(ally['x'] + ord('a'))) + str(ally['y'] + 1)]
 
-    derivedTabs = ""
+    derivedTabs = []
     if len(dSett['diff']) != 0:
         for j in range(len(derivedMap)):
-            if j != 0:
-                derivedTabs += ";"
-            derivedTabs += dSett['diff'][j] + "=" + MapIdToDiff(derivedMap[j]['map_id'])
+            derivedTabs += [dSett['diff'][j] + "=" + MapIdToDiff(derivedMap[j]['map_id'])]
 
     return "{{#invoke:UnitData|main" + \
         f"|mapImage={mapUtil.MapImage(SRPGMap['field'], True).replace('{{MapLayout', '{{#invoke:MapLayout|map')}" + \
-        f"|allyPos={allyPos}|battle={i}|derived={dSett['name']}" + \
+        f"|allyPos={','.join(allyPos)}|battle={i}|derived={dSett['name']}" + \
         f"|derivedMap={util.getName('MID_STAGE_' + derivedMap[0]['map_id'][0:5])}" + \
-        "|derivedTabs={" + derivedTabs + "} }}\n"
+        "|derivedTabs={" + ';'.join(derivedTabs) + "} }}\n"
 
 def UnitDataSA(maps: dict):
     content = "==Unit data==\n"
@@ -70,8 +63,7 @@ def SquadAssault(mapId: str):
     startTime = util.askFor(r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z|)", f"StartTime of {DATA['MID_STAGE_TITLE_'+mapId]}:") or ''
     notif = util.askFor(r".+ \(Notification\)", f"Notification of {DATA['MID_STAGE_TITLE_'+mapId]}:") or ''
 
-    content = ""
-    content += mapUtil.MapInfobox({
+    content = mapUtil.MapInfobox({
         'id_tag': mapId,
         'group': "Squad Assault",
         'lvl': {diff: StageEvent['scenario']['true_lv']},
@@ -139,8 +131,7 @@ def ChainChallengeMap(mapId: str, StageEvent: dict=None, index: int=None, notif:
                     StageEvent['avail']['start'] = StageEvent['avail']['start'] or req['avail']['start']
                     notif = util.askFor(None, "What is the notification for \33[3mChain Challenge: " + (StageEvent['book'] and f"Book {ROMAN[StageEvent['book']]}, " or '') + DATA["MID_STAGE_TITLE_"+mapId] + f"\33[0m ({mapId})?") or ''
 
-    content = ""
-    content += MapInfoboxCC(StageEvent, index)
+    content = MapInfoboxCC(StageEvent, index)
     content += BasedCC(StageEvent, index) + "\n"
     content += mapUtil.MapAvailability({'start': StageEvent['avail']['start']}, notif, "[[Chain Challenge]]") + "{{clear|right}}\n\n"
     content += UnitDataCC(StageEvent, index)
@@ -164,6 +155,7 @@ def ChainChallengeGroup(groupId: str):
     return ret
 
 def BlessedGarden(groupId: str):
+    #TODO Maybe
     return
 
 from sys import argv

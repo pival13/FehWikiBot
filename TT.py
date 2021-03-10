@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-from datetime import datetime, timedelta
 import json
 import re
 
@@ -58,7 +57,7 @@ def TTInfobox(StageEvent: str):
         "|rewardHeroes=" + ','.join([util.getName(hero) for hero in rewardsHeroes]) + '\n' + \
         "|bonusHeroes=" + ','.join([util.getName(hero) for hero in heroes]) + '\n' + \
         "|startTime=" + StageEvent['avail']['start'] + '\n' + \
-        "|endTime=" + (datetime.strptime(StageEvent['avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)  + '\n' + \
+        "|endTime=" + util.timeDiff(StageEvent['avail']['finish']) + '\n' + \
         "|maps=" + ' &<br>'.join(maps).replace(' &', ',', len(maps)-2) + '\n' + \
         "}}\n"
 
@@ -146,7 +145,7 @@ def TTContent(StageEvent: dict):
 
     return content
 
-def TTMap(mapTagId: str) -> dict:
+def TempestTrials(mapTagId: str) -> dict:
     if re.match(r'W\d{4}', mapTagId):
         tagId = getTTTag(mapTagId)
     elif re.match(r'\d+_\w+', mapTagId):
@@ -165,6 +164,6 @@ from sys import argv
 if __name__ == '__main__':
     for arg in argv[1:]:
         if re.match(r'W\d{4}', arg) or re.match(r'\d+_\w+', arg):
-            print(TTMap(arg))
+            print(TempestTrials(arg))
         else:
             print("Either a mapId (W\\d{4}) or a tagId (\\d+_\\w+) is expected")

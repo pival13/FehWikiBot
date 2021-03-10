@@ -26,18 +26,16 @@ def getBHBHero(mapId: str):
     if heroesName[0][0] == mapName[0] and heroesName[1][0] == mapName[4] and mapName[0] != mapName[4]:
         return heroes
     elif heroesName[0][0] == mapName[4] and heroesName[1][0] == mapName[0] and mapName[0] != mapName[4]:
-        heroes[0], heroes[1] = heroes[1], heroes[0]
-        return heroes
+        return [heroes[1], heroes[0]]
     elif mapName[0] != mapName[4]:
-        print(ERROR + "Unexpected heroes on " + mapId + ': ' + ' '.join(heroesName))
+        print(ERROR + "Unexpected heroes on " + mapId + ': ' + ', '.join(heroesName))
     else:
         while True:
             rep = util.askFor(f"{heroesName[0]}|{heroesName[1]}|1|2", f"Which unit is the first one {heroesName[0]} or {heroesName[1]}?")
             if rep and (rep == '1' or rep == heroesName[0]):
                 return heroes
             elif rep and ((rep == '2' or rep == heroesName[1])):
-                heroes[0], heroes[1] = heroes[1], heroes[0]
-                return heroes
+                return [heroes[1], heroes[0]]
 
 def HBMapInfobox(StageEvent: dict, group: str, SRPGMap: dict=None):
     if SRPGMap and 'field' in SRPGMap and 'player_pos' in SRPGMap:
@@ -51,10 +49,11 @@ def HBMapInfobox(StageEvent: dict, group: str, SRPGMap: dict=None):
         'map': SRPGMap and 'field' in SRPGMap and SRPGMap['field'] or {'id': StageEvent['id_tag'], 'player_pos': []},
         'bgms': util.getBgm(StageEvent['id_tag'])
     }
-    info['requirement'] += 'All allies must survive.' if StageEvent['scenarios'][-1]['survives'] else ''
-    info['requirement'] += (info['requirement'] != '' and '<br>' or '') + "Cannot use {{It|Light's Blessing}}." if StageEvent['scenarios'][-1]['no_lights_blessing'] else ''
-    info['requirement'] += (info['requirement'] != '' and '<br>' or '') + f"Turns to win: {StageEvent['scenarios'][-1]['turns_to_win']}" if StageEvent['scenarios'][-1]['turns_to_win'] != 0 else ''
-    info['requirement'] += (info['requirement'] != '' and '<br>' or '') + f"Turns to defend: {StageEvent['scenarios'][-1]['turns_to_defend']}" if StageEvent['scenarios'][-1]['turns_to_defend'] != 0 else ''
+    if StageEvent['scenarios'][-1]['survives']:             info['requirement'] += ['All allies must survive.']
+    if StageEvent['scenarios'][-1]['no_lights_blessing']:   info['requirement'] += ["Cannot use {{It|Light's Blessing}}."]
+    if StageEvent['scenarios'][-1]['turns_to_win'] != 0:    info['requirement'] += [f"Turns to win: {StageEvent['scenarios'][-1]['turns_to_win']}"]
+    if StageEvent['scenarios'][-1]['turns_to_defend'] != 0: info['requirement'] += [f"Turns to defend: {StageEvent['scenarios'][-1]['turns_to_defend']}"]
+    info['requirement'] = '<br>'.join(info['requirement'])
 
     if StageEvent['scenarios'][-1]['reinforcements']:
         info['mode'] = 'Reinforcement Map'
@@ -65,8 +64,6 @@ def HBMapInfobox(StageEvent: dict, group: str, SRPGMap: dict=None):
         info['stam'].update({diff: StageEvent['scenarios'][index]['stamina']})
         info['reward'].update({diff: StageEvent['scenarios'][index]['reward']})
 
-    if SRPGMap and SRPGMap != {}:
-        "Toto"
     return mapUtil.MapInfobox(info)
 
 def HBUnitData(StageEvent: dict, SRPGMap: dict, hero):
@@ -80,25 +77,24 @@ def HBUnitData(StageEvent: dict, SRPGMap: dict, hero):
     if StageEvent['scenarios'][-1]['reinforcements']:
         s += "\n|mapImage=" + mapUtil.MapImage(SRPGMap and 'field' in SRPGMap and SRPGMap['field'] or {'id': StageEvent['id_tag']}, True, True)
     if SRPGMap and 'units' in SRPGMap:
-        "Toto"
+        #TODO unit data is present in assets files
+        pass
         #for idiff in range(len(SRPGMap)):
         #    s += "|" + DIFFICULTIES[StageEvent['maps'][idiff]['scenarios'][index]['difficulty']] + "="
         #    s += mapUtil.UnitData(SRPGMap[idiff]) + "\n"
     else:
-        for idiff in range(StageEvent['scenario_count']):
-            s += '\n|' + DIFFICULTIES[StageEvent['scenarios'][idiff]['difficulty']] + '='
+        for idiff, scenario in enumerate(StageEvent['scenario_count']):
+            s += '\n|' + DIFFICULTIES[scenario['difficulty']] + '='
             units = []
-            for i in range(StageEvent['scenarios'][idiff]['difficulty'] > 2 and 6 or 5):
-                units += [{'rarity': StageEvent['scenarios'][idiff]['stars'], 'true_lv': StageEvent['scenarios'][idiff]['true_lv']}]
-                if idiff > 2 and i != 0:
-                    units[-1]['refine'] = 1
-            for i in range(len(hero)):
-                units[i]['id_tag'] = hero[i]['id_tag']
+            for i in range([True for w in scenario['enemy_weps'] if w != -1]):
+                units += [{'rarity': scenario['stars'], 'true_lv': scenario['true_lv']}]
+                if idiff > 2: units[-1]['refine'] = True
+            for i, h in enumerate(hero):
+                units[i]['id_tag'] = h['id_tag']
                 units[i]['cooldown_count'] = None
-            if StageEvent['scenarios'][idiff]['reinforcements']:
-                units += [{'rarity': StageEvent['scenarios'][idiff]['stars'], 'true_lv': StageEvent['scenarios'][idiff]['true_lv'], 'spawn_count': 0}]
-                if idiff > 2:
-                    units[-1]['refine'] = 1
+            if scenario['reinforcements']:
+                units += [{'rarity': scenario['stars'], 'true_lv': scenario['true_lv'], 'spawn_count': 0}]
+                if idiff > 2: units[-1]['refine'] = True
             s += mapUtil.UnitData({'units': units})
     return s + "\n}}\n"
 
@@ -108,11 +104,9 @@ def LHBMap(mapId: str):
 
     hero = getHeroWithName(util.getName(mapId))
     kind = hero['legendary']['element'] > 4 and 'Mythic Hero Battle' or 'Legendary Hero Battle'
-    startTime = datetime.strptime(StageEvent['avail']['start'], '%Y-%m-%dT%H:%M:%SZ')
 
-    content = ""
-    content += HBMapInfobox(StageEvent, kind, SRPGMap) + "\n"
-    content += mapUtil.MapAvailability(StageEvent['avail'], f"{kind}! ({startTime.strftime('%b %Y')}) (Notification)", f"[[{kind}]]")
+    content =  HBMapInfobox(StageEvent, kind, SRPGMap) + "\n"
+    content += mapUtil.MapAvailability(StageEvent['avail'], f"{kind}! ({datetime.strptime(StageEvent['avail']['start'], util.TIME_FORMAT).strftime('%b %Y')}) (Notification)", f"[[{kind}]]")
     content += HBUnitData(StageEvent, SRPGMap, hero) + '\n'
     content += Story(mapId) + "\n"
     content += "==Trivia==\n*\n"
@@ -131,9 +125,8 @@ def BHBMap(mapId: str):
     else:
         name = name.replace(name[0], DATA["M"+heroes[1]['id_tag']], 2).replace(DATA["M"+heroes[1]['id_tag']], DATA["M"+heroes[0]['id_tag']], 1)
 
-    content = ""
-    content += HBMapInfobox(StageEvent, "Bound Hero Battle", SRPGMap) + "\n"
-    content += mapUtil.MapAvailability(StageEvent['avail'], f"Bound Hero Battle: {DATA['M'+heroes[0]['id_tag']]} & {DATA['M'+heroes[1]['id_tag']]} (Notification)", "map was a [[Bound Hero Battle]] map which")
+    content =  HBMapInfobox(StageEvent, "Bound Hero Battle", SRPGMap) + "\n"
+    content += mapUtil.MapAvailability(StageEvent['avail'], f"Bound Hero Battle: {DATA['M'+heroes[0]['id_tag']]} & {DATA['M'+heroes[1]['id_tag']]} (Notification)", "[[Bound Hero Battle]]")
     content += HBUnitData(StageEvent, SRPGMap, heroes) + '\n'
     content += Story(mapId) + "\n"
     content += "==Trivia==\n*\n"
@@ -148,8 +141,7 @@ def GHBMap(mapId: str):
 
     hero = getHeroWithName(util.getName(mapId))
 
-    content = ""
-    content += HBMapInfobox(StageEvent, "Grand Hero Battle", SRPGMap) + "\n"
+    content =  HBMapInfobox(StageEvent, "Grand Hero Battle", SRPGMap) + "\n"
     content += mapUtil.MapAvailability(StageEvent['avail'], f"Grand Hero Battle - {util.getName(mapId)} (Notification)", "[[Grand Hero Battle]]")
     content += HBUnitData(StageEvent, SRPGMap, hero) + '\n'
     content += Story(mapId) + "\n"
@@ -162,12 +154,14 @@ def GHBMap(mapId: str):
 from sys import argv
 
 if __name__ == '__main__':
-    if len(argv) != 2 or len(argv[1]) != 5:
-        exit(0)
-    if argv[1][0] == 'T' and util.getName(argv[1])[2] == '&':
-        maps = list(BHBMap(argv[1]).items())[0]
-        print(maps[0], maps[1], sep='\n')
-    elif argv[1][0] == 'T':
-        print(GHBMap(argv[1]))
-    elif argv[1][0] == 'L':
-        print(LHBMap(argv[1]))
+    for arg in argv[1:]:
+        try:
+            if arg[0] == 'T' and util.getName(arg)[2] == '&':
+                maps = list(BHBMap(arg).items())[0]
+                print(maps[0], maps[1], sep='\n')
+            elif arg[0] == 'T':
+                print(GHBMap(arg))
+            elif arg[0] == 'L':
+                print(LHBMap(arg))
+        except:
+            print("Error with " + arg)

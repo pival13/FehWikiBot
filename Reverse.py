@@ -743,11 +743,11 @@ def parseShadow(data):#Rokkr Siege #TODO
             "_unknow11": hex(util.getLong(data, offGr+0x1F0)),
             "_unknow12": hex(util.getLong(data, offGr+0x1F8)),
             "units": [[{
-                "id_tag": util.getString(data, util.getLong(data, offGr+0x200)+0x30*iUni+0x120*iDiff),
-                "assist": util.getString(data, util.getLong(data, offGr+0x200)+0x10+0x30*iUni+0x120*iDiff),
-                "a": util.getString(data, util.getLong(data, offGr+0x200)+0x18+0x30*iUni+0x120*iDiff),
-                "b": util.getString(data, util.getLong(data, offGr+0x200)+0x20+0x30*iUni+0x120*iDiff),
-                "c": util.getString(data, util.getLong(data, offGr+0x200)+0x28+0x30*iUni+0x120*iDiff),
+                "id_tag": getName(util.getString(data, util.getLong(data, offGr+0x200)+0x30*iUni+0x120*iDiff)),
+                "assist": getName(util.getString(data, util.getLong(data, offGr+0x200)+0x10+0x30*iUni+0x120*iDiff)),
+                "a": getName(util.getString(data, util.getLong(data, offGr+0x200)+0x18+0x30*iUni+0x120*iDiff)),
+                "b": getName(util.getString(data, util.getLong(data, offGr+0x200)+0x20+0x30*iUni+0x120*iDiff)),
+                "c": getName(util.getString(data, util.getLong(data, offGr+0x200)+0x28+0x30*iUni+0x120*iDiff)),
             } for iUni in range(6)] for iDiff in range(3)],
             "_unknow13": [{
                 #0x18,
@@ -946,6 +946,9 @@ def parseEncourage(data):#Frontline Phalanx#TODO
                 "payload_size": util.getLong(data, util.getLong(data, offGr+0x78)+i*0x10+0x08, 0x30df0759),
             } for i in range(5)]
         }]
+    #27 F5 07 17  8D 71 BB 75  01 FC 60 0D  8C 80 E2 9F  52 96 47 C9  AC 74 5B A2     02 03 84 12 4D 8F 91 3C 25 DC 9B 12 00 00 00 00
+    #27 F5 07 17  8D 71 BB 75  01 FC 60 0D  8C 80 E2 9F  52 96 47 C9  AC 74 5B A2     B2 01 84 12 4D 8F 91 3C 25 DC 9B 12 00 00 00 00
+    #27 F5 07 17  8D 71 BB 75  01 FC 60 0D  8C 80 E2 9F  52 96 47 C9  AC 74 5B A2     42 05 84 12 4D 8F 91 3C 25 DC 9B 12 00 00 00 00
     return result
 
 def parseBoardGame(data):#TODO
@@ -1137,13 +1140,11 @@ def reverseFile(file: str):
     elif file.find("/SRPG/SequentialMap/") != -1:
         return parseSequentialMap(s)
     elif file.find("/TapAction/TapBattleData/") != -1:
-        print(json.dumps(parseTapAction(s), indent=2, ensure_ascii=False))
-        return
+        return parseTapAction(s)
     elif file.find("/Portrait/") != -1:
         return parsePortrait(s)
     elif file.find("/Shadow/") != -1:
-        print(json.dumps(parseShadow(s), indent=2, ensure_ascii=False))
-        return
+        return parseShadow(s)
     elif file.find("/Trip/Terms/") != -1:
         #print(json.dumps(parseTrip(s), indent=2, ensure_ascii=False))
         return parseTrip(s)
@@ -1152,8 +1153,7 @@ def reverseFile(file: str):
     elif file.find("/SRPG/IdolTower/") != -1:
         return parseIdolTower(s)
     elif file.find("/Encourage/") != -1:
-        print(json.dumps(parseEncourage(s), indent=2, ensure_ascii=False))
-        return
+        return parseEncourage(s)
     elif file.find("/SRPG/BoardGame/") != -1:
         return parseBoardGame(s)
     else:
@@ -1194,29 +1194,3 @@ if __name__ == "__main__":
                 #    print("File " + newFile + " create")
                 #except FileExistsError:
                 #    print("File already exist")
-
-
-# MS 3
-#                                                 8A 1E F8 C8 52 B3 AA B7 DF 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 71 0E 7D FC C2 88 BB 2F 68 BB CB 5D FA FA FB EE E4 1D D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 4
-#                                                 C8 1E F8 C8 52 B3 AA B7 DF 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 71 0E 7D FC C2 88 BB 2F 68 BB CB 5D FA FA FB EE E4 1F D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 5
-#                                                 C8 1E F8 C8 52 B3 AA B7 DF 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 BB 2F 68 BB CB 5D FA FA FB EE E4 1C D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 12
-# 17 F5 86 B4 93 B4 E3 27 1A BA C7 79 7D 2F 01 99 CE 1E F8 C8 52 B3 AA B7 DF 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 BB 2F 68 BB CB 5D FA FA FB EE E4 1F D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 13
-# 97 25 A3 B4 93 B4 E3 27 9A CB DB 79 7D 2F 01 99 4B 1E F8 C8 52 B3 AA B7 DF 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 BB 2F 68 BB CB 5D FA FA FB EE E4 1C D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 14
-# 97 E3 59 B4 93 B4 E3 27 9A B1 26 79 7D 2F 01 99 D2 1E F8 C8 52 B3 AA B7 DF 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 BB 2F 68 BB CB 5D FA FA FB EE E4 1E D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 15
-# 17 DE 48 B4 93 B4 E3 27 1A 55 35 79 7D 2F 01 99 CA 1D F8 C8 52 B3 AA B7 C2 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 63 2F 68 BB CB 5D FA FA FB EE E4 1D D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 31
-# 17 40 ED B5 93 B4 E3 27 1A 2F 92 78 7D 2F 01 99 CE 1E F8 C8 52 B3 AA B7 C2 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 63 2F 68 BB CB 5D FA FA FB EE E4 1D D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 32
-# 97 66 99 B5 93 B4 E3 27 9A 0A E6 78 7D 2F 01 99 CA 1A F8 C8 52 B3 AA B7 C2 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 63 2F 68 BB CB 5D FA FA FB EE E4 1F D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 33
-# 97 FA 92 B5 93 B4 E3 27 9A B6 EB 78 7D 2F 01 99 CA 0E F8 C8 52 B3 AA B7 C2 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 63 2F 68 BB CB 5D FA FA FB EE E4 1C D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 34
-# 97 13 8B B5 93 B4 E3 27 9A 81 F3 78 7D 2F 01 99 CA 0E F8 C8 52 B3 AA B7 C2 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 63 2F 68 BB CB 5D FA FA FB EE E4 1E D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5
-# MS 35
-# 97 3D BB B5 93 B4 E3 27 9A F3 C3 78 7D 2F 01 99 C8 1E F8 C8 52 B3 AA B7 C2 3A A7 D5 3F 81 0D A0 AF B3 C8 F6 70 0E 7D FC C2 88 63 2F 68 BB CB 5D FA FA FB EE E4 1D D2 6F 02 F4 8A 6E 0F F5 42 6D F4 F5

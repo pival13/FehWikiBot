@@ -81,6 +81,7 @@ def main(start=None):
                 #    continue
                 wp = getWeaponName(image['name'])
                 if wp and re.match(r"Wep[_ ]\w{2}\d{3}[_ ]up\.webp", image['name']) or re.match(r"Wep[_ ]mg\d{3}\.webp", image['name']):
+                    #Do not redirect up weapon and tomes
                     print(TODO + image['name'] + " to " + str(wp))
                 elif wp:
                     redirect(S, image['title'], wp)
@@ -92,7 +93,7 @@ def main(start=None):
                     redirect(S, image['title'], acc)
                 else:
                     print(TODO + "Accessory with unknow name: " + image['title'])
-            elif re.match(r".*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger|Cry)?\d?\.webp", image['name']):
+            elif re.match(r".*[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger|Cry|Blush)?\d*\.webp", image['name']):
                 redirect(S, image['title'])
             elif re.match(r"GC[_ ]\d{6}([_ ]\d{2})?\.webp", image['name']):
                 print(TODO + "Grand conquest map: " + image['title'])

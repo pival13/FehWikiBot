@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
-from datetime import datetime, timedelta
-import json
+from datetime import datetime
 import re
 
 from util import DATA
@@ -14,18 +13,14 @@ from Reverse import reverseFile
 COLORS = ['Red', 'Orange', 'Green', 'Blue']
 
 def FBInfobox(data):
+    # Perform a cargo query to get forging bonds number.
     return "{{Forging Bonds Infobox" + \
         "\n|number=" + str(int(util.cargoQuery('ForgingBonds', 'COUNT(DISTINCT _pageName)=Nb')[0]['Nb']) + 1) + \
         "\n|characters=" + ",".join([util.getName(unit) for unit in data['units']]) + \
         "\n|accessories=" + ",".join([util.getName(acc) for acc in data['bonus_accessories']]) + \
-        f"\n|startTime={data['event_avail']['start']}" + \
-        f"\n|endTime={(datetime.strptime(data['event_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT)}" + \
+        "\n|startTime=" + data['event_avail']['start'] + \
+        "\n|endTime=" + util.timeDiff(data['event_avail']['finish']) + \
         "\n}}"
-
-def FBAvailability(data):
-    return "==Availability==\nThis [[Forging Bonds]] event was made available:\n" +\
-        "* {{HT|" + data['event_avail']['start'] + "}} – {{HT|" + (datetime.strptime(data['event_avail']['finish'], util.TIME_FORMAT) - timedelta(seconds=1)).strftime(util.TIME_FORMAT) + "}} " + \
-        f"([[Forging Bonds: {util.getName(data['title'])} (Notification)|Notification]])"
 
 def FBRewards(data):
     s = "==Rewards==\n{{#invoke:Reward/ForgingBonds|main"
@@ -36,6 +31,7 @@ def FBRewards(data):
             if r['unit'] == i+1:
                 s += f"\n  {r['score']}={parseReward(r['reward'])};"
         s += "\n}"
+        # For original FB, Summoning tickets are First Summon Ticket I from the first revival, 2020-06-05
         s = re.sub(r"<!--Summoning Ticket: \[[^]]*\]-->", "First Summon Ticket I", s)
     s += "\n}}"
     return s
@@ -55,19 +51,20 @@ def FBConversation(data):
         s += f"\n==={unit}==="
         for t in ['C', 'B', 'A', 'S']:
             s += f"\n===={unit} - {t}====\n"
-            s += "{{tab/start}}{{tab/header|English}}\n{{StoryTextTableHeader}}\n" + \
-                "{{StoryImage|}}\n{{StoryTextTable|"+unit+"|}}\n{{StoryTextTableEnd}}\n" +  \
+            s += "{{tab/start}}{{tab/header|English}}\n" +\
+                "{{StoryTextTableHeader}}\n{{StoryImage|}}\n" +\
+                "{{StoryTextTable|"+unit+"|}}\n{{StoryTextTableEnd}}\n" +  \
                 "{{tab/header|Japanese}}\n{{StoryTextTableHeader}}\n{{StoryImage|}}\n" + \
                 "{{StoryTextTable|"+unit+"||ja}}\n{{StoryTextTableEnd}}\n{{tab/end}}"
     s += "\n" + StoryNavBar(util.getName(data['title']), "", "")
     return s
 
-def FBMap(tagId: str) -> dict:
+def ForgingBonds(tagId: str) -> dict:
     datas = reverseFile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tagId + '.bin.lz')
     content = {}
     for data in datas:
         s = FBInfobox(data) + "\n"
-        s += FBAvailability(data) + "\n"
+        s += mapUtil.Availability(data['event_avail'], f"Forging Bonds: {util.getName(data['title'])} (Notification)", "[[Forging Bonds]] event") + "\n"
         s += FBRewards(data) + "\n"
         s += FBConversation(data) + "\n"
         s += mapUtil.InOtherLanguage(data['title'])
@@ -80,7 +77,7 @@ from sys import argv
 if __name__ == '__main__':
     for arg in argv[1:]:
         if re.match(r'^\d+_\w+$', arg):
-            a = FBMap(arg)
+            a = ForgingBonds(arg)
             for k in a:
                 print(k, a[k])
         else:

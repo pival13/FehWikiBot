@@ -144,5 +144,4 @@ from sys import argv
 if __name__ == "__main__":
     begin = MIN_TIME if len(argv) < 2 else argv[1]
     end = MAX_TIME if len(argv) < 3 else argv[2]
-    #print(MissionsOf("200602_summer"))
     print(Mission(begin, end))

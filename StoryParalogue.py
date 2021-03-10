@@ -28,11 +28,12 @@ def StoryMapInfobox(stage: dict, field: dict, mapId: str, index: int):
         map['stam'].update({diff: stage['maps'][idiff]['scenarios'][index]['stamina']})
         map['reward'].update({diff: stage['maps'][idiff]['scenarios'][index]['reward']})
 
-    map['requirement'] = ''
-    map['requirement'] += 'All allies must survive.' if stage['maps'][0]['scenarios'][index]['survives'] else ''
-    map['requirement'] += (map['requirement'] != '' and '<br>' or '') + "Cannot use {{It|Light's Blessing}}." if stage['maps'][0]['scenarios'][index]['no_lights_blessing'] else ''
-    map['requirement'] += (map['requirement'] != '' and '<br>' or '') + f"Turns to win: {stage['maps'][0]['scenarios'][index]['turns_to_win']}" if stage['maps'][0]['scenarios'][index]['turns_to_win'] != 0 else ''
-    map['requirement'] += (map['requirement'] != '' and '<br>' or '') + f"Turns to defend: {stage['maps'][0]['scenarios'][index]['turns_to_defend']}" if stage['maps'][0]['scenarios'][index]['turns_to_defend'] != 0 else ''
+    map['requirement'] = []
+    if stage['maps'][0]['scenarios'][index]['survives']: map['requirement'] += ['All allies must survive.']
+    if stage['maps'][0]['scenarios'][index]['no_lights_blessing']: map['requirement'] += ["Cannot use {{It|Light's Blessing}}."]
+    if stage['maps'][0]['scenarios'][index]['turns_to_win'] != 0: map['requirement'] += [f"Turns to win: {stage['maps'][0]['scenarios'][index]['turns_to_win']}"]
+    if stage['maps'][0]['scenarios'][index]['turns_to_defend'] != 0: map['requirement'] += [f"Turns to defend: {stage['maps'][0]['scenarios'][index]['turns_to_defend']}"]
+    map['requirement'] = '<br>'.join(map['requirement'])
     map['bgms'] = util.getBgm(mapId)
 
     return mapUtil.MapInfobox(map)

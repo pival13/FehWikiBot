@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 from PIL import Image
-from datetime import datetime, timedelta
 import re
 
 from util import DATA, DIFFICULTIES, TIME_FORMAT
@@ -16,6 +15,14 @@ SKILLS = util.fetchFehData("Common/SRPG/Skill")
 SKILLS = {skillTag: SKILLS[skillTag] for skillTag in SKILLS if SKILLS[skillTag]['might'] != 0}
 
 def mapTerrain(terrain: list, wallStyle: str, x: int, y: int, useDebris: bool):
+    """Return the content of a cell on a terrain, as a string
+
+    Args:
+        terrain (list of list of int): The information about content of a map.
+        wallStyle (str): The style of walls/box
+        x, y (int): The x-y coordinate of the object wanted
+        useDebris (bool): Whether to use debris when a wall is desctructible.
+    """
     walls = [8,9,10,11,12,13,14,19,20,33,34]
     debris = [[8],[9,11,13,19,33],[10,12,14,20,34]]
     other = {
@@ -73,6 +80,30 @@ def needBackdrop(mapId):
     return False
 
 def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: dict=None):
+    """
+    Args:
+        field {
+            id (str): The id of the map
+            base_terrain (int): The base terrain. 0 is Normal, 1 is Inside, 2 is Desert
+            terrain (list of list of int): The content of the cell of the map
+            ally_pos, enemy_pos (list of {'x': int, 'y': int}): The position of ally and enemy units
+        },
+        simpleMap (bool) (False): Use {{MapLayout}} instead of {{#invoke:MapLayout|initTabber}}
+        useDebris (bool) (False): Whether to use debris on destructible walls.
+        units (dict) (None): Content of a SRPGMap.
+    
+    Return:
+        The map image of a level, as follow:
+            "{{#invoke:MapLayout|initTabber
+            |baseMap=|backdrop=
+            |type=
+            |allyPos=
+            |enemyPos=
+            |f1=|...|f6=
+             ...
+            |a1=|...|a6=
+            }}"
+    """
     mapType = ""
     wallStyle = ""
     backdrop = ""
@@ -136,9 +167,43 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
     return s
 
 def MapInfobox(obj: dict, restricted: bool=False):
-    """obj: {'lvl': {diff: ..., ...}, 'rarity': {diff: ..., ...}, 'stam': {diff: ..., ...}, 'reward': {diff: ..., ...},
-             'id_tag', ('name', 'title', 'epiteth'), 'banner', 'book', 'group', 'mode',
-             'map': SRPGMap(['field']+['allypos']), 'bgms': [...]}"""
+    """
+    Args:
+        obj: {
+            'id_tag',
+            'name', 'title', 'epiteth',
+            'banner', 'book', 'group', 'mode',
+            'map': SRPGMap(['field']+['allypos']),
+            'lvl': {diff: ..., ...},
+            'rarity': {diff: ..., ...},
+            'stam': {diff: ..., ...},
+            'reward': {diff: ..., ...},
+            'bgms': [...]
+        }
+        restricted (bool) (False): If True, display only present informations
+    
+    Returns:
+        "{{Battle Infobox
+          |bannerImage=
+          |stageTitle=
+          |stageName=
+          |stageEpithet=
+          |mapName=
+          |bookGroup=
+          |mapGroup=
+          |mapMode=
+          |map=
+          |mapImage=
+          |lvl=
+          |rarity=
+          |stam=
+          |reward=
+          |winReq=
+          |bgms=
+          |prev=|next=
+          }}
+        "
+        """
     rarity = ""
     stam = ""
     lvl = ""
@@ -182,18 +247,39 @@ def MapInfobox(obj: dict, restricted: bool=False):
            f"{prevNext}" + \
            "}}\n"
 
+def Availability(avail: dict, notification: str='', type: str="event"):
+    """Return an Availabily section.
+    
+    Args:
+        avail {'start', 'finish'}: The start and end time of the event.
+        notification (str) (''): The Notification of the event.
+        type (str) ("event"): The name of the type of event.
+    """
+    return "==Availability==\n" + \
+          f"This {type} was made available:\n" + \
+          "* {{HT|" + avail['start'] + "}} – {{HT|" + util.timeDiff(avail['finish']) + "}} " + \
+          "([[" + notification + "|Notification]])"
+
 def MapAvailability(avail: dict, notification: str=None, type: str="map"):
+    """Return a Map availabily section. This will store a MapDates.
+
+    Args:
+        avail {'start', 'finish'}: The start and end time of the map.
+        notification (str) (None): The Notification of the map.
+        type (str) ("map"): The name of the type of map.
+    """
     endTime = None
     if 'finish' in avail and avail['finish']:
-        endTime = datetime.strptime(avail['finish'], TIME_FORMAT) - timedelta(seconds=1)
+        endTime = util.timeDiff(avail['finish'])
 
     return "==Map availability==\n" + \
           f"This {type} was made available on:\n" + \
           f"* {{{{MapDates|start={'start' in avail and avail['start'] or ''}" + \
-          f"{endTime and ('|end=' + endTime.strftime(TIME_FORMAT)) or ''}" + \
+          f"{endTime and ('|end=' + endTime) or ''}" + \
           f"{notification != None and ('|notification=' + notification) or ''}}}}}\n"
 
 def UnitData(SRPGMap):
+    """Return the UnitData section, using a SRPGMap object"""
     s = ""
 
     for unit in SRPGMap['units']:
@@ -203,27 +289,6 @@ def UnitData(SRPGMap):
         if props != '' and props[-1] == ',':
             props = props[:-1]
 
-        #if SRPGMap['field']['id'][0] == 'W' and unitsQuery[unit['id_tag']] and unitsQuery[unit['id_tag']].isGeneric != '':
-        #    unitArgs = compact_hash {
-        #        {'pos', string.char(unit['pos'].x + 97) + tostring(unit['pos'].y + 1)},
-        #        {'rarity', unit['rarity']},
-        #        {'slot', slot},
-        #        {'level', unit['true_lv']},
-        #        {'displaylevel', unit['true_lv'] != unit['lv'] and unit['lv']},
-        #        {'ai', unit['is_enemy'] and compact_hash {
-        #            {'turn', unit['start_turn'] != -1 and unit['start_turn']},
-        #            {'group', unit['movement_group'] != -1 and unit['movement_group']},
-        #            {'delay', unit['movement_delay'] != -1 and unit['delay']},
-        #            {'break_walls', unit['break_terrain'] and '1'},
-        #            {'tether', unit['tether'] and '1'},
-        #        }},
-        #        {'random', compact_hash {
-        #            {'moves', unitsQuery[unit['id_tag']].Moves},
-        #            {'weapons', unitsQuery[unit['id_tag']].Weapons},
-        #            {'staff', unitsQuery[unit['id_tag']].Weapons == 'Ranged' and 'false'},
-        #        }},
-        #    }
-        #else:
         s += "{"
         s += f"unit={util.getName(unit['id_tag'])};" if 'id_tag' in unit else "unit=;"
         s += f"pos={chr(unit['pos']['x'] + 97)}{unit['pos']['y'] + 1};" if 'pos' in unit else "pos=;"
@@ -241,7 +306,7 @@ def UnitData(SRPGMap):
                                     'Res' if weaponId[-3:] == 'RES' else
                                     'Skill2' if weaponId[-2:] == "_幻" else 'Skill1')
 
-        s += f"weapon={weapon or '-'};" if weapon else "weapon=;"
+        s += f"weapon={weapon or '-'};" if weapon else "weapon=;refine=;" if 'refine' in unit else "weapon=;"
         s += f"assist={util.getName(unit['skills'][1]) or '-'};" if 'skills' in unit else "assist=;"
         s += f"special={util.getName(unit['skills'][2]) or '-'};" if 'skills' in unit else "special=;"
         s += f"cooldown={unit['cooldown_count'] or ''};" if 'cooldown_count' in unit and unit['cooldown_count'] != -1 else ''
@@ -275,6 +340,13 @@ def UnitData(SRPGMap):
 
 allLanguages = util.otherLanguages()
 def InOtherLanguage(ids, mapName: str=None, reorder: bool=True):
+    """Return the In other languages section.
+
+    Args:
+        ids (str/list of str): The id or ids of the object.
+        mapName (str) (None): The name of the map. If it is different to the english name, add the english name to the table.
+        reorder (bool) (True): Whether Japanese, Italian and Taiwan reverse elements when there is several of them
+    """
     if type(ids) is str:
         ids = [ids]
     usen = ""
