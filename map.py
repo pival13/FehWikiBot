@@ -5,27 +5,35 @@ import requests
 import json
 import re
 
-from util import URL, TODO, ERROR, DATA, TIME_FORMAT
+from util import TODO, ERROR, DATA
 import util
+
+from StoryParalogue import StoryMap, StoryGroup, ParalogueMap, ParalogueGroup
 from TD import TDmap
 from HO import HOmap
-from StoryParalogue import ParalogueMap, ParalogueGroup, StoryGroup, StoryMap
-from DerivedMap import SquadAssault, ChainChallengeGroup, ChainChallengeMap
+from DerivedMap import SquadAssault, ChainChallengeMap, ChainChallengeGroup
+
 from HB import BHBMap, LHBMap, GHBMap
 from RD import RDmap
 from EventMap import exportEventMap
-from TT import TTMap
-from FB import FBMap
+
+#from VG import VotingGauntlet as VGMap
+from TT import TempestTrials as TTMap
+#from TB import TapBattle as TBMap
+#from GC import GrandConquest as GCMap
+from FB import ForgingBonds as FBMap
+#from RS import RokkrSieges as RSMap
 from LL import LostLore as LLMap
 from HoF import HallOfForms as HoFMap
 from MS import MjolnirsStrike as MSMap
+from FP import FrontlinePhalanx as FPMap
 from PoL import PawnsOfLoki as PoLMap
 
 def exportMap(name: str, content: str):
     S = util.fehBotLogin()
 
     try:
-        result = S.post(url=URL, data={
+        result = S.post(url=util.URL, data={
             "action": "edit",
             "title": name,
             "text": content,
@@ -80,7 +88,10 @@ def parseMapId(mapId: str):
         exportGroup(ParalogueGroup(mapId))
 
     elif re.match(r"H\d{4}", mapId):
-        hero = util.getHeroName(int(re.match(r"H(\d+)", mapId)[1]))
+        nb = int(re.match(r"H(\d+)", mapId)[1])
+        heroes = util.fetchFehData("Common/SRPG/Person", False)
+        hero = None
+        for h in heroes: if h['id_num'] == nb: hero = util.getName(h['id_tag'])
         if hero:
             exportMap("Heroic Ordeals: " + hero + "'s Trial", HOmap(mapId))
         else:
@@ -160,9 +171,6 @@ def findEvents(tag: str):
     lastTB = 19#Here to change
 
     #if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Tournament' + tag + '.bin.lz'): print(TODO + "New Voting Gauntlet")
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tag + '.bin.lz'):
-        try: exportGroup(TTMap(tag))
-        except: print(TODO + "Tempest Trials")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + f'Common/TapAction/TapBattleData/TDID_{lastTB+1:04}.bin.lz'):
         print(TODO + "New Tap Battle")
         with open(__file__, 'r') as f: __file__Content = f.read()
@@ -171,10 +179,13 @@ def findEvents(tag: str):
         print(TODO + "New Tap Battle Revival")
         with open(__file__, 'r') as f: __file__Content = f.read()
         with open(__file__, 'w') as f: f.write(re.sub(r"lastTBRevival = \d+#Here to change", f"lastTBRevival = {lastTBRevival+1}#Here to change", __file__Content))
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tag + '.bin.lz'):
+        try: exportGroup(TTMap(tag))
+        except: print(TODO + "Tempest Trials")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Occupation/Data/' + tag + '.bin.lz'): print(TODO + "New Grand Conquests")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'):
         try: exportGroup(FBMap(tag))
-        except: print(TODO + "New Forging Bonds")
+        except: print(TODO + "Forging Bonds")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'): print(TODO + "New Rokkr Sieges")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'):
         try: exportGroup(LLMap(tag))
@@ -185,7 +196,9 @@ def findEvents(tag: str):
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Mjolnir/BattleData/' + tag + '.bin.lz'):
         try: exportGroup(MSMap(tag))
         except: print(TODO + "Mjölnir's Strike")
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Encourage/' + tag + '.bin.lz'): print(TODO + "New Frontline Phalanx")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Encourage/' + tag + '.bin.lz'):
+        try: exportGroup(FPMap(tag))
+        except: print(TODO + "Frontline Phalanx")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/BoardGame/' + tag + '.bin.lz'):
         try: exportGroup(PoLMap(tag))
         except: print(TODO + "Pawns of Loki")
@@ -194,8 +207,7 @@ def findUpcoming():
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent/", False)
     print('Upcoming special maps:')
     for stage in StageEvent:
-        datetime.fromordinal
-        if datetime.strptime(stage['avail']['start'], TIME_FORMAT) > datetime.now():
+        if datetime.strptime(stage['avail']['start'], util.TIME_FORMAT) > datetime.now():
             print(stage['id_tag'], util.getName(stage['id_tag']), MapAvailability(stage['avail'], "")[72:-17])
 
 def main(arg):
