@@ -4,6 +4,12 @@ from subprocess import Popen, PIPE, STDOUT
 import json
 import ctypes
 from datetime import datetime
+from os.path import realpath, dirname
+
+import sys
+sys.path.insert(0, dirname(dirname(realpath(__file__))))
+from PersonalData import BINLZ_ASSETS_DIR_PATH, JSON_ASSETS_DIR_PATH
+sys.path.pop(0)
 
 NONE_XORKEY = [
     0x00
@@ -164,12 +170,7 @@ def getAvail(data, idx):
             "cycle_sec": getSLong(data, idx+0x18, 0x6B227EC9D51B5721),
         }
     except:
-        result = {
-            "start": hex(getLong(data, idx+0x00, 0xDC0DA236C537F660)),
-            "finish": hex(getLong(data, idx+0x08, 0xC8AD692AFABD56E9)),
-            "avail_sec": hex(getSLong(data, idx+0x10, 0x7311F0404108A6E0)),
-            "cycle_sec": hex(getSLong(data, idx+0x18, 0x6B227EC9D51B5721)),
-        }
+        result = None
     return result
 
 def xorString(data, xor):
@@ -241,26 +242,64 @@ rewardParser = [
 ]
 
 def getReward(data, idx, size):
-    off1 = getLong(data, idx)
-    size = size - 0x08-0x10
-    if getLong(data, off1+size) != 0x160707001B9AD871:
+    try:
+        off1 = getLong(data, idx)
+        size = size - 0x08-0x10
+        if getLong(data, off1+size) != 0x160707001B9AD871:
+            return
+
+        iv = [getByte(data, off1+size+0x08+0x01*i) for i in range(16)]
+        iv.reverse()
+        ivValue = 0
+        for i in range(16):
+            ivValue += iv[i] << 8*i
+        cipher = AES.new(bytes(ENCR_KEY), AES.MODE_CTR, counter=Counter.new(128, initial_value=ivValue))
+        data = list(cipher.decrypt(bytes(data[off1:off1+size])))
+        idx = 1
+
+        result = []
+        for i in range(getByte(data, 0)):
+            kind = getByte(data, idx)
+            if kind >= len(rewardParser):
+                r, idx = {"kind": kind, "_type": "unknow"}, idx+1
+            else:
+                r, idx = rewardParser[kind](data, idx)
+            result += [r]
+        return result
+    except:
         return
 
-    iv = [getByte(data, off1+size+0x08+0x01*i) for i in range(16)]
-    iv.reverse()
-    ivValue = 0
-    for i in range(16):
-        ivValue += iv[i] << 8*i
-    cipher = AES.new(bytes(ENCR_KEY), AES.MODE_CTR, counter=Counter.new(128, initial_value=ivValue))
-    data = list(cipher.decrypt(bytes(data[off1:off1+size])))
-    idx = 1
 
-    result = []
-    for i in range(getByte(data, 0)):
-        kind = getByte(data, idx)
-        if kind >= len(rewardParser):
-            r, idx = {"kind": kind, "_type": "unknow"}, idx+1
-        else:
-            r, idx = rewardParser[kind](data, idx)
-        result += [r]
-    return result
+def getAllStringsOn(data):
+    t = {}
+    for i in range(int(len(data)/0x08)):
+        t[hex(i*0x08)] = xorString(data[i*0x08:], ID_XORKEY)
+    return t
+
+def getAllRewardsOn(data):
+    t = {}
+    for i in range(int(len(data)/0x08)):
+        rew = getReward(data, i*0x08, 0x48)
+        if rew:
+            t[hex(i*0x08)] = rew
+    return t
+
+def getAllAvailsOn(data):
+    t = {}
+    for i in range(int((len(data)-0x20)/0x08)):
+        avail = getAvail(data, i*0x08)
+        if avail:
+            t[hex(i*0x08)] = avail
+    return t
+
+def decompress(file: str):
+    curDir = dirname(realpath(__file__))
+    ruby = Popen(['ruby', curDir + '/REdecompress.rb', file], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+
+    initS = ruby.stdout.readline().decode('utf8')
+    if initS[0] != '[':
+        print(initS, end="" if initS[-1] == '\n' else '\n')
+        return
+
+    initS = [int(v.strip()) for v in initS[1:-1].split(sep=',')]
+    return initS

@@ -7,7 +7,8 @@ from num2words import num2words
 
 from util import DATA
 import util
-from Reverse import reverseFile
+import mapUtil
+from Reverse import reverseFrontlinePhalanx
 from reward import parseReward
 
 def FPInfobox(data: dict, nb: int):
@@ -34,7 +35,7 @@ def FPRewards(data: dict):
     return s + "}}"
 
 def FrontlinePhalanx(tag: str):
-    datas = reverseFile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Encourage/' + tag + '.bin.lz')
+    datas = reverseFrontlinePhalanx(tag)
 
     ret = {}
     for data in datas:

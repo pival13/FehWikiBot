@@ -7,7 +7,7 @@ from num2words import num2words
 
 from util import DATA, DIFFICULTIES
 import util
-from Reverse import reverseFile
+from Reverse import reverseMjolnirsStrike
 from reward import parseReward
 
 def MSInfobox(data: dict, nb: int):
@@ -45,7 +45,7 @@ def MSRewards(data: dict):
     return s + "}}"
 
 def MjolnirsStrike(tag: str):
-    datas = reverseFile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Mjolnir/BattleData/' + tag + '.bin.lz')
+    datas = reverseMjolnirsStrike(tag)
 
     ret = {}
     for data in datas:

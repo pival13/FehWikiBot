@@ -9,7 +9,7 @@ import mapUtil
 from scenario import Story
 from HB import getHeroWithName
 from reward import MOVE, parseReward
-from Reverse import reverseFile
+from Reverse import reverseTempestTrial
 
 TT_DIFFICULTIES = ["Normal/LV.8/3 battles","Normal/LV.14/3 battles","Normal/LV.20/3 battles","Hard/LV.25/4 battles","Hard/LV.30/5 battles","Lunatic/LV.35/5 battles","Lunatic/LV.40/7 battles"]
 
@@ -151,7 +151,7 @@ def TempestTrials(mapTagId: str) -> dict:
     elif re.match(r'\d+_\w+', mapTagId):
         tagId = mapTagId
     
-    datas = reverseFile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tagId + '.bin.lz')
+    datas = reverseTempestTrial(tagId)
     content = {}
     for data in datas:
         if re.match(r'W\d{4}', mapTagId) and data['sets'][0]['battles'][-1]['maps'][0][:-1] != mapTagId:
@@ -164,6 +164,8 @@ from sys import argv
 if __name__ == '__main__':
     for arg in argv[1:]:
         if re.match(r'W\d{4}', arg) or re.match(r'\d+_\w+', arg):
-            print(TempestTrials(arg))
+            r = TempestTrials(arg)
+            for tt in r:
+                print(tt, r[tt])
         else:
             print("Either a mapId (W\\d{4}) or a tagId (\\d+_\\w+) is expected")

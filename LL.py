@@ -7,9 +7,9 @@ from num2words import num2words
 
 from util import DATA, DIFFICULTIES
 import util
-from Reverse import reverseFile
+from Reverse import reverseLostLore
 from reward import parseReward, MOVE, WEAPON
-from mapUtil import InOtherLanguage
+from mapUtil import InOtherLanguage, Availability
 
 extraTeams = [20,60]
 
@@ -87,7 +87,7 @@ def LLUnit(data: dict, combats: list):
     return s + "|-\n|colspan=\"6\"|<nowiki/>*The order of foes is randomized at the start of every strike.\n|}"
 
 def LostLore(tag: str):
-    datas = reverseFile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz')
+    datas = reverseLostLore(tag)
 
     ret = {}
     for data in datas:
@@ -96,7 +96,7 @@ def LostLore(tag: str):
             continue
         enemies = [d['combatUnits'] for d in data['maps'] if d['combatUnits']]
         s = LLInfobox(data, enemies) + "\n"
-        s += mapUtil.Availability(data['avail'], f"Lost Lore ({util.getName('MID_TRIP_TITLE_' + data['id_tag'])}) (Notification)", "[[Lost Lore]] event") + "\n"
+        s += Availability(data['avail'], f"Lost Lore ({util.getName('MID_TRIP_TITLE_' + data['id_tag'])}) (Notification)", "[[Lost Lore]] event") + "\n"
         s += LLRewards(data) + "\n"
         s += LLSaga(data, tag) + "\n"
         s += LLLocation(data) + "\n"

@@ -8,7 +8,7 @@ import util
 import mapUtil
 from scenario import Conversation, StoryNavBar
 from reward import parseReward
-from Reverse import reverseFile
+from Reverse import reverseForgingBonds
 
 COLORS = ['Red', 'Orange', 'Green', 'Blue']
 
@@ -60,7 +60,7 @@ def FBConversation(data):
     return s
 
 def ForgingBonds(tagId: str) -> dict:
-    datas = reverseFile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tagId + '.bin.lz')
+    datas = reverseForgingBonds(tagId)
     content = {}
     for data in datas:
         s = FBInfobox(data) + "\n"

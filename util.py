@@ -110,14 +110,13 @@ def fetchFehData(path: str, easySort="id_tag"):
         d = readFehData(file, isFull=True)
         data += d if isinstance(d, list) else [d]
 
-    if not path:
-        return { data[i]['key'] : data[i]['value'] for i in range(len(data)) }
-    elif easySort and easySort in data[0]:
+    if easySort and easySort in data[0]:
         return { data[i][easySort] : data[i] for i in range(len(data)) }
     else:
         return data
 
-DATA = fetchFehData("USEN/Message/Data") + fetchFehData("USEN/Message/Menu")
+DATA = {r["key"]: r["value"] for r in fetchFehData("USEN/Message/Data")}
+DATA.update({r["key"]: r["value"] for r in fetchFehData("USEN/Message/Menu")})
 DATA.update({
     "MSID_ファルシオン": "Falchion (Mystery)",
     "MSID_ファルシオン外伝": "Falchion (Gaiden)",

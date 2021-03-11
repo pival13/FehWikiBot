@@ -7,7 +7,7 @@ from num2words import num2words
 
 from util import DATA
 import util
-from Reverse import reverseFile
+from Reverse import reversePawnsOfLoki
 from reward import parseReward
 
 WEAPON_CATEGORY = {
@@ -73,7 +73,7 @@ def PoLRewards(data: dict):
     return s + "}}"
 
 def PawnsOfLoki(tag: str):
-    datas = reverseFile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/BoardGame/' + tag + '.bin.lz')
+    datas = reversePawnsOfLoki(tag)
 
     ret = {}
     for data in datas:

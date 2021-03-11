@@ -6,7 +6,7 @@ from num2words import num2words
 
 from util import DATA
 import util
-from Reverse import reverseFile
+from Reverse import reverseHallOfForms
 from reward import parseReward
 
 def HoFInfobox(data: dict, nb: int):
@@ -27,7 +27,7 @@ def HoFRewards(data: dict):
     return s + "}}"
 
 def HallOfForms(tag: str):
-    datas = reverseFile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/IdolTower/' + tag + '.bin.lz')
+    datas = reverseHallOfForms(tag)
 
     ret = {}
     for data in datas:
