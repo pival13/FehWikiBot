@@ -8,6 +8,7 @@ import re
 
 from util import URL, TODO, DATA
 import util
+from wikiUtil import exportPage
 
 SKILL_DATA = util.fetchFehData("Common/SRPG/Skill", False)
 ACCESSORY_DATA = util.fetchFehData("Common/DressAccessory/Data", False)
@@ -34,18 +35,8 @@ def getAccessoryName(sprite: str):
         return "File:Accessory " + util.cleanStr(DATA["M" + nameId]) + ".png"
 
 def redirect(S: requests.session, name: str, redirect: str=None):
-    redirect = redirect or name.replace(".webp", ".png")
-    result = S.post(url=URL, data={
-        "action": "edit",
-        "title": redirect,
-        "text": "#REDIRECT [[" + name + "]]",
-        "createonly": True,
-        "bot": True,
-        "tags": "automated",
-        "watchlist": "nochange",
-        "token": util.getToken(),
-        "format": "json"
-    }).json()
+    result = exportPage(redirect or name.replace(".webp", ".png"),
+                        "#REDIRECT [[" + name + "]]", create=True)
     if 'error' in result and result['error']['code'] == 'articleexists':
         print(f"Redirect already exist: {redirect}")
     elif 'edit' in result and result['edit']['result'] == 'Success':

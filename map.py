@@ -7,6 +7,7 @@ import re
 
 from util import TODO, ERROR, DATA
 import util
+from wikiUtil import exportPage
 
 from StoryParalogue import StoryMap, StoryGroup, ParalogueMap, ParalogueGroup
 from TD import TDmap
@@ -30,31 +31,13 @@ from FP import FrontlinePhalanx as FPMap
 from PoL import PawnsOfLoki as PoLMap
 
 def exportMap(name: str, content: str):
-    S = util.fehBotLogin()
-
-    try:
-        result = S.post(url=util.URL, data={
-            "action": "edit",
-            "title": name,
-            "text": content,
-            "createonly": True,
-            #"nocreate": True,
-            "bot": True,
-            "tags": "automated",
-            "summary": "bot: new map",
-            "watchlist": "nochange",
-            "token": util.getToken(),
-            "format": "json"
-        }).json()
-        if 'error' in result and result['error']['code'] == 'articleexists':
-            print(f"Page already exist: " + name)
-        elif 'edit' in result and result['edit']['result'] == 'Success':
-            print(f"Page created: " + name)
-        else:
-            print(result)
-
-    except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        exportMap(name, content)
+    result = exportPage(name, content, "bot: new map", create=True)
+    if 'error' in result and result['error']['code'] == 'articleexists':
+        print(f"Page already exist: " + name)
+    elif 'edit' in result and result['edit']['result'] == 'Success':
+        print(f"Page created: " + name)
+    else:
+        print(result)
 
 def exportGroup(group: dict):
     for name in group:

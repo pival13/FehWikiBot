@@ -11,8 +11,8 @@ USE_ALLY_STATS = ['PID_ヘルビンディ味方', 'PID_レーギャルン味方'
 USE_ENEMY_STATS = ['EID_ヘルビンディ', 'EID_レーギャルン', 'EID_レーヴァテイン', 'EID_ロキ', 'EID_スルト', 'EID_スラシル', 'EID_リーヴ', 'EID_ヘル', 'EID_プルメリア']
 
 REFINED = util.fetchFehData("Common/SRPG/WeaponRefine", "refined")
-SKILLS = util.fetchFehData("Common/SRPG/Skill")
-SKILLS = {skillTag: SKILLS[skillTag] for skillTag in SKILLS if SKILLS[skillTag]['might'] != 0}
+WEAPONS = util.fetchFehData("Common/SRPG/Skill")
+WEAPONS = {skillTag: WEAPONS[skillTag] for skillTag in WEAPONS if WEAPONS[skillTag]['might'] != 0}
 
 def mapTerrain(terrain: list, wallStyle: str, x: int, y: int, useDebris: bool):
     """Return the content of a cell on a terrain, as a string
@@ -279,7 +279,7 @@ def MapAvailability(avail: dict, notification: str=None, type: str="map"):
           f"{notification != None and ('|notification=' + notification) or ''}}}}}\n"
 
 def UnitData(SRPGMap):
-    """Return the UnitData section, using a SRPGMap object"""
+    """Return the content for a single parameter of Module:UnitData, using a SRPGMap object"""
     s = ""
 
     for unit in SRPGMap['units']:
@@ -298,8 +298,8 @@ def UnitData(SRPGMap):
         s += f"stats=[{unit['stats']['hp']};{unit['stats']['atk']};{unit['stats']['spd']};{unit['stats']['def']};{unit['stats']['res']}];" if 'stats' in unit else "stats=[;;;;];"
 
         weaponId = unit['skills'][0] if 'skills' in unit else unit['weapon'] if 'weapon' in unit else ''
-        weapon = util.getName(SKILLS[weaponId]['name_id']) if weaponId in SKILLS else None
-        if weapon and "M" + weaponId != SKILLS[weaponId]['name_id']:
+        weapon = util.getName(WEAPONS[weaponId]['name_id']) if weaponId in WEAPONS else None
+        if weapon and "M" + weaponId != WEAPONS[weaponId]['name_id']:
             weapon += ';refine=' + ("Atk" if weaponId[-3:] == 'ATK' else
                                     "Spd" if weaponId[-3:] == 'SPD' else
                                     'Def' if weaponId[-3:] == 'DEF' else

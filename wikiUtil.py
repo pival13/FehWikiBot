@@ -2,6 +2,7 @@
 
 import requests
 import json
+import re
 from time import sleep
 from datetime import datetime, timedelta
 
@@ -45,7 +46,7 @@ def getPages(nameLike: str) -> list:
                 "action": "cargoquery",
                 "tables": "_pageData",
                 "fields": "_pageName=Page",
-                "where": "_pageName LIKE \""+nameLike.replace('"', '\\"')+"\"",
+                "where": "_pageName RLIKE \""+nameLike.replace('"', '\\"')+"\"",
                 "limit": "max",
                 "offset": offset,
                 "order_by": "_ID",
@@ -105,7 +106,9 @@ def deleteToRedirect(pageToDelete: str, redirectionTarget: str):
     }).json()
     return (deleteR, redirectR)
 
-def exportPage(name: str='User:'+util.USER+'/sandbox/Bot', content: str='', summary: str=None, minor: bool=False, create: bool=False):
+def exportPage(name: str='User:'+util.USER+'/sandbox/Bot', content: str='', summary: str=None, minor: bool=False, create: bool=False, attempt=0):
+    if attempt >= 3:
+        return {'error': {'code': "savefail"}}
     try:
         S = util.fehBotLogin()
         result = S.post(url=util.URL, data={
@@ -114,8 +117,7 @@ def exportPage(name: str='User:'+util.USER+'/sandbox/Bot', content: str='', summ
             "text": content,
             "summary": summary,
             "minor": minor,
-            "nocreate": not create,
-            #"createonly": create,
+            ("createonly" if create else "nocreate"): True,
             "bot": True,
             "tags": "automated",
             "watchlist": "nochange",
@@ -124,7 +126,7 @@ def exportPage(name: str='User:'+util.USER+'/sandbox/Bot', content: str='', summ
         }).json()
         return result
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        return exportPage(name, content, summary, minor)
+        return exportPage(name, content, summary, minor, create, attempt+1)
 
 
 if __name__ == '__main__':
