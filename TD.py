@@ -54,7 +54,7 @@ def Solution(SRPGMap: dict):
           f"|wall={{{';'.join([wall[0]+'='+wall[1] for wall in walls])}}}\n" + \
            "|turn1=[\n]\n}}\n"
 
-def TDmap(mapId: str):
+def TacticsDrills(mapId: str):
     SRPGMap = util.readFehData("Common/SRPGMap/" + mapId + ".json")
     StageEvent = util.fetchFehData("Common/SRPG/StagePuzzle")[mapId]
 
@@ -73,4 +73,4 @@ def TDmap(mapId: str):
 from sys import argv
 
 if __name__ == "__main__":
-    print(TDmap(argv[1]))
+    print(TacticsDrills(argv[1]))

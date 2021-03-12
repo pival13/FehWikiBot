@@ -119,7 +119,7 @@ def RDMapInfobox(StageEvent: dict):
 
     return re.sub(r"\|mapImage[^}]+\}\}", RDMapLayout(StageEvent['id_tag']), mapUtil.MapInfobox(info))
 
-def RDmap(mapId: str):
+def RivalDomains(mapId: str):
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent")[mapId]
 
     content = RDMapInfobox(StageEvent) + '\n'
@@ -139,4 +139,4 @@ from sys import argv
 if __name__ == "__main__":
     for arg in argv[1:]:
         if arg[0] == 'Q':
-            print(RDmap(arg))
+            print(RivalDomains(arg))

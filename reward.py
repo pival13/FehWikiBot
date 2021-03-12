@@ -66,28 +66,24 @@ AETHER_STONE = {
 }
 
 DIVINE_CODES = {
-    '2020': ": Part 1",
-    '2021': ": Part 2",
 }
 
 def parseReward(rewards: list):
-    s = ""
+    s = []
     for reward in rewards:
-        if reward != rewards[0]:
-            s += ';'
         kind = ""
         if reward['kind'] == -1: kind = reward['_type']
         elif len(ITEM_KIND) > reward['kind'] and ITEM_KIND[reward['kind']] != "": kind = ITEM_KIND[reward['kind']]
         else: kind = f"<!--{reward['_type']}-->"
 
         if kind == "Hero":
-            s += "{hero=" + util.getName(reward['id_tag']) + ";rarity=" + str(reward['rarity']) + "}"
+            s += ["{hero=" + util.getName(reward['id_tag']) + ";rarity=" + str(reward['rarity']) + "}"]
         elif kind == "FB Conversation":
-            s += "{hero=" + util.getName(reward['id_tag']) + ";fbrank=" + (FB_RANK[reward['support_rank']] or reward['support_rank']) + "}"
+            s += ["{hero=" + util.getName(reward['id_tag']) + ";fbrank=" + (FB_RANK[reward['support_rank']] or reward['support_rank']) + "}"]
         elif kind == "Accessory":
-            s += "{accessory=" + util.getName(reward['id_tag']) + "}"
+            s += ["{accessory=" + util.getName(reward['id_tag']) + "}"]
         elif kind == "Sacred Seal":
-            s += "{seal=" + util.getName(reward['id_tag']) + "}"
+            s += ["{seal=" + util.getName(reward['id_tag']) + "}"]
         else:
             if kind == "Shard":
                 kind = COLOR[reward['shard_color']] + (reward['great'] and ' Crystal' or ' Shard')
@@ -104,8 +100,10 @@ def parseReward(rewards: list):
             elif kind == 'Divine Code':
                 if len(reward['id_tag']) == 6:
                     kind += f": Ephemera {int(reward['id_tag'][-2:])}"
+                elif len(reward['id_tag']) == 4:
+                    kind += f": Part {int(reward['id_tag'])-2019}"
                 else:
                     kind += DIVINE_CODES[reward['id_tag']]
-            s += "{kind=" + kind + (reward['count'] != 1 and (";count=" + str(reward['count'])) or "") + "}"
+            s += ["{kind=" + kind + (reward['count'] != 1 and (";count=" + str(reward['count'])) or "") + "}"]
 
-    return len(rewards) > 1 and ('[' + s + ']') or s
+    return ('[' + ';'.join(s) + ']') if len(s) > 1 else s[0] if s != [] else ""

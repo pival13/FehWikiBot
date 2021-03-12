@@ -98,7 +98,7 @@ def HBUnitData(StageEvent: dict, SRPGMap: dict, hero):
             s += mapUtil.UnitData({'units': units})
     return s + "\n}}\n"
 
-def LHBMap(mapId: str):
+def LegendaryHeroBattle(mapId: str):
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent")[mapId]
     SRPGMap = util.readFehData("../feh-assets-json/extras/SRPGMap/"+mapId+"A.json", True)
 
@@ -114,7 +114,7 @@ def LHBMap(mapId: str):
     content += "{{Special Maps Navbox}}"
     return content
 
-def BHBMap(mapId: str):
+def BoundHeroBattle(mapId: str):
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent")[mapId]
     SRPGMap = util.readFehData("../feh-assets-json/extras/SRPGMap/"+mapId+"A.json", True)
 
@@ -135,7 +135,7 @@ def BHBMap(mapId: str):
 
     return {name: content}
 
-def GHBMap(mapId: str):
+def GrandHeroBattle(mapId: str):
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent")[mapId]
     SRPGMap = util.readFehData("../feh-assets-json/extras/SRPGMap/"+mapId+"A.json", True)
 
@@ -157,11 +157,11 @@ if __name__ == '__main__':
     for arg in argv[1:]:
         try:
             if arg[0] == 'T' and util.getName(arg)[2] == '&':
-                maps = list(BHBMap(arg).items())[0]
+                maps = list(BoundHeroBattle(arg).items())[0]
                 print(maps[0], maps[1], sep='\n')
             elif arg[0] == 'T':
-                print(GHBMap(arg))
+                print(GrandHeroBattle(arg))
             elif arg[0] == 'L':
-                print(LHBMap(arg))
+                print(LegendaryHeroBattle(arg))
         except:
             print("Error with " + arg)

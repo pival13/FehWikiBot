@@ -31,7 +31,7 @@ def getHeroJson(heroId: int):
             return hero
     return {}
 
-def HOmap(mapId: str):
+def HeroicOrdeals(mapId: str):
     heroId = int(mapId[1:])
     hero = getHeroJson(heroId)
     SRPGMap = util.readFehData("Common/SRPGMap/" + mapId + ".json")
@@ -63,4 +63,4 @@ def HOmap(mapId: str):
 from sys import argv
 
 if __name__ == "__main__":
-    print(HOmap(argv[1]))
+    print(HeroicOrdeals(argv[1]))

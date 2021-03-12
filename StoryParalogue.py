@@ -127,11 +127,16 @@ def ParalogueGroup(groupId: str):
 from sys import argv
 
 if __name__ == "__main__":
-    if argv[1][0] == 'X':
-        print(ParalogueMap(argv[1]))
-    elif argv[1][0] == 'S':
-        print(StoryMap(argv[1]))
-    elif argv[1][:2] == 'CX':
-        print(ParalogueGroup(argv[1]))
-    elif argv[1][0] == 'C':
-        print(StoryGroup(argv[1]))
+    for arg in argv[1:]:
+        if re.match(r"^S\d{4}$", arg):
+            print(StoryMap(arg))
+        elif re.match(r"^C\d{4}$", arg):
+            g = StoryGroup(arg)
+            for name in g:
+                print(name, g[name])
+        elif re.match(r"^X\d{4}$", arg):
+            print(ParalogueMap(arg))
+        elif re.match(r"^CX\d{3}$", arg):
+            g = ParalogueGroup(arg)
+            for name in g:
+                print(name, g[name])
