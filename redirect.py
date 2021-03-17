@@ -38,9 +38,9 @@ def redirect(S: requests.session, name: str, redirect: str=None):
     result = exportPage(redirect or name.replace(".webp", ".png"),
                         "#REDIRECT [[" + name + "]]", create=True)
     if 'error' in result and result['error']['code'] == 'articleexists':
-        print(f"Redirect already exist: {redirect}")
+        print(f"Redirect already exist: {redirect or name.replace('.webp', '.png')}")
     elif 'edit' in result and result['edit']['result'] == 'Success':
-        print(f"Redirect {name} to {redirect}")
+        print(f"Redirect {name} to {redirect or name.replace('.webp', '.png')}")
     else:
         print(json.dumps(result, indent=2))
         exit(0)

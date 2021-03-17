@@ -24,7 +24,7 @@ SERIES_BGM = [
 ]
 
 def getHeroJson(heroId: int):
-    HERO = fetchFehData("Common/SRPG/Person", False)
+    HERO = util.fetchFehData("Common/SRPG/Person", False)
 
     for hero in HERO:
         if hero['id_num'] == heroId:
@@ -36,7 +36,7 @@ def HeroicOrdeals(mapId: str):
     hero = getHeroJson(heroId)
     SRPGMap = util.readFehData("Common/SRPGMap/" + mapId + ".json")
     diff = heroId < 191 and 'Normal' or heroId < 317 and 'Hard' or 'Lunatic'
-    release = util.cargoQuery("Units", "ReleaseDate", "IntID="+str(heroID), limit=1)[0]["ReleaseDate"]
+    release = util.cargoQuery("Units", "ReleaseDate", "IntID="+str(heroId), limit=1)[0]["ReleaseDate"]
 
     SRPGMap['field'].update({'player_pos': SRPGMap['player_pos']})
 

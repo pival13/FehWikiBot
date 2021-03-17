@@ -61,6 +61,14 @@ PORTRAIT_XORKEY = [
     0xC9, 0x2B
 ]
 
+SOUND_XORKEY = [
+    0x5A, 0x60, 0x70, 0x80, 0xA1, 0x92, 0x0C, 0xF5,
+    0x27, 0x82, 0x92, 0x58, 0x1A, 0x8A, 0x56, 0x7A,
+    0x46, 0xC7, 0xF7, 0xCD, 0xDD, 0x2D, 0x0C, 0x3F,
+    0xA1, 0x58, 0x8A, 0x2F, 0x3F, 0xF5, 0xB7, 0x27,
+    0xFB, 0xD7, 0xEB, 0x6A
+]
+
 #TUTORIAL    8A FC FE 39 5A 45 98 8D 6E FE 80 CE 08 74 14 95 EF 7B 70 06 04 C3 A0 BF 62 77 94 04 7A 34 F2 8E EE 6F 15 81
 #VG          9A EC EE 29 81 9E C2 42 A1 8D F3 BD 7B 77 E3 F6 8C EC 3B 4D 4F 88 20 3F 63 E3 00 2C 52 1C DA D6 42 57 2D 4D
 #GC          17 FC C9 EA 79 69 24 BD A4 54 0E 58 BD 8B 36 CD AF B4 E2 09 3C 1F 8C 9C D1 48 51 A1 FB AD 48 7E C3 38 5A 41
@@ -69,7 +77,6 @@ PORTRAIT_XORKEY = [
 #LOADING     9A EC 03 C4 01 1E 42 C2 21 51 2F 7C BA 6D F9 EC 96 F6 85 F3 1C DB 1E 01 5D DD 3E 4E 30 63 A5 72 E6 F3 89 E9	assets/Common/Loading/Data.bin
 #BATTLE      71 1E 04 F5 47 7A 1C A2 3E 48 3B D8 95 89 28 52 4F 0E 17 37 04 C2 47 E1 E0 8F 95 64 D6 EB 8D 33 AF D9 AA 49 04 18 B9 C3 DE 9F 86 A6 95 53 D6 70	assets/Common/Battle/Asset/*.bin
 #EFFECT_ARC  44 00 35 C1 FF 14 C8 91 F3 1E 1F 6B CC 64 59 D8 BC C0 CB 8F BA 4E 70 9B 47 1E 7C 91 90 E4 43 EB D6 57 33 4F	assets/Common/Effect/arc/*.bin
-#SOUND_ARC   5A 60 70 80 A1 92 0C F5 27 82 92 58 1A 8A 56 7A 46 C7 F7 CD DD 2D 0C 3F A1 58 8A 2F 3F F5 B7 27 FB D7 EB 6A	assets/Common/Sound/arc/*.bin
 #WB          7C 98 E2 55 A7 C1 ED BF 8E 61 87 51 D3 BC 53 2C 01 16 5A BE C4 73 81 E7 CB 99 A8 47 A1 77 F5 9A 75 0A 27 30	assets/Common/Wb-4glP03ab/*.bin
 #HP          88 00 7A 39 9C E4 45 69 F0 EC F7 C1 3A 9D 1F E5 D9 06 0C C9 E8 1C BD 2C CB BB E3 9C 0F 5E CE 46 3C 7F DA A2 03 2F B6 AA B1 87 7C DB 59 A3 9F 40 4A 8F AE 5A FB 6A 8D FD A5 DA 49 18	assets/Common/Home/9h-bR4lQy/*.bin
 
@@ -82,8 +89,6 @@ def getBool(data, idx, xor=None):
     return False if getByte(data, idx, xor) == 0 else True
 
 def getByte(data, idx, xor=None):
-    if (len(data[idx:]) < 0x01):
-        raise IndexError
     v = 0
     for i in range(1):
         v += data[i+idx] << 8*i
@@ -99,8 +104,6 @@ def getSByte(data, idx, xor=None):
     return v
 
 def getShort(data, idx, xor=None):
-    if (len(data[idx:]) < 0x02):
-        raise IndexError
     v = 0
     for i in range(2):
         v += data[i+idx] << 8*i
@@ -116,8 +119,6 @@ def getSShort(data, idx, xor=None):
     return v
 
 def getInt(data, idx, xor=None):
-    if (len(data[idx:]) < 0x04):
-        raise IndexError
     v = 0
     for i in range(4):
         v += data[i+idx] << 8*i
@@ -133,8 +134,6 @@ def getSInt(data, idx, xor=None):
     return v
 
 def getLong(data, idx, xor=None):
-    if (len(data[idx:]) < 0x08):
-        raise IndexError
     v = 0
     for i in range(8):
         v += data[i+idx] << 8*i
@@ -175,10 +174,12 @@ def getAvail(data, idx):
 
 def xorString(data, xor):
     s = []
-    size = min(len(data), (data.index(0) if 0 in data else len(data)))
+    size = len(data)
+    sizeXor = len(xor)
     for i in range(size):
-        if data[i] != xor[i%len(xor)]:
-            s += [(data[i] ^ xor[i%len(xor)])]
+        if data[i] == 0: break
+        elif data[i] != xor[i%sizeXor]:
+            s += [(data[i] ^ xor[i%sizeXor])]
         else:
             s += [(data[i])]
         #data[i] = 0x00
@@ -270,10 +271,10 @@ def getReward(data, idx, size):
         return
 
 
-def getAllStringsOn(data):
+def getAllStringsOn(data, key=ID_XORKEY):
     t = {}
     for i in range(int(len(data)/0x08)):
-        t[hex(i*0x08)] = xorString(data[i*0x08:], ID_XORKEY)
+        t[hex(i*0x08)] = xorString(data[i*0x08:], key)
     return t
 
 def getAllRewardsOn(data):

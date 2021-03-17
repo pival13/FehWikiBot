@@ -44,7 +44,7 @@ def HBMapInfobox(StageEvent: dict, group: str, SRPGMap: dict=None):
         'id_tag': StageEvent['id_tag'],
         'banner': 'Banner ' + StageEvent['banner_id'] + '.webp',
         'group': group,
-        'requirement': '',
+        'requirement': [],
         'lvl': {}, 'rarity': {}, 'stam': {}, 'reward': {},
         'map': SRPGMap and 'field' in SRPGMap and SRPGMap['field'] or {'id': StageEvent['id_tag'], 'player_pos': []},
         'bgms': util.getBgm(StageEvent['id_tag'])
@@ -83,18 +83,18 @@ def HBUnitData(StageEvent: dict, SRPGMap: dict, hero):
         #    s += "|" + DIFFICULTIES[StageEvent['maps'][idiff]['scenarios'][index]['difficulty']] + "="
         #    s += mapUtil.UnitData(SRPGMap[idiff]) + "\n"
     else:
-        for idiff, scenario in enumerate(StageEvent['scenario_count']):
+        for idiff, scenario in enumerate(StageEvent['scenarios']):
             s += '\n|' + DIFFICULTIES[scenario['difficulty']] + '='
             units = []
-            for i in range([True for w in scenario['enemy_weps'] if w != -1]):
+            for i in range(len([True for w in scenario['enemy_weps'] if w != -1])):
                 units += [{'rarity': scenario['stars'], 'true_lv': scenario['true_lv']}]
-                if idiff > 2: units[-1]['refine'] = True
+                if scenario['difficulty'] > 2: units[-1]['refine'] = True
             for i, h in enumerate(hero):
                 units[i]['id_tag'] = h['id_tag']
                 units[i]['cooldown_count'] = None
             if scenario['reinforcements']:
                 units += [{'rarity': scenario['stars'], 'true_lv': scenario['true_lv'], 'spawn_count': 0}]
-                if idiff > 2: units[-1]['refine'] = True
+                if scenario['difficulty'] > 2: units[-1]['refine'] = True
             s += mapUtil.UnitData({'units': units})
     return s + "\n}}\n"
 
