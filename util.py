@@ -115,6 +115,7 @@ def fetchFehData(path: str, easySort="id_tag"):
     else:
         return data
 
+
 DATA = {r["key"]: r["value"] for r in fetchFehData("USEN/Message/Data")}
 DATA.update({r["key"]: r["value"] for r in fetchFehData("USEN/Message/Menu")})
 DATA.update({
@@ -127,6 +128,8 @@ DATA.update({
     "MSID_ナーガ": "Naga (tome)",
     "MID_STAGE_X0041": "Legendary Hero (map)"
 })
+SOUNDS = fetchFehData("Common/Sound/arc")
+BGMS = fetchFehData("Common/SRPG/StageBgm")
 
 def getName(id: str, complete=True):
     """Return the name relativ to `id`.
@@ -157,84 +160,24 @@ def getName(id: str, complete=True):
         return DATA["MID_CHAPTER_" + id]
     return id
 
-BGM_FILEPATH = __file__[:__file__.rfind('/')] + '/bgm.json'
-BGM = {
-    "BGM_BATTLE_BOSS_01": "bgm_battle_boss.ogg",
-    "BGM_BATTLE_BOSS_02": "bgm_menu_theme01.ogg",
-    "BGM_BATTLE_BOSS_03": "bgm_boss3.ogg",
-    "BGM_BATTLE_BOSS_04": "bgm_boss4.ogg",
-    "BGM_BATTLE_BOSS_05": "bgm_boss5.ogg",
-    "BGM_BATTLE_BOSS_06": "bgm_boss6.ogg",
-    "BGM_BATTLE_BOSS_07": "bgm_boss7.ogg",
-    "BGM_BATTLE_BOSS_08": "bgm_boss8.ogg",
-    "BGM_MAP_BRAVE_01": "bgm_map_Brave_01.ogg",
-    "BGM_MAP_BRAVE_02": "bgm_map_Brave_02.ogg",
-    "BGM_MAP_BRAVE_03": "bgm_map_Brave_03.ogg",
-    "BGM_MAP_BRAVE_03_SAME": "bgm_map_Brave_03.ogg",
-    "BGM_MAP_BRAVE_04": "bgm_map_FEH_04.ogg",
-    "BGM_MAP_BRAVE_05": "bgm_map_FEH_05.ogg",
-    "BGM_MAP_BRAVE_06": "bgm_map_FEH_06.ogg",
-    "BGM_MAP_BRAVE_07": "bgm_map_FEH_07.ogg",
-    "BGM_MAP_EVT_HAPPY_01": "bgm_event_happy1.ogg",
-    "BGM_MAP_EVT_SERIOUS_01": "bgm_event_serious1.ogg",
-    "BGM_MAP_EVT_SERIOUS_02": "bgm_event_serious2.ogg",
-    "BGM_MAP_EVT_SERIOUS_03": "bgm_event_serious3.ogg",
-    "BGM_MAP_EVT_SERIOUS_04": "bgm_event_serious4.ogg",
-    "BGM_MAP_FES_01_SAME": "bgm_map_fes_01.ogg",
-    "BGM_MAP_FES_02_SAME": "bgm_map_fes_02.ogg",
-    "BGM_MAP_FES_03_SAME": "bgm_map_fes_03.ogg",
-    "BGM_MAP_FES_04_SAME": "bgm_map_fes_04.ogg",
-    "BGM_MAP_FES_05_SAME": "bgm_map_fes_05.ogg",
-    "BGM_MAP_FE08_04": "bgm_mns_FE08_04.ogg",
-    "BGM_MAP_FE10_07": "bgm_mns_FE10_01.ogg",
-    "BGM_MAP_FE10_09": "bgm_mns_FE10_03.ogg",
-    "BGM_MAP_FE10_10": "bgm_mns_FE10_04.ogg",
-    "BGM_MAP_FE10_11": "bgm_mns_FE10_05.ogg",
-    "BGM_MAP_FE11_02": "bgm_mns_FE11_03.ogg",
-    "BGM_MAP_FE13_14": "bgm_mns_FE13_06.ogg",
-    "BGM_MAP_FE14_05_SAME": "bgm_map_FE14_05.ogg",
-    "BGM_MAP_FE14_14_SAME": "bgm_mns_FE14_07.ogg",
-    "BGM_MAP_FE14_16": "bgm_mns_FE14_06.ogg",
-    "BGM_MAP_FE14_17": "bgm_mns_FE14_09.ogg",
-}
-
-wikiBgms = []
-bgms = {}
 def getBgm(mapId: str):
     """Return the list of bgm relativ to an Id"""
-    global wikiBgms
-    if len(wikiBgms) == 0: wikiBgms = [m['Filename'] for m in cargoQuery('BackgroundMusic', fields='Filename')]
-    global bgms
-    if len(bgms) == 0: bgms = readFehData(BGM_FILEPATH, True)
-
-    if not mapId in bgms:
+    if not mapId in BGMS:
         return []
-    tmp = bgms[mapId]
-    bgm = ""
-    if tmp["unknow_id"]:
+    
+    mapBgms = BGMS[mapId]
+    if mapBgms["unknow_id"]:
         askFor("", "Map "+mapId+" has 'unknow_id': "+tmp["unknow_id"])
-    if tmp["bgm2_id"]:
-        if tmp["bgm2_id"] in BGM: bgm = BGM[tmp["bgm2_id"]]
-        else: bgm = tmp["bgm2_id"].lower().replace('fe','FE')+".ogg"
-        if not bgm in wikiBgms: bgm = '<!--'+bgm+'-->'
-        bgm += '<!--'+(BGM[tmp["bgm_id"]] if tmp["bgm_id"] in BGM else (tmp["bgm_id"].lower().replace('fe','FE')+".ogg"))+'-->'
-    else:
-        if tmp["bgm_id"] in BGM: bgm = BGM[tmp["bgm_id"]]
-        else: bgm = tmp["bgm_id"].lower().replace('fe','FE')+".ogg"
-        if not bgm in wikiBgms: bgm = '<!--'+bgm+'-->'
-    if tmp["useGenericBossMusic"]:
-        return [bgm, BGM["BGM_BATTLE_BOSS_01"]]
-    elif tmp["nbBossMusic"] > 0:
-        boss = []
-        for b in tmp["bossMusics"]:
-            if not b["bgm"] in boss: boss += [b["bgm"]]
-        for i in range(len(boss)):
-            if boss[i] in BGM: boss[i] = BGM[boss[i]]
-            else: boss[i] = boss[i].lower().replace('fe','FE')+".ogg"
-            if not boss[i] in wikiBgms: boss[i] = '<!--'+boss[i]+'-->'; print(TODO + "Unknow boss: " + boss[i] + " on " + mapId)
-        return [bgm] + boss
-    else:
-        return [bgm]
+    
+    bgms = []
+    for bgm in [mapBgms["bgm_id"], mapBgms["bgm2_id"]] + [boss["bgm"] for boss in mapBgms["bossMusics"]]:
+        if bgm and bgm in SOUNDS:
+            bgms += [files["file"] + ".ogg" for files in SOUNDS[bgm]["list"]]
+        elif bgm:
+            bgms.append(f"<!--{bgm}-->")
+    if mapBgms["useGenericBossMusic"]:
+        bgms += [files["file"] + ".ogg" for files in SOUNDS["BGM_BATTLE_BOSS_01"]["list"]]
+    return bgms
 
 
 def askFor(pattern: str=None, intro=None, ignoreCase=False):

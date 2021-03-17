@@ -6,7 +6,8 @@ sys.path.insert(0, dirname(realpath(__file__)))
 from .REutil  import decompress
 from .Reverse import reverseFile as reverse
 
-from .RevData import reverseBGM, reverseMessage
+from .RevData  import reverseMessage
+from .RevSound import reverseBGM, reverseSound
 
 from .RevVG  import reverseVotingGauntlet
 from .RevTT  import reverseTempestTrial
