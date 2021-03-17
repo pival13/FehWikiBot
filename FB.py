@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+from sys import argv, stderr
 from datetime import datetime
 import re
 
@@ -63,16 +64,18 @@ def ForgingBonds(tagId: str) -> dict:
     datas = reverseForgingBonds(tagId)
     content = {}
     for data in datas:
-        s = FBInfobox(data) + "\n"
-        s += mapUtil.Availability(data['event_avail'], f"Forging Bonds: {util.getName(data['title'])} (Notification)", "[[Forging Bonds]] event") + "\n"
-        s += FBRewards(data) + "\n"
-        s += FBConversation(data) + "\n"
-        s += mapUtil.InOtherLanguage(data['title'])
-        s += "{{Main Events Navbox}}"
-        content[util.getName(data['title'])] = s
+        if data["id_tag"] != data["original_id_tag"]:
+            print("Revival.")
+        else:
+            s = FBInfobox(data) + "\n"
+            s += mapUtil.Availability(data['event_avail'], f"Forging Bonds: {util.getName(data['title'])} (Notification)", "[[Forging Bonds]] event") + "\n"
+            s += FBRewards(data) + "\n"
+            s += FBConversation(data) + "\n"
+            s += mapUtil.InOtherLanguage(data['title'])
+            s += "{{Main Events Navbox}}"
+            content[util.getName(data['title'])] = s
     return content
 
-from sys import argv
 
 if __name__ == '__main__':
     for arg in argv[1:]:

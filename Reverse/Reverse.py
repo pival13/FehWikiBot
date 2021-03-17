@@ -15,7 +15,8 @@ XXX: 0x04
 XXX: 0x04
 """
 
-from RevData  import parseMsg, parseStageBGM
+from RevData  import parseMsg
+from RevSound import parseSound, parseStageBGM
 from RevMap   import parseField, parseSRPGMap, parseStageScenario, parseStageEvent, parseStagePuzzle
 from RevUnit  import parsePerson, parseEnemy
 from RevQuest import parseQuests
@@ -109,6 +110,8 @@ def reverseFile(file: str):
     elif file.find("/LoginBonus/") != -1:
         print(json.dumps(parseLoginBonus(s), indent=2, ensure_ascii=False))
         return
+    elif file.find("/Sound/arc/") != -1:
+        return parseSound(s)
     elif file.find("/DressAccessory/Data/") != -1:
         print(json.dumps(parseAccessory(s), indent=2, ensure_ascii=False))
         return
