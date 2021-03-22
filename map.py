@@ -7,14 +7,14 @@ import re
 
 from util import TODO, ERROR, DATA
 import util
-from wikiUtil import exportPage
+from wikiUtil import exportPage, exportSeveralPages
 
 from StoryParalogue import StoryMap, StoryGroup, ParalogueMap, ParalogueGroup
 from TD import TacticsDrills
 from HO import HeroicOrdeals
 from DerivedMap import SquadAssault, ChainChallengeMap, ChainChallengeGroup
 
-from HB import GrandHeroBattle, BoundHeroBattle, LegendaryHeroBattle
+from HB import GrandHeroBattle, BoundHeroBattle, LegendaryHeroBattle, LimitedHeroBattle
 from RD import RivalDomains
 from EventMap import exportEventMap
 
@@ -22,26 +22,13 @@ from EventMap import exportEventMap
 from TT import TempestTrials
 #from TB import TapBattle
 #from GC import GrandConquest
-from FB import ForgingBonds
+from FB import exportForgingBonds
 #from RS import RokkrSieges
 from LL import LostLore
 from HoF import HallOfForms
 from MS import MjolnirsStrike
 from FP import FrontlinePhalanx
 from PoL import PawnsOfLoki
-
-def exportMap(name: str, content: str):
-    result = exportPage(name, content, "bot: new map", create=True)
-    if 'error' in result and result['error']['code'] == 'articleexists':
-        print(f"Page already exist: " + name)
-    elif 'edit' in result and result['edit']['result'] == 'Success':
-        print(f"Page created: " + name)
-    else:
-        print(result)
-
-def exportGroup(group: dict):
-    for name in group:
-        exportMap(name, group[name])
 
 def parseMapId(mapId: str):
     if "MID_STAGE_"+mapId in DATA:
@@ -59,40 +46,42 @@ def parseMapId(mapId: str):
         return
 
     if re.match(r"S\d{4}", mapId):
-        exportMap(name, StoryMap(mapId))
+        exportPage(name, StoryMap(mapId), 'Bot: new Story Map', create=True)
 
     if re.match(r"C\d{4}", mapId):
-        exportGroup(StoryGroup(mapId))
+        exportSeveralPages(StoryGroup(mapId), 'Bot: new Story Map', create=True)
 
     elif re.match(r"X[X0-9]\d{3}", mapId):
-        exportMap(name, ParalogueMap(mapId))
+        exportPage(name, ParalogueMap(mapId), 'Bot: new Paralogue Map', create=True)
 
     elif re.match(r"CX\d{3}", mapId):
-        exportGroup(ParalogueGroup(mapId))
+        exportSeveralPages(ParalogueGroup(mapId), 'Bot: new Paralogue Map', create=True)
 
     elif re.match(r"H\d{4}", mapId):
         nb = int(re.match(r"H(\d+)", mapId)[1])
         heroes = util.fetchFehData("Common/SRPG/Person", 'id_num')
         if nb in heroes:
-            exportMap("Heroic Ordeals: " + util.getName(heroes[nb]['id_tag']) + "'s Trial", HeroicOrdeals(mapId))
+            exportPage("Heroic Ordeals: " + util.getName(heroes[nb]['id_tag']) + "'s Trial", HeroicOrdeals(mapId), 'Bot: new Heroic Ordeals', create=True)
         else:
             print(ERROR + "Unknow map: " + mapId)
 
     elif re.match(r"P[ABC]\d{3}", mapId):
-        exportMap(name, TacticsDrills(mapId))
+        exportPage(name, TacticsDrills(mapId), 'Bot: new Tactics Drills', create=True)
 
 
     elif re.match(r"T\d{4}", mapId):
         if re.match(r"\w{1,2} & \w{1,2}", name):
-            exportGroup(BoundHeroBattle(mapId))
+            exportSeveralPages(BoundHeroBattle(mapId), 'Bot: new Bound Hero Battle', create=True)
         else:
-            exportMap(name + " (map)", GrandHeroBattle(mapId))
+            exportPage(name + " (map)", GrandHeroBattle(mapId), 'Bot: new Grand Hero Battle', create=True)
 
     elif re.match(r"L\d{4}", mapId):
-        exportMap(name + " (map)", LegendaryHeroBattle(mapId))
+        content = LegendaryHeroBattle(mapId)
+        isMythic = content.find("Mythic Hero Battle") != -1
+        exportPage(name + " (map)", content, 'Bot: new Legendary Hero Battle' if not isMythic else 'Bot: new Mythic Hero Battle', create=True)
 
     elif re.match(r"Q\d{4}", mapId):
-        exportMap(name + " (" + str(int(mapId.replace("Q", ""))) + ")", RivalDomains(mapId))
+        exportPage(name + f" ({int(mapId[1:])})", RivalDomains(mapId), 'Bot: new Rival Domains', create=True)
         print(TODO + "Edit Grand Conquests Trivia")
 
     elif re.match(r"V\d{4}-V\d{4}", mapId):
@@ -101,16 +90,19 @@ def parseMapId(mapId: str):
     elif re.match(r"V\d{4}", mapId):
         exportEventMap(mapId)
 
+    elif re.match(r"I\d{4}", mapId):
+        exportSeveralPages(LimitedHeroBattle(mapId), 'Bot: new Limited Hero Battle', create=False)
+
 
     elif re.match(r"SB_\d{4}", mapId):
-        exportMap(name, SquadAssault(mapId))
+        exportPage(name, SquadAssault(mapId), 'Bot: new Squad Assault', create=True)
 
     elif re.match(r"ST_S\d{4}", mapId) or re.match(r"ST_X\d{4}", mapId):
-        exportMap("Chain Challenge: " + (mapId[3] == 'S' and f"Book {util.ROMAN[int(mapId[5]) or 1]}, " or '') + name,
-            ChainChallengeMap(mapId))
+        name = "Chain Challenge: " + (f"Book {util.ROMAN[int(mapId[5]) or 1]}, " if mapId[3] == 'S' else '') + name
+        exportPage(name, ChainChallengeMap(mapId), 'Bot: new Chain Challenge', create=True)
 
     elif re.match(r"ST_C\d{4}", mapId) or re.match(r"ST_CX\d{3}", mapId):
-        exportGroup(ChainChallengeGroup(mapId))
+        exportSeveralPages(ChainChallengeGroup(mapId), 'Bot: new Chain Challenge', create=True)
 
     elif re.compile(r"BG_(WATER|WIND|EARTH|FIRE)_\d{4}").match(mapId): #TODO
         print("Blessed Garden: " + name)
@@ -161,27 +153,27 @@ def findEvents(tag: str):
         with open(__file__, 'r') as f: __file__Content = f.read()
         with open(__file__, 'w') as f: f.write(re.sub(r"lastTBRevival = \d+#Here to change", f"lastTBRevival = {lastTBRevival+1}#Here to change", __file__Content))
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tag + '.bin.lz'):
-        try: exportGroup(TempestTrials(tag))
+        try: exportSeveralPages(TempestTrials(tag), 'Bot: new Tempest Trials', create=True)
         except: print(TODO + "Tempest Trials")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Occupation/Data/' + tag + '.bin.lz'): print(TODO + "New Grand Conquests")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'):
-        try: exportGroup(ForgingBonds(tag))
+        try: exportForgingBonds(tag)
         except: print(TODO + "Forging Bonds")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'): print(TODO + "New Rokkr Sieges")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'):
-        try: exportGroup(LostLore(tag))
+        try: exportSeveralPages(LostLore(tag), 'Bot: new Lost Lore', create=True)
         except: print(TODO + "Lost Lore")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/IdolTower/' + tag + '.bin.lz'):
-        try: exportGroup(HallOfForms(tag))
+        try: exportSeveralPages(HallOfForms(tag), 'Bot: new Hall of Forms', create=True)
         except: print(TODO + "Hall of Form")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Mjolnir/BattleData/' + tag + '.bin.lz'):
-        try: exportGroup(MjolnirsStrike(tag))
+        try: exportSeveralPages(MjolnirsStrike(tag), 'Bot: new Mjölnir\'s Strike', create=True)
         except: print(TODO + "Mjölnir's Strike")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Encourage/' + tag + '.bin.lz'):
-        try: exportGroup(FrontlinePhalanx(tag))
+        try: exportSeveralPages(FrontlinePhalanx(tag), 'Bot: new Frontline Phalanx', create=True)
         except: print(TODO + "Frontline Phalanx")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/BoardGame/' + tag + '.bin.lz'):
-        try: exportGroup(PawnsOfLoki(tag))
+        try: exportSeveralPages(PawnsOfLoki(tag), 'Bot: new Pawns of Loki', create=True)
         except: print(TODO + "Pawns of Loki")
 
 def findUpcoming():

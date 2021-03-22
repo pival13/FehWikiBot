@@ -39,4 +39,4 @@ if __name__ == '__main__':
         page = re.sub(r'\{\{MjolnirStrikeResults[^}]*?\}\}', s, page)
 
         wikiUtil.waitSec(10)
-        print(wikiUtil.exportPage(f"Mjölnir's Strike {nb}", page, "Bot: Mjölnir's Strike result", True))
+        wikiUtil.exportPage(f"Mjölnir's Strike {nb}", page, "Bot: Mjölnir's Strike result", minor=True, create=False)

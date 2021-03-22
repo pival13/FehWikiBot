@@ -9,38 +9,12 @@ from num2words import num2words
 from util import DATA, DIFFICULTIES, ERROR, URL
 import util
 import mapUtil
+from wikiUtil import _exportPage
 
 UNITS = {util.getName(u['id_tag']): u for u in util.fetchFehData("Common/SRPG/Person", False) + util.fetchFehData("Common/SRPG/Enemy", False)}
 WEAPON_TYPE = ['剣', '槍', '斧', '弓', '弓', '弓', '弓', '暗器', '暗器', '暗器', '暗器']
 MAGIC_TYPE = [['','',''],['ファイアー','エルファイアー','ボルガノン'],['サンダー','エルサンダー','トロン'],['ウインド','エルウインド','レクスカリバー'],['ライト','エルライト','シャイン'],['ミィル','ルイン','ノスフェラート'],['ロック','エルロック','アトラース']]
 BEAST_TYPE = ['歩行', '重装', '騎馬', '飛行']
-
-def __export(content: str, name: str):
-    S = util.fehBotLogin()
-
-    try:
-        result = S.post(url=URL, data={
-            "action": "edit",
-            "title": name,
-            "text": content,
-            "createonly": True,
-            "bot": True,
-            "tags": "automated",
-            "summary": "bot: new map",
-            "watchlist": "nochange",
-            "token": util.getToken(),
-            "format": "json"
-        }).json()
-    except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        __export(content, name)
-
-    if 'error' in result and result['error']['code'] == 'articleexists':
-        return False
-    elif 'edit' in result and result['edit']['result'] == 'Success':
-        return True
-    else:
-        print(result)
-        return False
 
 def exportEventMap(mapId1: str, mapId2: str=None):
     if mapId2:
@@ -52,12 +26,13 @@ def exportEventMap(mapId1: str, mapId2: str=None):
     for name in content:
         success = False
         while not success:
-            if not __export(content[name], name+append):
+            result = _exportPage(name + append, content[name], 'Bot: new Event Map', create=True)
+            if 'edit' in result and result['edit']['result'] == 'Success':
+                success = True
+            else:
                 append = util.askAgreed(f"\"{name}\" already exist. Should something be append to the name?", useTrueDefault=False, askYes="What should be append?")
                 if not append:
                     return
-            else:
-                success = True
 
 def getDefaultWeapon(unit: dict, diff: int, level: int):
     weapon = unit['weapon_type']

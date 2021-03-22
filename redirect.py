@@ -8,7 +8,7 @@ import re
 
 from util import URL, TODO, DATA
 import util
-from wikiUtil import exportPage
+from wikiUtil import _exportPage
 
 SKILL_DATA = util.fetchFehData("Common/SRPG/Skill", False)
 ACCESSORY_DATA = util.fetchFehData("Common/DressAccessory/Data", False)
@@ -35,7 +35,7 @@ def getAccessoryName(sprite: str):
         return "File:Accessory " + util.cleanStr(DATA["M" + nameId]) + ".png"
 
 def redirect(name: str, redirect: str):
-    result = exportPage(redirect or name.replace(".webp", ".png"),
+    result = _exportPage(redirect or name.replace(".webp", ".png"),
                         "#REDIRECT [[" + name + "]]", create=True)
     if 'error' in result and result['error']['code'] == 'articleexists':
         print(f"Redirect already exist: {redirect or name.replace('.webp', '.png')}")

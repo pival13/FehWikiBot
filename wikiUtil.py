@@ -106,7 +106,7 @@ def deleteToRedirect(pageToDelete: str, redirectionTarget: str):
     }).json()
     return (deleteR, redirectR)
 
-def exportPage(name: str='User:'+util.USER+'/sandbox/Bot', content: str='', summary: str=None, minor: bool=False, create: bool=False, attempt=0):
+def _exportPage(name: str, content: str, summary: str=None, minor: bool=False, create: bool=False, attempt=0):
     if attempt >= 3:
         return {'error': {'code': "savefail"}}
     try:
@@ -126,7 +126,23 @@ def exportPage(name: str='User:'+util.USER+'/sandbox/Bot', content: str='', summ
         }).json()
         return result
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        return exportPage(name, content, summary, minor, create, attempt+1)
+        return _exportPage(name, content, summary, minor, create, attempt+1)
+
+def exportPage(name: str, content: str, summary: str=None, minor: bool=False, create: bool=False):
+    result = _exportPage(name, content, summary, minor, create)
+    if 'error' in result and result['error']['code'] == 'articleexists':
+        print(f"Page already exist: " + name)
+    elif 'edit' in result and result['edit']['result'] == 'Success':
+        if 'nochange' in result['edit']:
+            print(f"No change: " + name)
+        else:
+            print(f"Page created: " + name)
+    else:
+        print(result)
+
+def exportSeveralPages(group: dict, summary: str=None, minor: bool=False, create: bool=False):
+    for name in group:
+        exportMap(name, group[name], summary, minor, create)
 
 
 if __name__ == '__main__':
