@@ -8,6 +8,7 @@ from util import DATA, DIFFICULTIES, ERROR
 import util
 import mapUtil
 from scenario import Story, UNIT_IMAGE
+from reward import parseReward
 
 def getHeroWithName(name: str):
     heroes = util.fetchFehData("Common/SRPG/Person", None)
@@ -151,17 +152,54 @@ def GrandHeroBattle(mapId: str):
 
     return content
 
+def LimitedHeroBattleTemplate(StageEvent: object):
+    entry = []
+    obj = {DIFFICULTIES[scenario['difficulty']]: scenario['reward'] for scenario in StageEvent['scenarios']}
+    reward = "{\n"
+    for diff in DIFFICULTIES:
+        if diff in obj:
+            reward += "  " + diff + "=" + parseReward(obj[diff]) + ";\n"
+    reward += "}"
+    for i in range(8*4):
+        if StageEvent['scenarios'][0]['origins'] & (1 << i):
+            entry.append(str(i))
+    return "{{Limited Hero Battle\n" + \
+        f"|map={StageEvent['id_tag']}|entry={','.join(entry)}" +\
+        f"|refresher={StageEvent['scenarios'][0]['max_refreshers']}\n" + \
+        f"|reward={reward}\n" + \
+        f"|start={StageEvent['avail']['start']}|end={util.timeDiff(StageEvent['avail']['finish'])}\n" + \
+        f"|notification=Limited Hero Battles! ({datetime.strptime(StageEvent['avail']['start'], util.TIME_FORMAT).strftime('%b %Y')}) (Notification)\n" + \
+        "}}"
+
+from wikiUtil import getPageContent
+def LimitedHeroBattle(mapId: str):
+    StageEvent = util.fetchFehData("Common/SRPG/StageEvent")[mapId]
+    pageName = util.cargoQuery('Maps', where=f"Map='{StageEvent['banner_id']}'", limit=1)[0]['Page'].replace('&amp;', '&')
+    content = getPageContent([pageName])[pageName]
+
+    if not re.search(r"==\s*Limited Hero Battle\s*==", content):
+        content = re.sub(r"(==\s*Unit [dD]ata\s*==(\n.*)*?)\n==", "\\1\n==Limited Hero Battle==\n==", content)
+    if content.find("{{Limited Hero Battle/header}}") == -1:
+        content = re.sub(r"(==\s*Limited Hero Battle\s*==)\n", "\\1\n{{Limited Hero Battle/header}}\n|}\n", content)
+    if not re.search(r"map\s*=\s*"+mapId, content):
+        content = re.sub(r"(==\s*Limited Hero Battle\s*==(\n.*)*?)\n\|\}", "\\1\n"+LimitedHeroBattleTemplate(StageEvent)+"\n|}", content)
+    return {pageName: content}
+
 from sys import argv
 
 if __name__ == '__main__':
     for arg in argv[1:]:
         try:
-            if arg[0] == 'T' and util.getName(arg)[2] == '&':
+            if re.match(r'T\d{4}', arg) and util.getName(arg)[2] == '&':
                 maps = list(BoundHeroBattle(arg).items())[0]
                 print(maps[0], maps[1], sep='\n')
-            elif arg[0] == 'T':
+            elif re.match(r'T\d{4}', arg):
                 print(GrandHeroBattle(arg))
-            elif arg[0] == 'L':
+            elif re.match(r'L\d{4}', arg):
                 print(LegendaryHeroBattle(arg))
+            elif re.match(r'I\d{4}', arg):
+                print(LimitedHeroBattle(arg))
+            else:
+                print(util.ERROR, "Unknow argument", arg)
         except:
             print("Error with " + arg)
