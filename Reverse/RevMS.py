@@ -9,7 +9,7 @@ def parseMjolnir(data):
     result = []
     nbGroup = util.getLong(data,0x08)
     for iGr in range(nbGroup):
-        offGr = util.getLong(data, 0x00) + 0x19A0*iGr
+        offGr = util.getLong(data, 0x10+0x08*iGr)
         result += [{
             "id_tag": util.getString(data, offGr),
             "bonus_structure": util.getString(data, offGr+0x08),

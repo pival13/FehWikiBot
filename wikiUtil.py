@@ -61,7 +61,7 @@ def getPages(nameLike: str) -> list:
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         return getPages(nameLike)
 
-def getPageContent(pages: list) -> dict:
+def getPageContent(pages: list, revision: int=0) -> dict:
     if len(pages) > 0:
         try:
             S = util.fehBotLogin()
@@ -71,9 +71,10 @@ def getPageContent(pages: list) -> dict:
                 "prop": "revisions",
                 "rvprop": "content",
                 "rvslots": "*",
+                "rvlimit": revision+1,
                 "format": "json"
             }).json()['query']['pages']
-            result = {result[pageId]['title']: result[pageId]['revisions'][0]['slots']['main']['*'] for pageId in result}
+            result = {result[pageId]['title']: (result[pageId]['revisions'][revision]['slots']['main']['*'] if len(result[pageId]['revisions']) > revision else result[pageId]['revisions'][-1]['slots']['main']['*']) for pageId in result}
             result.update(getPageContent(pages[50:]))
             return result
         except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
@@ -92,18 +93,7 @@ def deleteToRedirect(pageToDelete: str, redirectionTarget: str):
         "token": util.getToken(),
         "format": "json"
     }).json()
-    redirectR = S.post(url=util.URL, data={
-        "action": "edit",
-        "title": pageToDelete,
-        "text": "#REDIRECT [[" + redirectionTarget + "]]",
-        "summary": "Bot: redirect",
-        "createonly": True,
-        "bot": True,
-        "tags": "automated",
-        "watchlist": "nochange",
-        "token": util.getToken(),
-        "format": "json"
-    }).json()
+    redirectR = _exportPage(pageToDelete, f"#REDIRECT [[{redirectionTarget}]]", "Bot: redirect", create=True)
     return (deleteR, redirectR)
 
 def _exportPage(name: str, content: str, summary: str=None, minor: bool=False, create: bool=False, attempt=0):
@@ -135,14 +125,16 @@ def exportPage(name: str, content: str, summary: str=None, minor: bool=False, cr
     elif 'edit' in result and result['edit']['result'] == 'Success':
         if 'nochange' in result['edit']:
             print(f"No change: " + name)
-        else:
+        elif create:
             print(f"Page created: " + name)
+        else:
+            print(f"Page edited: " + name)
     else:
         print(result)
 
 def exportSeveralPages(group: dict, summary: str=None, minor: bool=False, create: bool=False):
     for name in group:
-        exportMap(name, group[name], summary, minor, create)
+        exportPage(name, group[name], summary, minor, create)
 
 
 if __name__ == '__main__':

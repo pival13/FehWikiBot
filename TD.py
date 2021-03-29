@@ -41,8 +41,8 @@ def TDUnitData(SRPGMap: dict, StageEvent):
            "|" + DIFFICULTIES[StageEvent['difficulty']] + "=" + \
             mapUtil.UnitData(SRPGMap) + "}}\n"
 
-def Solution(SRPGMap: dict):
-    layout = mapUtil.MapImage(SRPGMap['field'], simpleMap=True)
+def Solution(field: dict):
+    layout = mapUtil.MapImage(field, simpleMap=True)
     baseMap = re.search(r'baseMap=(\w*)', layout)
     backdrop = re.search(r'backdrop=(\w*)', layout)
     wallStyle = re.search(r'style=([^}|]*)', layout)
@@ -61,10 +61,10 @@ def TacticsDrills(mapId: str):
     SRPGMap['field'].update({'player_pos': SRPGMap['player_pos']})
 
     content = TDMapInfobox(StageEvent, SRPGMap['field']) + "\n"
-    content += mapUtil.MapAvailability(StageEvent['avail'] or {}, "New Tactics Drills! (" + datetime.strptime(StageEvent['avail']['start'], UTIL.TIME_FORMAT).strftime("%b %d, %Y").replace(" 0", " ") + ") (Notification)")
+    content += mapUtil.MapAvailability(StageEvent['avail'] or {}, "New Tactics Drills! (" + datetime.strptime(StageEvent['avail']['start'], util.TIME_FORMAT).strftime("%b %d, %Y").replace(" 0", " ") + ") (Notification)")
     content += TDText(mapId)
     content += TDUnitData(SRPGMap, StageEvent)
-    content += Solution(SRPGMap)
+    content += Solution(SRPGMap['field'])
     content += mapUtil.InOtherLanguage('MID_STAGE_' + mapId)
     content += "{{Tactics Drills Navbox}}"
 

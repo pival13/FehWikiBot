@@ -133,7 +133,7 @@ def Conversation(mapId, tag):
                      ['{{StoryTextTableEnd}}','{{tab/header|Japanese}}','{{StoryTextTableHeader}}'] +
                      wikiTextJPJA + ['{{StoryTextTableEnd}}','{{tab/end}}'])
 
-def StoryNavBar(mapId, prev, next):
+def StoryNavBar(mapId, prev='', next=''):
     answer = util.askFor(None, f"{mapId}: Previous story{prev != '' and (' is ' + prev + '?') or ''}")
     if answer and re.match('n|no', answer, re.IGNORECASE):
         prev = ""

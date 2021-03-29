@@ -9,8 +9,8 @@ import REutil as util
 BIN.LZ Header:
 TotalSize: 0x04
 CorpseSize: 0x04
-PtrTableSize: 0x04
-StringTableSize: 0x04 (0x08 each : idx (0x04), tblStringIdx (0x04))
+PtrTableCount: 0x04 (0x08 each: adress of a pointer)
+StringTableSize: 0x04 (0x08 each : corpseIdx (0x04), tblStringIdx (0x04))
 XXX: 0x04
 XXX: 0x04
 """

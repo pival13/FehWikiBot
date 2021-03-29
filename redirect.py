@@ -11,7 +11,7 @@ import util
 from wikiUtil import _exportPage
 
 SKILL_DATA = util.fetchFehData("Common/SRPG/Skill", False)
-ACCESSORY_DATA = util.fetchFehData("Common/DressAccessory/Data", False)
+ACCESSORY_DATA = util.fetchFehData("Common/DressAccessory/Data", "sprite")
 
 def getWeaponName(sprite: str):
     nameId = None
@@ -19,20 +19,14 @@ def getWeaponName(sprite: str):
         if nameId:
             break
         for s in skill['sprites']:
-            if s and s.lower() + ".webp" == sprite.lower():
+            if s and s == sprite.replace(' ', '_'):
                 nameId = skill['name_id']
     if nameId and nameId in DATA:
         return "File:Weapon " + util.cleanStr(DATA[nameId]) + (" V2" if sprite.find("ar") != -1 else "") + ".png"
 
 def getAccessoryName(sprite: str):
-    nameId = None
-    for skill in ACCESSORY_DATA:
-        if nameId:
-            break
-        if skill['sprite'].lower() + ".webp" == sprite.lower():
-            nameId = skill['id_tag']
-    if nameId and "M" + nameId in DATA:
-        return "File:Accessory " + util.cleanStr(DATA["M" + nameId]) + ".png"
+    if sprite.replace(' ', '_') in ACCESSORY_DATA:
+        return f"File:Accessory {util.cleanStr(util.getName(ACCESSORY_DATA[sprite.replace(' ', '_')]['id_tag']))}.png"
 
 def redirect(name: str, redirect: str):
     result = _exportPage(redirect or name.replace(".webp", ".png"),
@@ -66,7 +60,7 @@ def main(start=None):
             else:
                 print(TODO + "TT banner: " + image['title'])
         elif re.match(r"Wep[_ ][a-z]{2}\d{3}([_ ]up)?\.webp", image['name']):
-            wp = getWeaponName(image['name'])
+            wp = getWeaponName(image['title'])
             if wp and (image['name'].find("up") != -1 or image['name'].find("mg") != -1):
                 #Do not automatically redirect refine weapon and tomes
                 print(TODO + image['name'] + " to " + str(wp))
@@ -75,7 +69,7 @@ def main(start=None):
             else:
                 print(TODO + "Unknow weapon: " + image['title'])
         elif re.match(r"Acc[_ ][1-4][_ ]\d{4}[_ ]\d\.webp", image['name']):
-            name = getAccessoryName(image['name'])
+            name = getAccessoryName(image['title'])
             if not name:
                 print(TODO + "Unknow accessory: " + image['title'])
         elif re.search(r"[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger|Cry|Blush)?\d*\.webp$", image['name']):

@@ -15,7 +15,7 @@ def parseMsg(data):
         }]
     return result
 
-def reverseMessage(name: str, type: str, lang: str="USEN"):
+def reverseMessage(tag: str, type: str, lang: str="USEN"):
     """
     Args:
         tag (str): The name of the file, without the extension.

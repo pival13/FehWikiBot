@@ -47,10 +47,10 @@ def parseSound(data):
 def parseStageBGM(data, header):
     result = []
     nbGroup = util.getLong(data, 0x08, 0x0)
-    offset = util.getLong(data, 0x00)
     stringOffsetTable = util.getInt(header, 0x04) + util.getInt(header, 0x08) * 0x08
     stringTable = data[stringOffsetTable + util.getInt(header, 0x0C) * 0x08:]
     for iGr in range(nbGroup):
+        offset = util.getInt(data, stringOffsetTable+0x08*iGr)
         result += [{
             "id_tag": util.xorString(stringTable[util.getInt(data, stringOffsetTable+0x08*iGr+0x04):], util.NONE_XORKEY),
             "bgm_id": getStringBgm(data, offset),
@@ -58,15 +58,11 @@ def parseStageBGM(data, header):
             "unknow_id": getStringBgm(data, offset+0x10),
             "useGenericBossMusic": util.getBool(data, offset+0x18),
             "nbBossMusic": util.getInt(data, offset+0x19),
-            "bossMusics": []
+            "bossMusics": [{
+                "boss": getStringBgm(data, offset+0x20+0x10*i),
+                "bgm": getStringBgm(data, offset+0x28+0x10*i)
+            } for i in range(util.getInt(data, offset+0x19))],
         }]
-        offset += 0x20
-        for i in range(result[-1]["nbBossMusic"]):
-            result[-1]["bossMusics"] += [{
-                "boss": getStringBgm(data, offset),
-                "bgm": getStringBgm(data, offset+0x08)
-            }]
-            offset += 0x10
     return result
 
 def reverseSound(tag: str):

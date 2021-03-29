@@ -10,7 +10,7 @@ from sys import stdin, stderr
 from datetime import datetime, timedelta
 import re
 
-URL = "https://feheroes.gamepedia.com/api.php"
+URL = "https://feheroes.fandom.com/api.php"
 TODO = "\33[1;30;103mTODO\33[0m: "
 ERROR = "\33[1;101mERROR\33[0m: "
 DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
@@ -48,12 +48,6 @@ REMOVE_ACCENT_TABLE = {
     "Ý": "Y", "Ŷ": "Y", "Ÿ": "Y", "Ỹ": "Y", "Ȳ": "Y", "ý": "y", "ŷ": "y", "ÿ": "y", "ỹ": "y", "ȳ": "y",
     "Ź": "Z", "Ż": "Z", "Ž": "Z", "ź": "z", "ż": "z", "ž": "z"
 }
-
-class LoginError(RuntimeError):
-    def __init__(self, arg):
-        self.args = arg
-    def __str__(self):
-        return self.arg
 
 def timeDiff(time: str, diff: int=1) -> str:
     """
@@ -217,7 +211,7 @@ def askAgreed(intro, askYes: str=None, askNo: str=None, defaultTrue=None, defaul
         If answer is Yes, and askYes is present, return the result of askFor with it.
         If answer is No, and askNo is present, return the result of askFor with it.
     """
-    answer = askFor(None, intro)
+    answer = askFor(intro=intro)
     if not answer and useTrueDefault:
         return defaultTrue
     elif not answer and not useTrueDefault:
@@ -244,7 +238,7 @@ def getToken():
     }).json()
     return result['query']['tokens']['csrftoken']
 
-def fehBotLogin():
+def fehBotLogin(attempt=0):
     """Create a new connection to the FeH Wiki, or return the existing connection if any"""
     global SESSION
     if SESSION:
@@ -268,13 +262,14 @@ def fehBotLogin():
         }).json()
 
         if result['login']['result'] != 'Success':
-            raise LoginError(result['login']['reason'])
+            SESSION = None
+            raise requests.exceptions.ConnectionError("Failed to login")
         return SESSION
 
-    except LoginError:
-        print("Error during login")
-    except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        return fehBotLogin()
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError) as e:
+        if attempt < 3:
+            return fehBotLogin(attempt+1)
+        raise e
 
 def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: str=None, group: str=None, order: str="_pageID", limit: int="max"):
     """Return the result of a cargo query.
@@ -382,5 +377,5 @@ from sys import argv
 
 if __name__ == "__main__":
     #print(getName(argv[1]))
-    json.dump(DATA, open('data.json', 'w'), indent=2, ensure_ascii=False)
-    json.dump(otherLanguages(), open("otherLanguages.json", 'w'), indent=2, ensure_ascii=False)
+    json.dump(DATA, open('jsons/data.json', 'w'), indent=2, ensure_ascii=False)
+    json.dump(otherLanguages(), open("jsons/otherLanguages.json", 'w'), indent=2, ensure_ascii=False)

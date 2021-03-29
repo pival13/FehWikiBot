@@ -116,7 +116,7 @@ def parseTapAction(data):
     return result
 
 def reverseTapBattle(nb: int, revival: bool=False):
-    fpath = util.BINLZ_ASSETS_DIR_PATH + f"/Common/TapAction/TapBattleData/TDID_{id:04}{'_01' if revival else ''}.bin.lz"
+    fpath = util.BINLZ_ASSETS_DIR_PATH + f"/Common/TapAction/TapBattleData/TDID_{nb:04}{'_01' if revival else ''}.bin.lz"
     if isfile(fpath):
         data = util.decompress(fpath)
         return parseTapAction(data[0x20:])

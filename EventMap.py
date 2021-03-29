@@ -11,7 +11,7 @@ import util
 import mapUtil
 from wikiUtil import _exportPage
 
-UNITS = {util.getName(u['id_tag']): u for u in util.fetchFehData("Common/SRPG/Person", False) + util.fetchFehData("Common/SRPG/Enemy", False)}
+UNITS = {util.getName(u['id_tag']): u for u in util.fetchFehData("Common/SRPG/Enemy", False) + util.fetchFehData("Common/SRPG/Person", False)}
 WEAPON_TYPE = ['剣', '槍', '斧', '弓', '弓', '弓', '弓', '暗器', '暗器', '暗器', '暗器']
 MAGIC_TYPE = [['','',''],['ファイアー','エルファイアー','ボルガノン'],['サンダー','エルサンダー','トロン'],['ウインド','エルウインド','レクスカリバー'],['ライト','エルライト','シャイン'],['ミィル','ルイン','ノスフェラート'],['ロック','エルロック','アトラース']]
 BEAST_TYPE = ['歩行', '重装', '騎馬', '飛行']

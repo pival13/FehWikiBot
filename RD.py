@@ -30,27 +30,31 @@ def getDuplicateMap(mapId: str):
         return getDuplicateMap(mapId)
 
 def drawRDMapLayout(mapLayout: dict):
-    key = [[ c + str(n) for c in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] ] for n in range(10, 0, -1) ]
     mapNormal = mapLayout['map']
-    enemySpawn = re.compile(r"\{\{RDTerrain\|color=Enemy\|type=Spawn\}\}")
     enemyCamp = re.compile(r"\{\{RDTerrain\|color=Enemy\|type=Camp( Spawn)?\}\}")
+    enemySpawn = re.compile(r"\{\{RDTerrain\|color=Enemy\|type=Spawn\}\}")
     enemyWarpSpawn = re.compile(r"\{\{RDTerrain\|color=Enemy\|type=Warp Spawn\}\}")
-    cellIsKind = lambda a, b, regex: a >= 0 and b >= 0 and a < len(mapNormal) and b < len(mapNormal[a]) and regex.search(mapLayout['map'][a][b])
+    cellIsKind = lambda a, b, regex: a >= 0 and b >= 0 and a < len(mapNormal) and b < len(mapNormal[a]) and regex.search(mapNormal[a][b])
 
-    #Case 2 Spawn cell
-    if sum([sum([bool(enemySpawn.search(cell)) for cell in line]) for line in mapNormal]) == 2:
+    #Case 2 Spawn cell.
+    if sum([sum([1 for cell in line if enemySpawn.search(cell)]) for line in mapNormal]) == 2:
         mapNormal = [[enemySpawn.sub("", cell) if enemySpawn.search(cell) else cell for cell in line] for line in mapNormal]
-    #Case 2 Camp
-    elif sum([sum([bool(enemyCamp.search(cell)) for cell in line]) for line in mapNormal]) == 2:
-        mapNormal = [[re.sub("Warp Spawn", "Warp", mapNormal[i][j]) if cellIsKind(i, j, enemyWarpSpawn) and
-            any([cellIsKind(x, y, enemyCamp) for (x, y) in [(i, j-1), (i, j+1), (i-1, j), (i+1, j)]])
-                else mapNormal[i][j] for j in range(len(mapNormal[i]))] for i in range(len(mapNormal))]
-    #Case 6 Warp Spawn. In this case, Warp Spawn next to only one warp spawn are remove
-    elif sum([sum([bool(enemyWarpSpawn.search(cell)) for cell in line]) for line in mapNormal]) == 6:
-        mapNormal = [[re.sub("Warp Spawn", "Warp", mapNormal[i][j]) if cellIsKind(i, j, enemyWarpSpawn) and
-            any([cellIsKind(x, y, enemyCamp) and cellIsKind(x2, y2, enemyWarpSpawn) for (x, y, x2, y2) in [(i, j-1, i, j-2), (i, j+1, i, j+2), (i-1, j, i-2, j), (i+1, j, i+2, j)]])
-                else mapNormal[i][j] for j in range(len(mapNormal[i]))] for i in range(len(mapNormal))]
+    #Case 2 Camp.
+    elif sum([sum([1 for cell in line if enemyCamp.search(cell)]) for line in mapNormal]) == 2:
+        cond = lambda i, j: cellIsKind(i, j, enemyWarpSpawn) and any([cellIsKind(x, y, enemyCamp) for (x, y) in [(i, j-1), (i, j+1), (i-1, j), (i+1, j)]])
+        mapNormal = [[re.sub("Warp Spawn", "Warp", mapNormal[i][j]) if cond(i, j) else mapNormal[i][j]
+            for j in range(len(mapNormal[i]))] for i in range(len(mapNormal))]
+    #Case 6 Warp Spawn.
+    #Two Warp Spawn separated by a Camp are converted to Spawn.
+    elif sum([sum([1 for cell in line if enemyWarpSpawn.search(cell)]) for line in mapNormal]) == 6:
+        cond = lambda i, j: cellIsKind(i, j, enemyWarpSpawn) and any([cellIsKind(x, y, enemyCamp) and cellIsKind(x2, y2, enemyWarpSpawn)
+            for (x, y, x2, y2) in [(i, j-1, i, j-2), (i, j+1, i, j+2), (i-1, j, i-2, j), (i+1, j, i+2, j)]])
+        mapNormal = [[re.sub("Warp Spawn", "Warp", mapNormal[i][j]) if cond(i, j) else mapNormal[i][j]
+            for j in range(len(mapNormal[i]))] for i in range(len(mapNormal))]
+    else:
+        print(util.TODO + "Rival domains with an unknow pattern")
 
+    key = [[ c + str(n) for c in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] ] for n in range(10, 0, -1) ]
     content = "|version1=Standard\n|mapImage={{MapLayout|type=RD|baseMap=" + mapLayout['basemap'] + "|backdrop=" + mapLayout['backdrop'] + "\n"
     for i in range(len(mapLayout['map'])):
         for j in range(len(mapLayout['map'][i])):
@@ -96,7 +100,7 @@ def RDMapLayout(mapId: str):
     result = {
         'basemap': mapId,
         'backdrop': re.findall(r"backdrop=(\w*)\n", GCLayout)[0],
-        'map': [ re.findall(r"."+str(i)+r"=\s*(\{\{[^}]+\}\}|)\s*(?:\n|\|)", GCLayout) for i in range(10,0,-1) ]
+        'map': [ re.findall("[a-h]"+str(i)+r"=\s*(\{\{.+?\}\}|)\s*", GCLayout) for i in range(10,0,-1) ]
     }
     return drawRDMapLayout(result)
 
