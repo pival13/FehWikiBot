@@ -185,6 +185,53 @@ def LimitedHeroBattle(mapId: str):
         content = re.sub(r"(==\s*Limited Hero Battle\s*==(\n.*)*?)\n\|\}", "\\1\n"+LimitedHeroBattleTemplate(StageEvent)+"\n|}", content)
     return {pageName: content}
 
+def RevivalHeroBattle(mapId: str):
+    StageEvent = util.fetchFehData("Common/SRPG/StageEvent")[mapId]
+    pageName = util.cargoQuery('Maps', where=f"Map='{StageEvent['banner_id']}'", limit=1)[0]['Page'].replace('&amp;', '&')
+    content = getPageContent([pageName])[pageName]
+
+    if mapId[0] == 'I' or re.search(r"start\s*=\s*"+StageEvent['avail']['start']+r"\s*\|end\s*=\s*"+util.timeDiff(StageEvent['avail']['finish']), content):
+        return {}
+    
+    starttime = datetime.strptime(StageEvent['avail']['start'], util.TIME_FORMAT)
+    if starttime >= datetime.strptime(util.timeDiff(StageEvent['avail']['finish'], -86400*5), util.TIME_FORMAT):
+        notification = ""
+    else:
+        kind = re.search(r"mapGroup\s*=\s*(.*)\n", content)[1]
+        
+        if kind.find('Legendary') != -1 or kind.find('Mythic') != -1:
+            year = int(StageEvent['avail']['start'][:4])
+            month = int(StageEvent['avail']['start'][5:7])
+            day = int(StageEvent['avail']['start'][8:10])
+            if day > 25 or day < 3:
+                if day < 3: month -= 1
+                if month % 2 == 0:
+                    notification = f"Legendary Hero Battle! ({datetime(year=year,month=month,day=1).strftime('%b %Y')}) (Notification)"
+                else:
+                    notification = f"Mythic Hero Battle! ({datetime(year=year,month=month,day=1).strftime('%b %Y')}) (Notification)"
+            else:
+                notification = f'Legendary Hero Remix ({datetime(year=year,month=month,day=1).strftime("%b %Y")}) (Notification)'
+    
+        elif kind.find('Bound') != -1:
+            if content.find('Bound Hero Battle Revival') != -1:
+                notification = f"Bound Hero Battle Revival: {pageName[:pageName.find(':')]} (Notification)"
+            else:
+                notification = f"Bound Hero Battle Revival: {pageName[:pageName.find(':')]} ({starttime.strftime('%b %Y')}) (Notification)"
+
+        elif kind.find('Grand') != -1:
+            if content.find('Grand Hero Battle Revival') != -1:
+                notification = f"Grand Hero Battle Revival - {pageName[:pageName.find(' (')]} (Notification)"
+            else:
+                notification = f"Grand Hero Battle Revival - {pageName[:pageName.find(' (')]} ({starttime.strftime('%b %Y')}) (Notification)"
+
+        else:
+            print(TODO + "Unknow revival")
+            return {}
+    
+    content = re.sub(r"(\{\{MapDates[^\n]*)(\s*?\n)*(==\s*Unit [Dd]ata\s*==)", f"\\1\n* {{{{MapDates|start={StageEvent['avail']['start']}|end={util.timeDiff(StageEvent['avail']['finish'])}|notification={notification}}}}}\n\\3", content)
+    return {pageName: content}
+
+
 from sys import argv
 
 if __name__ == '__main__':
