@@ -44,7 +44,7 @@ def parseTrip(data):
                     "payload": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x38)+0x10*j+0x08, 0x941587cf),
                     "proba": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x38)+0x10*j+0x0C, 0xA0DC749D),
                 } for j in range(18)],
-                "combatUnits": {
+                "strike": {
                     'id_tag': util.getString(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)),
                     '_unknow': hex(util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x08)),
                     'units': [{

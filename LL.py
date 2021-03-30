@@ -13,9 +13,9 @@ from mapUtil import InOtherLanguage, Availability
 
 extraTeams = [20,60]
 
-def LLInfobox(data: dict, enemies: list):
+def LLInfobox(data: dict, strikes: list):
     foes = []
-    for enemys in enemies: foes += [util.getName(f"MID_TRIP_ENEMY_{enemys['id_tag']}_{enemy['name_id']}") for enemy in enemys['units']]
+    for strike in strikes: foes += [util.getName(f"MID_TRIP_ENEMY_{strike['id_tag']}_{enemy['name_id']}") for enemy in strike['units']]
     return "{{Lost Lore Infobox\n" + \
         f"|name={util.getName('MID_TRIP_TITLE_' + data['id_tag'])}\n" + \
         f"|promoArt=Lost Lore {util.cleanStr(util.getName('MID_TRIP_TITLE_' + data['id_tag']))}.jpg\n" + \
@@ -74,15 +74,15 @@ def LLLocation(data: dict):
     return "==Locations==\n{{#invoke:Reward/LostLore|location|extraTeams=" + ",".join([str(t) for t in extraTeams]) + "\n" + \
         "|locations=[\n " + ";\n ".join(locations) + ";\n]}}"
 
-def LLUnit(data: dict, combats: list):
+def LLUnit(data: dict, strikes: list):
     s = "==Unit data==\n"
-    for combat in combats:
-        if len(combats) != 1: s += f"===Battle {combats.index(combat)+1}===\n"
+    for i, strike in enumerate(strikes):
+        if len(strikes) != 1: s += f"===Strike {i+1}===\n"
         s += "{|class=\"wikitable\" style=\"text-align:center;\"\n!Foe!!HP!!Atk!!Spd!!Def!!Res\n"
-        for foe in combat['units']:
+        for foe in strike['units']:
             s += "|-\n|{{LostLoreEnemy\n|file=" + re.sub(r".*/([^/]*)\..*", r"\1.webp", foe["facePath"]) + "|size=100\n"
             s += f"|rarity={foe['rarity']}\n|weapon={WEAPON[foe['weapon']]}\n|move={MOVE[foe['move']]}\n}}}}\n"
-            s += ("[[" if foe['rarity'] != 3 else "") + util.getName(f"MID_TRIP_ENEMY_{combat['id_tag']}_{foe['name_id']}") + ("]]" if foe['rarity'] != 3 else "") + "\n"
+            s += ("[[" if foe['rarity'] != 3 else "") + util.getName(f"MID_TRIP_ENEMY_{strike['id_tag']}_{foe['name_id']}") + ("]]" if foe['rarity'] != 3 else "") + "\n"
             s += f"|\n|{foe['Atk']}\n|{foe['Spd']}\n|{foe['Def']}\n|{foe['Res']}\n"
     return s + "|-\n|colspan=\"6\"|<nowiki/>*The order of foes is randomized at the start of every strike.\n|}"
 
@@ -94,7 +94,7 @@ def LostLore(tag: str):
         if data['isSpoil']:
             print(util.TODO + "New Lost Lore Spoils: " + str(data['avail']))
             continue
-        enemies = [d['combatUnits'] for d in data['maps'] if d['combatUnits']]
+        enemies = [d['strike'] for d in data['maps'] if d['strike']]
         s = LLInfobox(data, enemies) + "\n"
         s += Availability(data['avail'], f"Lost Lore ({util.getName('MID_TRIP_TITLE_' + data['id_tag'])}) (Notification)", "[[Lost Lore]] event") + "\n"
         s += LLRewards(data) + "\n"

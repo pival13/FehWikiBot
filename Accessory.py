@@ -39,14 +39,14 @@ def Accessory(sprite: str):
     s += AccessoryObtention(data['id_tag'])
     s += InOtherLanguage('M'+data['id_tag'])
     s += '{{Accessories Navbox}}'
-    return {util.getName(data['id_tag']): s}
+    return s
 
 def AccessoryOf(tag_update: str):
     datas = util.readFehData(f'Common/DressAccessory/Data/{tag_update}.json')
     ret = {}
     for data in datas:
         try:
-            ret.update(Accessory(data['sprite']))
+            ret[util.getName(data['id_tag'])] = Accessory(data['sprite'])
         except:
             print(util.ERROR + f"Accessory {util.getName(data['id_tag'])} ({data['sprite']})")
     return ret
