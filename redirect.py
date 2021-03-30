@@ -25,8 +25,8 @@ def getWeaponName(sprite: str):
         return "File:Weapon " + util.cleanStr(DATA[nameId]) + (" V2" if sprite.find("ar") != -1 else "") + ".png"
 
 def getAccessoryName(sprite: str):
-    if sprite.replace(' ', '_') in ACCESSORY_DATA:
-        return f"File:Accessory {util.cleanStr(util.getName(ACCESSORY_DATA[sprite.replace(' ', '_')]['id_tag']))}.png"
+    if sprite in ACCESSORY_DATA:
+        return f"File:Accessory {util.cleanStr(util.getName(ACCESSORY_DATA[sprite]['id_tag']))}.png"
 
 def redirect(name: str, redirect: str):
     result = _exportPage(redirect or name.replace(".webp", ".png"),
@@ -69,7 +69,7 @@ def main(start=None):
             else:
                 print(TODO + "Unknow weapon: " + image['title'])
         elif re.match(r"Acc[_ ][1-4][_ ]\d{4}[_ ]\d\.webp", image['name']):
-            name = getAccessoryName(image['title'])
+            name = getAccessoryName(image['name'][:-5])
             if not name:
                 print(TODO + "Unknow accessory: " + image['title'])
         elif re.search(r"[_ ](Btl)?Face[_ ]?(FC|C|D|Smile|Pain|Cool|Anger|Cry|Blush)?\d*\.webp$", image['name']):
