@@ -61,20 +61,39 @@ def getPages(nameLike: str) -> list:
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         return getPages(nameLike)
 
-def getPageContent(pages: list, revision: int=0) -> dict:
+def getPageRevision(page: str, revision: int) -> str:
+    try:
+        S = util.fehBotLogin()
+        result = S.get(url=util.URL, params={
+            "action": "query",
+            "titles": page,
+            "prop": "revisions",
+            "rvprop": "content",
+            "rvlimit": revision+1,
+            "rvslots": "*",
+            "format": "json"
+        }).json()['query']['pages']
+        result = list(result.values())[0]['revisions']
+        if len(result) > revision:
+            return result[revision]['slots']['main']['*']
+        else:
+            return result[-1]['slots']['main']['*']
+    except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
+        return getPageContent(pages)
+
+def getPageContent(pages: list) -> dict:
     if len(pages) > 0:
         try:
             S = util.fehBotLogin()
-            result = requests.get(url=util.URL, params={
+            result = S.get(url=util.URL, params={
                 "action": "query",
                 "titles": "|".join(pages[:50]),
                 "prop": "revisions",
                 "rvprop": "content",
                 "rvslots": "*",
-                "rvlimit": revision+1,
                 "format": "json"
             }).json()['query']['pages']
-            result = {result[pageId]['title']: (result[pageId]['revisions'][revision]['slots']['main']['*'] if len(result[pageId]['revisions']) > revision else result[pageId]['revisions'][-1]['slots']['main']['*']) for pageId in result}
+            result = {result[pageId]['title']: result[pageId]['revisions'][0]['slots']['main']['*'] for pageId in result}
             result.update(getPageContent(pages[50:]))
             return result
         except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
