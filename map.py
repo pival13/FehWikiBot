@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 from os.path import isfile
-import requests
 import json
 import re
 

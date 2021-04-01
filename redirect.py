@@ -2,7 +2,6 @@
 
 from sys import argv
 from datetime import datetime
-import requests
 import json
 import re
 
@@ -39,7 +38,7 @@ def redirect(name: str, redirect: str):
         print(json.dumps(result, indent=2))
 
 def main(start=None):
-    result = requests.get(url=URL, params={
+    result = util.fehBotLogin().get(url=URL, params={
         "action": "query",
         "list": "allimages",
         "aisort": "timestamp",

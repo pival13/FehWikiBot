@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-import requests
 import re
 import json
 from sys import stderr
