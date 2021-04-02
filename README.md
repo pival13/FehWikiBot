@@ -41,7 +41,7 @@ path = BINLZ + '/Common/SRPG/StageBgm/'
 for file in listdir(path):
     if isfile(path+file) and file[-7:] == '.bin.lz':
         try:
-            with open(path.replace(BINLZ, JSON) + file[:-7] + '.json', 'x') as f:
+            with open(path.replace(BINLZ, JSON) + file[:-7] + '.json', 'x', encoding='utf-8') as f:
                 print(reverseBGM(file[:-7]), file=f)
         except FileExistsError:
             print(f"BGM file '{file[:-7]}.json' already exist")
@@ -50,7 +50,7 @@ path = BINLZ + '/Common/Sound/arc/'
 for file in listdir(path):
     if isfile(path+file) and file[-7:] == '.bin.lz':
         try:
-            with open(path.replace(BINLZ, JSON) + file[:-7] + '.json', 'x') as f:
+            with open(path.replace(BINLZ, JSON) + file[:-7] + '.json', 'x', encoding='utf-8') as f:
                 print(reverseSound(file[:-7]), file=f)
         except FileExistsError:
             print(f"Sound file '{file[:-7]}.json' already exist")

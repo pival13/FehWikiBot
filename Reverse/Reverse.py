@@ -165,7 +165,7 @@ def parseDir(path: str, updateName: str):
             if s:
                 try:
                     newFile = path.replace(BINLZ_ASSETS_DIR_PATH, JSON_ASSETS_DIR_PATH).replace('/files/assets/', '/extras/') + '/' + d.replace('.bin.lz', '.json')
-                    json.dump(s, open(newFile, 'x'), indent=2, ensure_ascii=False)
+                    json.dump(s, open(newFile, 'x', encoding='utf-8'), indent=2, ensure_ascii=False)
                     print("File " + newFile + " create")
                 except FileExistsError:
                     print("File already exist")
