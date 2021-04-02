@@ -79,7 +79,7 @@ def readFehData(path: str, isFull: bool=False):
         path = JSON_ASSETS_DIR_PATH + path
     data = {}
     try:
-        f = open(path)
+        f = open(path, encoding="utf-8")
         data = json.load(f)
         f.close()
     except:
@@ -212,20 +212,18 @@ def askAgreed(intro, askYes: str=None, askNo: str=None, defaultTrue=None, defaul
         If answer is No, and askNo is present, return the result of askFor with it.
     """
     answer = askFor(intro=intro)
-    if not answer and useTrueDefault:
-        return defaultTrue
-    elif not answer and not useTrueDefault:
-        return defaultFalse
-    if re.fullmatch("no|n", answer, re.IGNORECASE):
+    if not answer:
+        answer = defaultTrue if useTrueDefault else defaultFalse
+    elif re.fullmatch("no|n", answer, re.IGNORECASE):
         if askNo:
             answer = askFor(intro=askNo)
         else:
-            return defaultFalse
+            answer = defaultFalse
     elif re.fullmatch("yes|y|o", answer, re.IGNORECASE):
         if askYes:
             answer = askFor(intro=askYes)
         else:
-            return defaultTrue
+            answer = defaultTrue
     return answer
 
 def getToken():
@@ -377,5 +375,5 @@ from sys import argv
 
 if __name__ == "__main__":
     #print(getName(argv[1]))
-    json.dump(DATA, open('jsons/data.json', 'w'), indent=2, ensure_ascii=False)
-    json.dump(otherLanguages(), open("jsons/otherLanguages.json", 'w'), indent=2, ensure_ascii=False)
+    json.dump(DATA, open('jsons/data.json', 'w', encoding='utf-8'), indent=2, ensure_ascii=False)
+    json.dump(otherLanguages(), open("jsons/otherLanguages.json", 'w', encoding='utf-8'), indent=2, ensure_ascii=False)
