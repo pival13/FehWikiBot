@@ -32,12 +32,14 @@ The json needed are those from sounds and background musics. However you can use
 ```python
 #! /usr/bin/env python3
 
-from os import listdir
+from os import listdir, makedirs
 from os.path import isfile
 from Reverse import reverseBGM, reverseSound
 from util import BINLZ_ASSETS_DIR_PATH as BINLZ, JSON_ASSETS_DIR_PATH as JSON
 
 path = BINLZ + '/Common/SRPG/StageBgm/'
+try: makedirs(path.replace(BINLZ, JSON))
+except FileExistsError: pass
 for file in listdir(path):
     if isfile(path+file) and file[-7:] == '.bin.lz':
         try:
@@ -47,6 +49,8 @@ for file in listdir(path):
             print(f"BGM file '{file[:-7]}.json' already exist")
 
 path = BINLZ + '/Common/Sound/arc/'
+try: makedirs(path.replace(BINLZ, JSON))
+except FileExistsError: pass
 for file in listdir(path):
     if isfile(path+file) and file[-7:] == '.bin.lz':
         try:
