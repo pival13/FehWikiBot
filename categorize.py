@@ -5,7 +5,7 @@ import re
 import util
 
 from util import cargoQuery
-from wikiUtil import getPageContent, exportPage
+from wikiUtil import getPageContent, exportPage, waitSec
 from mapUtil import WEAPONS
 
 lastWeaponID = 139527
@@ -17,7 +17,7 @@ def categorizeWeapon(name: str, content: str, wepType: int, exclusive: bool, ope
     if re.match(r'File:Wep \w{5}( up)?.webp', name) and content.find('{{Source|') == -1:
         add = ('\n' if content[-1] != '\n' else '') + '{{Source|assets=/assets/Common/Wep/' + name[5:-4].replace(' ', '_').lower() + 'png}}\n'
         desc = 'Bot: add source and categorize'
-    else content[-2:] == "}}": add = "\n"
+    elif content[-2:] == "}}": add = "\n"
     if content.find('[[Category:Weapon sprites]]') == -1: add += '[[Category:Weapon sprites]]'
     
     if wepType >= 0b100000000000 and wepType <= 0b111100000000000:

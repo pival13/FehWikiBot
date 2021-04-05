@@ -18,7 +18,7 @@ def getWeaponName(sprite: str):
         if nameId:
             break
         for s in skill['sprites']:
-            if s and s == sprite.replace(' ', '_'):
+            if s and s == sprite[:-5].lower().replace(' ', '_'):
                 nameId = skill['name_id']
     if nameId and nameId in DATA:
         return "File:Weapon " + util.cleanStr(DATA[nameId]) + (" V2" if sprite.find("ar") != -1 else "") + ".png"
@@ -59,7 +59,7 @@ def main(start=None):
             else:
                 print(TODO + "TT banner: " + image['title'])
         elif re.match(r"Wep[_ ][a-z]{2}\d{3}([_ ]up)?\.webp", image['name']):
-            wp = getWeaponName(image['title'])
+            wp = getWeaponName(image['name'])
             if wp and (image['name'].find("up") != -1 or image['name'].find("mg") != -1):
                 #Do not automatically redirect refine weapon and tomes
                 print(TODO + image['name'] + " to " + str(wp))

@@ -13,7 +13,7 @@ from TD import TacticsDrills
 from HO import HeroicOrdeals
 from DerivedMap import SquadAssault, ChainChallengeMap, ChainChallengeGroup
 
-from HB import GrandHeroBattle, BoundHeroBattle, LegendaryHeroBattle, LimitedHeroBattle
+from HB import GrandHeroBattle, BoundHeroBattle, LegendaryHeroBattle, LimitedHeroBattle, RevivalHeroBattle
 from RD import RivalDomains
 from EventMap import exportEventMap
 
@@ -40,7 +40,7 @@ def parseMapId(mapId: str):
         name = DATA["MID_CHAPTER_"+mapId]
     elif mapId[0] == "Q":
         name = DATA["MID_STAGE_OCCUPATION"] + ": " + DATA["MID_STAGE_HONOR_OCCUPATION"]
-    elif not mapId[0] == "H" and not re.fullmatch(r"V\d{4}-V\d{4}", mapId):
+    elif not mapId[0] in ["H", "I"] and not re.fullmatch(r"V\d{4}-V\d{4}", mapId):
         print(ERROR + "Unknow map " + mapId)
         return
 
@@ -140,7 +140,7 @@ from mapUtil import MapAvailability
 
 def findEvents(tag: str):
     lastTBRevival = 8#Here to change
-    lastTB = 19#Here to change
+    lastTB = 20#Here to change
 
     #if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Tournament' + tag + '.bin.lz'): print(TODO + "New Voting Gauntlet")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + f'Common/TapAction/TapBattleData/TDID_{lastTB+1:04}.bin.lz'):
@@ -180,7 +180,7 @@ def findUpcoming():
     print('Upcoming special maps:')
     for stage in StageEvent:
         if datetime.strptime(stage['avail']['start'], util.TIME_FORMAT) > datetime.now():
-            print(stage['id_tag'], util.getName(stage['id_tag']), MapAvailability(stage['avail'], "")[72:-17])
+            exportSeveralPages(RevivalHeroBattle(stage['id_tag']), 'Bot: new revival', minor=True, create=False)
 
 def main(arg):
     if len(arg) < 2:

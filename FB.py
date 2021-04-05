@@ -71,8 +71,7 @@ def ForgingBondsOriginal(data):
     s += FBConversation(data) + "\n"
     s += mapUtil.InOtherLanguage(data['title'])
     s += "{{Main Events Navbox}}"
-    content[util.getName(data['title'])] = s
-    return (util.getName(data['title']), content)
+    return (util.getName(data['title']), s)
 
 def ForgingBondsRevival(data):
     if data["id_tag"] == data["original_id_tag"]:

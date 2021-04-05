@@ -190,7 +190,7 @@ def RevivalHeroBattle(mapId: str):
     pageName = util.cargoQuery('Maps', where=f"Map='{StageEvent['banner_id']}'", limit=1)[0]['Page'].replace('&amp;', '&')
     content = getPageContent([pageName])[pageName]
 
-    if mapId[0] == 'I' or re.search(r"start\s*=\s*"+StageEvent['avail']['start']+r"\s*\|end\s*=\s*"+util.timeDiff(StageEvent['avail']['finish']), content):
+    if mapId[0] in ['I', 'Q'] or re.search(r"start\s*=\s*"+StageEvent['avail']['start']+r"\s*\|end\s*=\s*"+util.timeDiff(StageEvent['avail']['finish']), content):
         return {}
     
     starttime = datetime.strptime(StageEvent['avail']['start'], util.TIME_FORMAT)
@@ -213,19 +213,19 @@ def RevivalHeroBattle(mapId: str):
                 notification = f'Legendary Hero Remix ({datetime(year=year,month=month,day=1).strftime("%b %Y")}) (Notification)'
     
         elif kind.find('Bound') != -1:
-            if content.find('Bound Hero Battle Revival') != -1:
+            if content.find('Bound Hero Battle Revival') == -1:
                 notification = f"Bound Hero Battle Revival: {pageName[:pageName.find(':')]} (Notification)"
             else:
                 notification = f"Bound Hero Battle Revival: {pageName[:pageName.find(':')]} ({starttime.strftime('%b %Y')}) (Notification)"
 
         elif kind.find('Grand') != -1:
-            if content.find('Grand Hero Battle Revival') != -1:
+            if content.find('Grand Hero Battle Revival') == -1:
                 notification = f"Grand Hero Battle Revival - {pageName[:pageName.find(' (')]} (Notification)"
             else:
                 notification = f"Grand Hero Battle Revival - {pageName[:pageName.find(' (')]} ({starttime.strftime('%b %Y')}) (Notification)"
 
         else:
-            print(TODO + "Unknow revival")
+            print(util.TODO + "Unknow revival")
             return {}
     
     content = re.sub(r"(\{\{MapDates[^\n]*)(\s*?\n)*(==\s*Unit [Dd]ata\s*==)", f"\\1\n* {{{{MapDates|start={StageEvent['avail']['start']}|end={util.timeDiff(StageEvent['avail']['finish'])}|notification={notification}}}}}\n\\3", content)
