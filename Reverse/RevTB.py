@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+#import struct
 from os.path import isfile
 from datetime import datetime
 
@@ -55,64 +56,37 @@ def parseTapAction(data):
         "_unknow": util.getString(data, 0x28),
         "_unknow2": util.getString(data, 0x30),
         "desc_spa_id": util.getString(data, 0x38),
-        "stages": [[], []],
-        "extras": [[], []],
+        "stages": {"normal": [], "hard": []},
+        "extras": {"normal": [], "hard": []},
         "foes": [{
             "id_tag": util.getString(data, util.getLong(data, 0x50)+i*0x10+0x00),
-            "_unknow1": hex(util.getByte(data, util.getLong(data, 0x50)+i*0x10+0x08, 0xb7)),
+            "_id_": hex(util.getByte(data, util.getLong(data, 0x50)+i*0x10+0x08, 0xb7)),
             "movetype": util.getByte(data, util.getLong(data, 0x50)+i*0x10+0x09, 0xd7),
             "_unknow2": hex(util.getShort(data, util.getLong(data, 0x50)+i*0x10+0x0a)),
-            "_unknow3": hex(util.getInt(data, util.getLong(data, 0x50)+i*0x10+0x0c)),
-            #"_unknow4": hex(util.getShort(data, util.getLong(data, 0x50)+i*0x10+0x0e)),
+            "_speed_": hex(util.getInt(data, util.getLong(data, 0x50)+i*0x10+0x0c)),#struct.unpack('f', struct.pack('I', util.getInt(data, util.getLong(data, 0x50)+i*0x10+0x0c, 0x400000)))[0],
         } for i in range(util.getShort(data, 0x5E, 0x02B7))],
-        #"level_off": util.getLong(data, 0x40),
-        #"extra_off": util.getLong(data, 0x48),
-        #"foe_off": util.getLong(data, 0x50),
-        #"level_size": util.getByte(data, 0x58, 0x09),
-        #"extra_size": util.getByte(data, 0x59, 0x1b),
-        #"_unknow3": hex(util.getInt(data, 0x5A)),
-        #"foe_size": util.getShort(data, 0x5E, 0x02B7),
+        
+        "level_count": util.getByte(data, 0x58, 0x09),
+        "extra_count": util.getByte(data, 0x59, 0x1b),
+        "_unknow3": hex(util.getInt(data, 0x5A)),
+        "foe_count": util.getShort(data, 0x5E, 0x02B7),
         "start": datetime.utcfromtimestamp(util.getLong(data, 0x60, 0x71FF2C1E8B6EF875)).isoformat() + "Z",
         "finish": datetime.utcfromtimestamp(util.getLong(data, 0x68, 0x126029ADCA1E3937)).isoformat() + "Z",
         "encore": util.getBool(data, 0x70, 0x9a)
     }
-    stageOff = util.getLong(data, 0x40)
-    while stageOff and util.getByte(data, 0x58, 0x09) != 0:
-        stage, stageOff, bossOff = parseTapActionStage(data, stageOff)
-        result["stages"][0] += [stage]
-        while bossOff:
-            stage, other, bossOff = parseTapActionStage(data, bossOff)
-            result["stages"][0][-1]["boss_stage"] += [stage]
-            if other:
-                print("next_stage value on a boss stage", file=stderr)
-    stageOff = util.getLong(data, 0x40) + 0x78*util.getByte(data, 0x58, 0x09)
-    while stageOff and util.getByte(data, 0x58, 0x09) != 0:
-        stage, stageOff, bossOff = parseTapActionStage(data, stageOff)
-        result["stages"][1] += [stage]
-        while bossOff:
-            stage, other, bossOff = parseTapActionStage(data, bossOff)
-            result["stages"][1][-1]["boss_stage"] += [stage]
-            if other:
-                print("next_stage value on a boss stage", file=stderr)
-    stageOff = util.getLong(data, 0x48)
-    while stageOff and util.getByte(data, 0x59, 0x1b) != 0:
-        stage, stageOff, bossOff = parseTapActionStage(data, stageOff)
-        result["extras"][0] += [stage]
-        while bossOff:
-            stage, other, bossOff = parseTapActionStage(data, bossOff)
-            result["extras"][0][-1]["boss_stage"] += [stage]
-            if other:
-                print("next_stage value on a boss stage", file=stderr)
-    stageOff = util.getLong(data, 0x48) + 0x78*util.getByte(data, 0x59, 0x1b)
-    while stageOff and util.getByte(data, 0x59, 0x1b) != 0:
-        stage, stageOff, bossOff = parseTapActionStage(data, stageOff)
-        result["extras"][1] += [stage]
-        while bossOff:
-            stage, other, bossOff = parseTapActionStage(data, bossOff)
-            result["extras"][1][-1]["boss_stage"] += [stage]
-            if other:
-                print("next_stage value on a boss stage", file=stderr)
-    #json.dump(data, open('a', 'w'), indent=2)
+
+    for stageOff, kind, diff, count in [(util.getLong(data, 0x40), "stages", "normal", result['level_count']),
+                                        (util.getLong(data, 0x40)+0x78*result['level_count'], "stages", "hard", result['level_count']),
+                                        (util.getLong(data, 0x48), "extras", "normal", result['extra_count']),
+                                        (util.getLong(data, 0x48)+0x78*result['extra_count'], "extras", "hard", result['extra_count'])]:
+        while stageOff and count != 0:
+            stage, stageOff, bossOff = parseTapActionStage(data, stageOff)
+            result[kind][diff] += [stage]
+            while bossOff:
+                stage, other, bossOff = parseTapActionStage(data, bossOff)
+                result[kind][diff][-1]["boss_stage"] += [stage]
+                if other:
+                    print("next_stage value on a boss stage", file=stderr)
     return result
 
 def reverseTapBattle(nb: int, revival: bool=False):
