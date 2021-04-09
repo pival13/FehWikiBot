@@ -24,7 +24,7 @@ def MSInfobox(data: dict, nb: int):
         "|season=" + ("LightDark" if data['season'] == 0 else 'DarkLight' if data['season'] == 1 else 'HeavenLogic' if data['season'] == 2 else 'LogicHeaven') + "\n}}"
 
 def MSAvailability(data: dict, nb: int, isStart: bool):
-    start = util.askAgreed(f"Does Mjölnir's Strike {nb} begin at {data['event_avail']['start']} ?", askNo='When does it begin ?', defaultTrue=data['event_avail']['start']) if isStart else data['event_avail']['start']
+    start = util.askAgreed(f"Does Mjölnir's Strike {nb} begin at {data['event_avail']['start']} ?", askFalse='When does it begin ?', defaultTrue=data['event_avail']['start']) if isStart else data['event_avail']['start']
     notifTime = datetime.strptime(data['shield_avail']['start'], util.TIME_FORMAT) - timedelta(days=2)
     return "==Availability==\nThis [[Mjölnir's Strike]] event was made available:\n" + \
         f"* {{{{HT|{start}}}}} – {{{{HT|{util.timeDiff(data['event_avail']['finish'])}}}}} ([[Brace Yourselves - Mjölnir's Strike Begins ({notifTime.strftime('%b %d, %Y').replace(' 0', ' ')}) (Notification)|Notification]])\n" + \

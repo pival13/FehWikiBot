@@ -193,35 +193,35 @@ def askFor(pattern: str=None, intro=None, ignoreCase=False):
     if s != None and (not pattern or re.fullmatch(pattern, s, re.IGNORECASE if ignoreCase else 0)):
         return s
     
-def askAgreed(intro, askYes: str=None, askNo: str=None, defaultTrue=None, defaultFalse=None, useTrueDefault=True):
+def askAgreed(intro, askTrue: str=None, askFalse: str=None, defaultTrue=None, defaultFalse=None, useTrueDefault=True):
     """Ask the user for a Yes/No answer.
 
     Args:
         intro (str): The string to print before the user answer
-        askYes (str) (None): A new question in case of an initial Yes.
-        askNo (str) (None): A new question in case of an initial No.
+        askTrue (str) (None): A new question in case of an initial Yes.
+        askFalse (str) (None): A new question in case of an initial No.
         defaultTrue (str) (None): Default value for a Yes.
         defaultFalse (str) (None): Default value for a No.
         useTrueDefault (bool) (True): Whether choose True as default or False.
     
     Return:
         If no answer is given, return defaultTrue/False depending of useTrueDefault.
-        If answer if Yes, and askYes is not present, return defaultTrue.
-        If answer is No, and askNo is not present, return defaultFalse.
-        If answer is Yes, and askYes is present, return the result of askFor with it.
-        If answer is No, and askNo is present, return the result of askFor with it.
+        If answer if Yes, and askTrue is not present, return defaultTrue.
+        If answer is No, and askFalse is not present, return defaultFalse.
+        If answer is Yes, and askTrue is present, return the result of askFor with it.
+        If answer is No, and askFalse is present, return the result of askFor with it.
     """
     answer = askFor(intro=intro)
     if not answer:
         answer = defaultTrue if useTrueDefault else defaultFalse
     elif re.fullmatch("no|n", answer, re.IGNORECASE):
-        if askNo:
-            answer = askFor(intro=askNo)
+        if askFalse:
+            answer = askFor(intro=askFalse)
         else:
             answer = defaultFalse
     elif re.fullmatch("yes|y|o", answer, re.IGNORECASE):
-        if askYes:
-            answer = askFor(intro=askYes)
+        if askTrue:
+            answer = askFor(intro=askTrue)
         else:
             answer = defaultTrue
     return answer

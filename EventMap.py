@@ -29,7 +29,7 @@ def exportEventMap(mapId1: str, mapId2: str=None):
             if 'edit' in result and result['edit']['result'] == 'Success':
                 success = True
             else:
-                append = util.askAgreed(f"\"{name}\" already exist. Should something be append to the name?", useTrueDefault=False, askYes="What should be append?")
+                append = util.askAgreed(f"\"{name}\" already exist. Should something be append to the name?", useTrueDefault=False, askTrue="What should be append?")
                 if not append:
                     return
 
@@ -126,7 +126,7 @@ def EventUnitData(StageEvent: dict, weaponKind):
 
 def EventMap(mapId: str, kindUnitWeapon=None, event=None, notif=None):
     if event is None:
-        event = util.askAgreed(f"Is \"{util.getName(mapId)}\" ({mapId}) related to the event \"{util.getName('MID_STAGE_HONOR_'+mapId)}\"?", defaultTrue=util.getName('MID_STAGE_HONOR_'+mapId), askNo="Then what is it related to?")
+        event = util.askAgreed(f"Is \"{util.getName(mapId)}\" ({mapId}) related to the event \"{util.getName('MID_STAGE_HONOR_'+mapId)}\"?", defaultTrue=util.getName('MID_STAGE_HONOR_'+mapId), askFalse="Then what is it related to?")
     if notif is None:
         notif = util.askFor(r".+ \(Notification\)", f"Which notification is \"{util.getName(mapId)}\" ({mapId}) related to?") or ""
     while not kindUnitWeapon:
@@ -146,7 +146,7 @@ def EventGroup(mapId1: str, mapId2: str):
     begin = int(mapId1[1:])
     end = int(mapId2[1:])
 
-    event = util.askAgreed(f"Are those maps ({mapId1}-{mapId2}) related to the event \"{util.getName('MID_STAGE_HONOR_'+mapId1)}\"?", defaultTrue=util.getName('MID_STAGE_HONOR_'+mapId1), askNo="Then what are they related to?")
+    event = util.askAgreed(f"Are those maps ({mapId1}-{mapId2}) related to the event \"{util.getName('MID_STAGE_HONOR_'+mapId1)}\"?", defaultTrue=util.getName('MID_STAGE_HONOR_'+mapId1), askFalse="Then what are they related to?")
     notif = util.askFor(r".+ \(Notification\)", "Which notification are they related to?") or ""
     weaponKind = None
     while not weaponKind:
