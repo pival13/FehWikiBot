@@ -6,11 +6,13 @@ import util
 
 from util import cargoQuery
 from wikiUtil import getPageContent, exportPage, waitSec
-from mapUtil import WEAPONS
+from os.path import exists
+from redirect import SKILL_DATA
 
-lastWeaponID = 139527
+lastWeaponID = 140408
 
-def categorizeWeapon(name: str, content: str, wepType: int, exclusive: bool, openCloseTome: bool=True):
+def categorizeWeapon(name: str, content: str, wepType: int, exclusive: bool):
+    openCloseTome = False if re.match(r'File:Wep mg', name) else True
     desc = 'Bot: categorize'
     add = ""
 
@@ -21,7 +23,7 @@ def categorizeWeapon(name: str, content: str, wepType: int, exclusive: bool, ope
     if content.find('[[Category:Weapon sprites]]') == -1: add += '[[Category:Weapon sprites]]'
     
     if wepType >= 0b100000000000 and wepType <= 0b111100000000000:
-        if re.match(r'File:Weapon .+ V[34]\.png', name) and content.find('[[Category:Upgrade Weapon sprites]]') == -1: add += '[[Category:Upgrade Weapon sprites]]'
+        if (re.match(r'File:Weapon .+ V[34]\.png', name) or re.match(r'File:Wep \w{5} up\.webp', name)) and content.find('[[Category:Upgrade Weapon sprites]]') == -1: add += '[[Category:Upgrade Weapon sprites]]'
     elif (re.match(r'File:Weapon .+ V2\.png', name) or re.match(r'File:Wep \w{5} up\.webp', name)) and content.find('[[Category:Upgrade Weapon sprites]]') == -1: add += '[[Category:Upgrade Weapon sprites]]'
 
     if wepType == 0b1 and content.find('[[Category:Red Sword sprites]]') == -1: add += '[[Category:Red Sword sprites]]'
@@ -60,7 +62,7 @@ def categorizeWeapon(name: str, content: str, wepType: int, exclusive: bool, ope
         if openCloseTome and (add.find('Open Tome') != -1 or content.find('Open Tome') != -1) and content.find('[[Category:Open Colorless Tome sprites]]') == -1: add += '[[Category:Open Colorless Tome sprites]]'
         if openCloseTome and (add.find('Closed Tome') != -1 or content.find('Closed Tome') != -1) and content.find('[[Category:Closed Colorless Tome sprites]]') == -1: add += '[[Category:Closed Colorless Tome sprites]]'
 
-    if not re.search(r" V\d\.png", name) and name.find(' up.webp') == -1 and name.find('File:Wep ar') == -1 and (not re.search(r"File:Wep mg", name) or not openCloseTome):
+    if not re.search(r" V\d\.png", name) and name.find(' up.webp') == -1 and name.find('File:Wep ar') == -1 and (not re.search(r"File:Wep mg", name) or exists(util.WEBP_ASSETS_DIR_PATH+'Common/Wep/'+name[5:-5].replace(' ', '_')+'.ssbp')):
         if exclusive and content.find('[[Category:Exclusive Weapon sprites]]') == -1: add += '[[Category:Exclusive Weapon sprites]]'
         if not exclusive and content.find('[[Category:Inheritable Weapon sprites]]') == -1: add += '[[Category:Inheritable Weapon sprites]]'
 
@@ -72,61 +74,32 @@ def categorizeWeapons():
     pagesName = [m['Page'] for m in cargoQuery('_pageData', where=f'(_pageName LIKE "File:Weapon %" OR _pageName LIKE "File:Wep %") AND _pageID > {lastWeaponID}', order='_pageID')]
     wikiPages = getPageContent(pagesName)
     wikiPages = {name: wikiPages[name] for name in wikiPages if wikiPages[name].find('REDIRECT') == -1}
+    if len(wikiPages) == 0: return
     newID = cargoQuery('_pageData', fields='_pageID=ID', where=f'_pageName="{pagesName[-1]}"', limit=1)[0]['ID']
     pagesName = list(wikiPages.keys())
-    print(f"Previous lastWeaponID: {lastWeaponID}. New lastWeaponID: {newID}")
 
-    for wepTag in WEAPONS:
-        if WEAPONS[wepTag]["refine_sort_id"] != 0 or wepTag[-1] == '＋' or (not WEAPONS[wepTag]['sprites'][0] and not WEAPONS[wepTag]['sprites'][1]): continue
-        searchPage = 'File:' + (WEAPONS[wepTag]['sprites'][0] if WEAPONS[wepTag]['sprites'][0] else WEAPONS[wepTag]['sprites'][1]).capitalize().replace('_', ' ') + '.webp'
-        if not searchPage in wikiPages:
-            searchPage = 'File:Weapon ' + util.cleanStr(util.getName(wepTag)) + '.png'
-        if not searchPage in wikiPages: continue
-        elif searchPage in pagesName: pagesName.remove(searchPage)
+    WEAPONS = {skill['sprites'][0]: skill for skill in SKILL_DATA if skill['sprites'][0]}
+    WEAPONS.update({skill['sprites'][1]: skill for skill in SKILL_DATA if skill['sprites'][1]})
+    WEAPONS.update({util.cleanStr(util.getName(skill['id_tag'])): skill for skill in SKILL_DATA if skill['might'] != 0})
 
-        if WEAPONS[wepTag]["wep_equip"] == 0b1111000:#Bow
-            searchPage = 'File:' + WEAPONS[wepTag]['sprites'][0].capitalize().replace('_', ' ') + '.webp'
-            if not searchPage in wikiPages:
-                searchPage = 'File:Weapon ' + util.cleanStr(util.getName(wepTag)) + '.png'
-            categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"])
-            if re.match(r'File:Weapon .+\.png', searchPage):
-                searchPage = re.sub(r'\.png', ' V2.png', searchPage)
-                if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
-                searchPage = re.sub('V2', 'V3', searchPage)
-                if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
-                searchPage = re.sub('V3', 'V4', searchPage)
-                if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
-            elif re.match(r'File:Wep bw\d{3}\.webp', searchPage):
-                sId = searchPage[11:14]
-                if f'File:Wep ar{sId}.webp' in wikiPages: categorizeWeapon(f'File:Wep ar{sId}.webp', wikiPages[f'File:Wep ar{sId}.webp'], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(f'File:Wep ar{sId}.webp')
-                if f'File:Wep bw{sId} up.webp' in wikiPages: categorizeWeapon(f'File:Wep bw{sId} up.webp', wikiPages[f'File:Wep bw{sId} up.webp'], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(f'File:Wep bw{sId} up.webp')
-                if f'File:Wep ar{sId} up.webp' in wikiPages: categorizeWeapon(f'File:Wep ar{sId} up.webp', wikiPages[f'File:Wep ar{sId} up.webp'], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(f'File:Wep ar{sId} up.webp')
-        elif WEAPONS[wepTag]["wep_equip"] >= 0b100000000000 and WEAPONS[wepTag]["wep_equip"] <= 0b111100000000000:#Tome
-            searchPage = re.sub(' V2', '', searchPage)
-            categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"], (re.match(r'File:Weapon .+\.png', searchPage) and re.sub(r'\.png', ' V2.png', searchPage) in wikiPages) or (re.match(r'File:Wep mg.+\.webp', searchPage) and ('File:Weapon ' + util.cleanStr(util.getName(wepTag)) + '.png') in wikiPages))
-            if re.match(r'File:Wep mg\d{3}\.webp', searchPage):
-                searchPage = re.sub(r'\.webp', ' up.webp', searchPage)
-                if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
-            if not re.match(r'File:Weapon .+\.png', searchPage):
-                searchPage = 'File:Weapon ' + util.cleanStr(util.getName(wepTag)) + '.png'
-                if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
-            searchPage = re.sub(r'\.png', ' V2.png', searchPage)
-            if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
-            searchPage = re.sub('V2', 'V3', searchPage)
-            if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
-            searchPage = re.sub('V3', 'V4', searchPage)
-            if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
+    regWebp = re.compile(r'File:Wep (\w{5}(?: up)?)\.webp')
+    regPng = re.compile(r'File:Weapon (.*?)(?: V\d+)?\.png')
+    for weapon in pagesName:
+        res1 = regWebp.match(weapon)
+        res2 = regPng.match(weapon)
+        if res1:
+            wobject = WEAPONS[f"wep_{res1[1].lower().replace(' ', '_')}"]
+        elif res2:
+            wobject = WEAPONS[res2[1]]
         else:
-            categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"])
-            if re.match(r'File:Weapon .+\.png', searchPage):
-                searchPage = re.sub(r'\.png', ' V2.png', searchPage)
-                if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
-            elif re.match(r'File:Wep \w{5}\.webp', searchPage):
-                searchPage = re.sub(r'\.webp', ' up.webp', searchPage)
-                if searchPage in wikiPages: categorizeWeapon(searchPage, wikiPages[searchPage], WEAPONS[wepTag]["wep_equip"], WEAPONS[wepTag]["exclusive"]) or pagesName.remove(searchPage)
+            print(util.TODO, f'Cannot categorize {weapon}')
+            continue
 
-    with open(__file__, 'r') as f: content = f.read()
-    with open(__file__, 'w') as f: f.write(content.replace(f'lastWeaponID = {lastWeaponID}', f'lastWeaponID = {newID}'))
+        categorizeWeapon(weapon, wikiPages[weapon], wobject["wep_equip"], wobject["exclusive"])
+
+    if util.askAgreed(f"Do you want to replace the current lastWeaponID ({lastWeaponID}) with the new one ({newID})?", defaultTrue=True, defaultFalse=False):
+        with open(__file__, 'r') as f: content = f.read()
+        with open(__file__, 'w') as f: f.write(content.replace(f'lastWeaponID = {lastWeaponID}', f'lastWeaponID = {newID}'))
 
 if __name__ == '__main__':
     categorizeWeapons()
