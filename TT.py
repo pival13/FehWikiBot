@@ -67,7 +67,7 @@ def TTMapInfobox(StageEvent: dict, SRPGMap: dict):
     SRPGMap['field']['enemy_pos'] = [unit['pos'] for unit in SRPGMap['units']]
     SRPGMap['field']['enemy_pos'][0] = {}
     info = {
-        'banner': 'Banner ' + name + '.png',
+        'banner': 'Banner ' + util.cleanStr(name) + '.png',
         'mapName': name,
         'group': 'Tempest Trials',
         'map': SRPGMap['field'],
