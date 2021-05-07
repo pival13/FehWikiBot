@@ -26,4 +26,4 @@ def reverseMessage(tag: str, type: str, lang: str="USEN"):
     fpath = util.BINLZ_ASSETS_DIR_PATH + f"/{lang}/Message/{type}/{tag}.bin.lz"
     if isfile(fpath):
         data = util.decompress(fpath)
-        return parseStageBGM(data[0x20:], data[:0x20])
+        return parseMsg(data[0x20:])

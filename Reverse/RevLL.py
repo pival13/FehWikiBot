@@ -47,6 +47,10 @@ def parseTrip(data):
                 "strike": {
                     'id_tag': util.getString(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)),
                     '_unknow': hex(util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x08)),
+                    #Unit count?
+                    #Round count?
+                    #Round lines?
+                    #strike lines?
                     'units': [{
                         'facePath': util.getString(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x10+0x20*j),
                         'name_id': util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x18+0x20*j, 0xFF),
@@ -62,7 +66,7 @@ def parseTrip(data):
                         '_unknow2': util.getLong(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x28+0x20*j, 0x60599D5DE82F2ECF),
                     } for j in range(4)]
                 } if util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40) else None,
-            } for i in range(5)],
+            } for i in range(util.getInt(data, offGr+0x74, 0xC5DBCC7B))],
         }]
     return result
 

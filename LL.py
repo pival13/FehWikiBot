@@ -18,7 +18,6 @@ def LLInfobox(data: dict, strikes: list):
     for strike in strikes: foes += [util.getName(f"MID_TRIP_ENEMY_{strike['id_tag']}_{enemy['name_id']}") for enemy in strike['units']]
     return "{{Lost Lore Infobox\n" + \
         f"|name={util.getName('MID_TRIP_TITLE_' + data['id_tag'])}\n" + \
-        f"|promoArt=Lost Lore {util.cleanStr(util.getName('MID_TRIP_TITLE_' + data['id_tag']))}.jpg\n" + \
         f"|world={util.getName('MID_TRIP_WORLD_'+'_'.join([str(d) for d in data['bonusEntry']][:data['entryCount']]))}\n" + \
         f"|locations={','.join([util.getName('MID_TRIP_PLACE_'+d['id_tag']) for d in data['maps']])}\n" + \
         f"|strikeFoes=" + ",".join(list(dict.fromkeys(foes))) + "\n" + \

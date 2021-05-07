@@ -9,7 +9,7 @@ from wikiUtil import getPageContent, exportPage, waitSec
 from os.path import exists
 from redirect import SKILL_DATA
 
-lastWeaponID = 140408
+lastWeaponID = 141934
 
 def categorizeWeapon(name: str, content: str, wepType: int, exclusive: bool):
     openCloseTome = False if re.match(r'File:Wep mg', name) else True
@@ -89,7 +89,7 @@ def categorizeWeapons():
         res2 = regPng.match(weapon)
         if res1:
             wobject = WEAPONS[f"wep_{res1[1].lower().replace(' ', '_')}"]
-        elif res2:
+        elif res2 and res2[1] in WEAPONS:
             wobject = WEAPONS[res2[1]]
         else:
             print(util.TODO, f'Cannot categorize {weapon}')

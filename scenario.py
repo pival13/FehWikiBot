@@ -6,13 +6,15 @@ import re
 UNIT_IMAGE = util.fetchFehData("Common/SRPG/Person", "face_name")
 UNIT_IMAGE.update(util.fetchFehData("Common/SRPG/Enemy", "face_name"))
 UNIT_IMAGE.update({"ch00_00_Eclat_X_Normal": {'name': "Kiran"},
-                    "ch00_00_Eclat_X_Avatar00": {'name': "Kiran: Hero Summoner", 'id_tag': "EID_アバター"},
+                    "ch00_00_Eclat_X_Avatar00": {'name': "Kiran: Hero Summoner", 'id_tag': "PID_アバター"},
                     "ch00_00_Eclat_M_Avatar01": {'name': "Kiran: Hero Summoner M01"},
                     "ch00_00_Eclat_M_Avatar02": {'name': "Kiran: Hero Summoner M02"},
                     "ch00_00_Eclat_M_Avatar03": {'name': "Kiran: Hero Summoner M03"},
+                    "ch00_00_Eclat_M_Avatar04": {'name': "Kiran: Hero Summoner M04"},
                     "ch00_00_Eclat_F_Avatar01": {'name': "Kiran: Hero Summoner F01"},
                     "ch00_00_Eclat_F_Avatar02": {'name': "Kiran: Hero Summoner F02"},
                     "ch00_00_Eclat_F_Avatar03": {'name': "Kiran: Hero Summoner F03"},
+                    "ch00_00_Eclat_F_Avatar04": {'name': "Kiran: Hero Summoner F04"},
                     "ch00_13_Gustaf_M_Normal": {'name': "Gustav", 'id_tag': 'PID_グスタフ'},
                     "ch00_14_Henriette_F_Normal": {'name': "Henriette", 'id_tag': 'PID_ヘンリエッテ'},
                     "ch00_16_Freeze_M_Normal": {'name': "Hríd"},
