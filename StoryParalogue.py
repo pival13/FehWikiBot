@@ -5,6 +5,7 @@ import re
 from util import DATA, DIFFICULTIES, ROMAN
 import util
 import mapUtil
+import wikiUtil
 from scenario import Story
 
 def StoryMapInfobox(stage: dict, field: dict, mapId: str, index: int):
@@ -122,6 +123,32 @@ def ParalogueGroup(groupId: str):
     for i in range(StageScenario['maps'][0]['scenario_count']):
         ret.update({util.getName("MID_STAGE_" + StageScenario['maps'][0]['scenarios'][i]["id_tag"][:-1]):
             ParalogueMap(StageScenario['maps'][0]['scenarios'][i]["id_tag"][:-1], StageScenario, i, notif)})
+    return ret
+
+def UpdateStoryParalogueList(groupId: str):
+    type = 'Paralogue' if groupId[1] == 'X' else 'Story'
+    pages = wikiUtil.getPageContent([f'{type} Maps', f'Template:{type} Maps Navbox'])
+    name = util.getName(groupId)
+    nameCleaned = re.sub(r'Book .*?,\s*', '', name)
+    ret = {}
+
+    if pages[f'{type} Maps'].find(name) == -1:
+        content = "===" + nameCleaned + "===\n"
+        content += "{{#invoke:MapList|byGroup|"+name+"}}\n"
+        content += mapUtil.InOtherLanguage('MID_CHAPTER_' + groupId).replace('==', '====')
+        ret[f'{type} Maps'] = re.sub(r"\s*(==Xenologues==|\{\{Battle Screen Navbox\}\})", "\n" + content + '\\1', pages[f'{type} Maps'], 1)
+    
+    if pages[f'Template:{type} Maps Navbox'].find(nameCleaned) == -1:
+        count = re.search(r'\d+', nameCleaned)[0]
+        content = f" |group{count}=[[{type} Maps#{nameCleaned}|{nameCleaned}]]\n"
+        content += f" |list{count}=\n"
+        i = 1
+        while f"MID_STAGE_{'X' if groupId[1] == 'X' else 'S'}{groupId[2:]}{i}" in DATA:
+            name = DATA[f"MID_STAGE_{'S' if groupId[1] == '0' else groupId[1]}{groupId[2:]}{i}"]
+            content += f'# [[{name}]]\n'
+            i += 1
+        ret[f'Template:{type} Maps Navbox'] = re.sub(r'(\|group99|\}\}\}\})', content + '\\1', pages[f'Template:{type} Maps Navbox'], 1)
+    
     return ret
 
 from sys import argv

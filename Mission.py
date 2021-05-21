@@ -19,6 +19,7 @@ SORTING_PATTERN = [
     {'value': 17, 'pattern': r'TAPBTL'}, # Tap Battle
     {'value': 18, 'pattern': r'DAISEIATU'}, # Grand Conquests
     {'value': 20, 'pattern': r'SHADOW'}, # Rokkr Sieges
+    {'value': 23, 'pattern': r'MJOLNIR'}, #Mjölnir's Strike
 	{'value': 24, 'pattern': r'MAMORE'}, # Frontline Phalanx
 	{'value': 25, 'pattern': r'BOARDGAME'}, # Pawns of Loki
     {'value': 31, 'pattern': r'HERO'}, # Grand Hero

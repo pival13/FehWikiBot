@@ -8,7 +8,7 @@ from util import TODO, ERROR, DATA
 import util
 from wikiUtil import exportPage, exportSeveralPages
 
-from StoryParalogue import StoryMap, StoryGroup, ParalogueMap, ParalogueGroup
+from StoryParalogue import StoryMap, StoryGroup, ParalogueMap, ParalogueGroup, UpdateStoryParalogueList
 from TD import TacticsDrills
 from HO import HeroicOrdeals
 from DerivedMap import SquadAssault, ChainChallengeMap, ChainChallengeGroup
@@ -49,12 +49,14 @@ def parseMapId(mapId: str):
 
     if re.match(r"C\d{4}", mapId):
         exportSeveralPages(StoryGroup(mapId), 'Bot: new Story Map', create=True)
+        exportSeveralPages(UpdateStoryParalogueList(mapId), 'Bot: ' + util.getName(mapId))
 
     elif re.match(r"X[X0-9]\d{3}", mapId):
         exportPage(name, ParalogueMap(mapId), 'Bot: new Paralogue Map', create=True)
 
     elif re.match(r"CX\d{3}", mapId):
         exportSeveralPages(ParalogueGroup(mapId), 'Bot: new Paralogue Map', create=True)
+        exportSeveralPages(UpdateStoryParalogueList(mapId), 'Bot: ' + util.getName(mapId))
 
     elif re.match(r"H\d{4}", mapId):
         nb = int(re.match(r"H(\d+)", mapId)[1])

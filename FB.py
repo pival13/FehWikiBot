@@ -11,7 +11,7 @@ from scenario import Conversation, StoryNavBar
 from reward import parseReward
 from Reverse import reverseForgingBonds
 
-from wikiUtil import exportPage
+from wikiUtil import exportPage, getPageContent
 
 COLORS = ['Red', 'Orange', 'Green', 'Blue']
 
@@ -97,7 +97,7 @@ def ForgingBondsRevival(data):
     if not re.search(f"wikiname\\s*=\\s*{wikiname}", page):
         page = re.sub(r"\}\}\n(\n*==\s*Special [cC]onversations\s*==)", "}}\n===Rerun===\n"+rewards+"\\1", page)
     
-    return (name, content)
+    return (name, page)
 
 def ForgingBonds(tagId: str) -> dict:
     datas = reverseForgingBonds(tagId)
