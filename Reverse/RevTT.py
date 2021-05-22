@@ -16,18 +16,26 @@ def parseSequentialMap(data):
             "id_tag2": util.getString(data, offGr+0x10),
             "full_id_tag": util.getString(data, offGr+0x18),
             "avail": util.getAvail(data, offGr+0x20),
-            "units1": {
-                "bonus": util.getInt(data, util.getLong(data, offGr+0x48)+0x0c, 0x88f82c4b),
+            "bonus_units1": {
                 "units": [util.getString(data, util.getLong(data, util.getLong(data, offGr+0x48)) + 0x08*i)
                     for i in range(util.getInt(data, util.getLong(data, offGr+0x48)+0x08, 0xf3470912))],
+                "bonus": util.getInt(data, util.getLong(data, offGr+0x48)+0x0c, 0x88f82c4b),
             },
-            "units2": {
-                "bonus": util.getInt(data, util.getLong(data, offGr+0x50)+0x0c, 0x88f82c4b),
+            "bonus_units2": {
                 "units": [util.getString(data, util.getLong(data, util.getLong(data, offGr+0x50)) + 0x08*i)
                     for i in range(util.getInt(data, util.getLong(data, offGr+0x50)+0x08, 0xf3470912))],
+                "bonus": util.getInt(data, util.getLong(data, offGr+0x50)+0x0c, 0x88f82c4b),
             },
-            "scoreCond1": "_TODO",#TODO
-            "scoreCond2": "_TODO",
+            "survival_bonus": [{
+                "rank": util.getString(data, util.getLong(data, util.getLong(data, offGr+0x58))+0x10*i+0x00),
+                "team_lost": util.getSInt(data, util.getLong(data, util.getLong(data, offGr+0x58))+0x10*i+0x08, 0x88F494D0),
+                "mult": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x58))+0x10*i+0x0C, 0x608B1F2C)
+            } for i in range(util.getInt(data, util.getLong(data, offGr+0x58)+0x08, 0xA8F24510))],
+            "speed_bonus": [{
+                "rank": util.getString(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x10*i+0x00),
+                "extra_turns": util.getSInt(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x10*i+0x08, 0x88F494D0),
+                "mult": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x60))+0x10*i+0x0C, 0x608B1F2C)
+            } for i in range(util.getInt(data, util.getLong(data, offGr+0x60)+0x08, 0xA8F24510))],
             "_unknow1": {
                 "_unknow2": hex(util.getLong(data, util.getLong(data, offGr+0x68))),
             },
@@ -44,11 +52,11 @@ def parseSequentialMap(data):
                 "rank_hi": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x78))+i*0x20 + 0x18, 0xc1805a3c),
                 "rank_lo": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x78))+i*0x20 + 0x1c, 0xd5f99032),
             } for i in range(util.getLong(data, util.getLong(data, offGr+0x78)+0x08, 0xd5f99032))],
-            "_unknow2": {
-                "off": util.getLong(data, util.getLong(data, offGr+0x80)),
-                "size": util.getInt(data, util.getLong(data, offGr+0x80)+0x08),
-            },
-            "sets": [],
+            "target_bonus": [{
+                "target": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x80))+0x08*i+0x00, 0x4e2d3d06),
+                "bonus": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x80))+0x08*i+0x04, 0xb48ec15a),
+            } for i in range(util.getLong(data, util.getLong(data, offGr+0x80)+0x08, 0xEAF41B8B))],#0x25E8 b48e020a
+            "sets": []
         }]
         for iSet in range(util.getLong(data, offGr+0x90, 0xc33b272f)):
             offSet = util.getLong(data, util.getLong(data, offGr+0x88)+0x08*iSet)
@@ -70,7 +78,7 @@ def parseSequentialMap(data):
                 "stamina": util.getInt(data, offSet+0x24, 0x7ad1f34),
                 "base_score": util.getInt(data, offSet+0x28, 0x65fb2a5e),
                 "team_count": util.getInt(data, offSet+0x2c, 0xd4eaabad),
-                "_unknow2": hex(util.getInt(data, offSet+0x30)),
+                "turn_limit": util.getInt(data, offSet+0x30, 0x0DC968F3),
             }]
     return result
 

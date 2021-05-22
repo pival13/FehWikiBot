@@ -12,7 +12,7 @@ def parseShadow(data):
         offGr = util.getLong(data, 0x00)+0x250*iGr
         result += [{
             "id_tag": util.getString(data, offGr+0x00),
-            "pre_registr_avail": util.getAvail(data, offGr+0x08),
+            "pre_register_avail": util.getAvail(data, offGr+0x08),
             "event_avail": util.getAvail(data, offGr+0x30),
             "battle_avail": [util.getAvail(data, offGr+0x58+0x28*i) for i in range(3)],
             "_unknow1": hex(util.getLong(data, offGr+0xD0)),

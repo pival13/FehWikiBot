@@ -6,7 +6,7 @@ import re
 UNIT_IMAGE = util.fetchFehData("Common/SRPG/Person", "face_name")
 UNIT_IMAGE.update(util.fetchFehData("Common/SRPG/Enemy", "face_name"))
 UNIT_IMAGE.update({"ch00_00_Eclat_X_Normal": {'name': "Kiran"},
-                    "ch00_00_Eclat_X_Avatar00": {'name': "Kiran: Hero Summoner", 'id_tag': "PID_アバター"},
+                    "ch00_00_Eclat_X_Avatar00": {'name': "Kiran: Hero Summoner", 'id_tag': "EID_アバター"},
                     "ch00_00_Eclat_M_Avatar01": {'name': "Kiran: Hero Summoner M01"},
                     "ch00_00_Eclat_M_Avatar02": {'name': "Kiran: Hero Summoner M02"},
                     "ch00_00_Eclat_M_Avatar03": {'name': "Kiran: Hero Summoner M03"},
@@ -162,9 +162,9 @@ def Story(mapId: str):
         wikiTextJPJA[0] = wikiTextJPJA[0][wikiTextJPJA[0].find('\n')+1:]
 
     pmapid = mapId[:-1] + str(int(mapId[-1]) -1)
-    pmapid = util.getName(pmapid) != pmapid and util.getName(pmapid) or ''
+    pmapid = util.getName(pmapid) if mapId[0] in ['S','X'] and util.getName(pmapid) != pmapid else ''
     nmapid = mapId[:-1] + str(int(mapId[-1]) +1)
-    nmapid = util.getName(nmapid) != nmapid and util.getName(nmapid) or ''
+    nmapid = util.getName(nmapid) if mapId[0] in ['S','X'] and util.getName(nmapid) != nmapid else ''
     navbar = StoryNavBar(mapId, pmapid, nmapid) + "\n"
 
     return '\n'.join(outputWikitext + ['{{tab/start}}{{tab/header|English}}'] + wikiTextUSEN +
