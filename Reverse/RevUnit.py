@@ -73,3 +73,17 @@ def parseEnemy(data):
             "growth_rates": util.getStat(data, offGr+0x69),
         }]
     return result
+
+def parseSubscriptionCostume(data):
+    result = []
+    nbGroup = util.getInt(data, 0x08, 0x17E55C54)
+    for iGr in range(nbGroup):
+        offGr = util.getLong(data, 0x00) + 0x20*iGr
+        result += [{
+            "id": util.getLong(data, offGr+0x00, 0xBFC98CB0CFDCD2D1),
+            #"num": 
+            "avail_start": datetime.utcfromtimestamp(util.getLong(data, offGr+0x08, 0x91f9ebb0b4a90f77)).isoformat() + "Z" if util.getLong(data, offGr+0x08) ^ 0x91f9ebb0b4a90f77 != 0xFFFFFFFFFFFFFFFF else None,
+            "avail_finish": datetime.utcfromtimestamp(util.getLong(data, offGr+0x10, 0x75dc9cc8b9ece87f)).isoformat() + "Z" if util.getLong(data, offGr+0x10) ^ 0x75dc9cc8b9ece87f != 0xFFFFFFFFFFFFFFFF else None,
+            "hero_id": util.getString(data, offGr+0x18)
+        }]
+    return result

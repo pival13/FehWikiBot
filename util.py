@@ -72,12 +72,12 @@ def readFehData(path: str, isFull: bool=False):
         path (str): The filepath of the file
         isFull (bool) (False): Whether it is an absolute path or not.
             If False, prepend JSON_ASSETS_DIR_PATH to it.
-    
+
     Returns:
-        object, list: the content of the file."""
+        list, object: the content of the file."""
     if not isFull:
         path = JSON_ASSETS_DIR_PATH + path
-    data = {}
+    data = []
     try:
         f = open(path, encoding="utf-8")
         data = json.load(f)
