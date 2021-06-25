@@ -18,7 +18,7 @@ def getTTTag(mapId: str):
 
 def TTInfobox(StageEvent: str):
     name = util.getName('MID_SEQUENTIAL_MAP_TERM_' + StageEvent['id_tag'])
-    heroes = StageEvent['units1']['units'] + StageEvent['units2']['units']
+    heroes = StageEvent['bonus_units1']['units'] + StageEvent['bonus_units2']['units']
     rewardsHeroes = []
     for rewards in StageEvent['score_rewards']:
         for reward in rewards['rewards']:

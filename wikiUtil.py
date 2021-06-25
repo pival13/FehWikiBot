@@ -82,6 +82,7 @@ def getPageRevision(page: str, revision: int) -> str:
         return getPageContent(pages)
 
 def getPageContent(pages: list) -> dict:
+    if isinstance(pages, str): pages = [pages]
     if len(pages) > 0:
         try:
             S = util.fehBotLogin()
