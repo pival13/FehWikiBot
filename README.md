@@ -1,6 +1,8 @@
 # Fire Emblem Heroes Wiki Bot
 This repository hosts various Python3 scripts use to create and update pages on the [Fire Emblem Heroes Wiki](https://feheroes.fandom.com/wiki/).
 
+It is a clone of the same [gitlab](https://gitlab.com/pival1302/FehWikiBot) repository and may therefore be out of date or broken compared to it.
+
 ## Utilisation
 ### Dependencies
 The following dependencies are needed in order to the scripts to work properly:
@@ -18,7 +20,7 @@ Depending what is your intent using this repository, all dependencies may not be
 ### Personal Data
 A `PersonalData.py` module must be created. This module is use to get some of the needed informations, such as the location of the Fire Emblem Heroes files, or the user who will be use to perform posts.
 
-Details about this module as well as an example can be found [here](https://gitlab.com/pival1302/FehWikiBot/-/wikis/Modules#personal-data).
+Details about this module as well as an example can be found [here](https://github.com/pival13/FehWikiBot/wiki/Modules#personal-data).
 
 ### JSON objects
 
@@ -64,4 +66,4 @@ for file in listdir(path):
 
 ### Scripts
 
-See [here](https://gitlab.com/pival1302/FehWikiBot/-/wikis/Modules) for a description of each and every scripts
+See [here](https://github.com/pival13/FehWikiBot/wiki/Modules) for a description of each and every scripts
