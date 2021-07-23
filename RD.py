@@ -5,8 +5,7 @@ import json
 import re
 from num2words import num2words
 
-from reward import MOVE
-from util import DATA, DIFFICULTIES, URL
+from globals import DIFFICULTIES, URL, MOVE_TYPE
 import util
 import mapUtil
 
@@ -107,9 +106,9 @@ def RDMapLayout(mapId: str):
 def RDMapInfobox(StageEvent: dict):
     info = {
         'id_tag': 'OCCUPATION',
-        'banner': 'Banner_Rival_Domains_' + MOVE[int(StageEvent['banner_id'][-1])-1] + '.png',
+        'banner': 'Banner_Rival_Domains_' + MOVE_TYPE[int(StageEvent['banner_id'][-1])-1] + '.png',
         'group': 'Rival Domains',
-        'requirement': 'Reach the target [[Rival Domains#Scoring|score]] to earn<br>a reward. Bonus for defeating<br>foes with {{Mt|'+MOVE[int(StageEvent['banner_id'][-1])-1].lower()+'}} allies.',
+        'requirement': 'Reach the target [[Rival Domains#Scoring|score]] to earn<br>a reward. Bonus for defeating<br>foes with {{Mt|'+MOVE_TYPE[int(StageEvent['banner_id'][-1])-1].lower()+'}} allies.',
         'mode': 'Reinforcement Map',
         'lvl': {'Normal': 30, 'Hard': 35, 'Lunatic': 40, 'Infernal': 40},
         'rarity': {'Normal': 3, 'Hard': 4, 'Lunatic': 5, 'Infernal': 5},

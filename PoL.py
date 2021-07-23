@@ -5,36 +5,10 @@ import json
 from os.path import isfile
 from num2words import num2words
 
-from util import DATA
 import util
+from globals import WEAPON_CATEGORY
 from Reverse import reversePawnsOfLoki
 from reward import parseReward
-
-WEAPON_CATEGORY = {
-    0b000000000000000000000111: "Melee",
-    0b000000000000000001111000: "Bow",
-    0b000000000000011110000000: "Dagger",
-    0b000000000111100000000000: "Magic",
-    0b000000001000000000000000: "Staff",
-    0b000011110000000000000000: "Dragonstone",
-    0b111100000000000000000000: "Beast",
-    
-    0b000100010000100010001001: "Red",
-    0b001000100001000100010010: "Blue",
-    0b010001000010001000100100: "Green",
-    0b100010001100010001000000: "Colorless",
-
-    0b111111110000000000000111: "Close",
-    0b000000001111111111111000: "Ranged",
-    
-    0b111100000000011111111111: "Physical",
-    0b000011111111100000000000: "Magical",
-    
-    0b000000000000011111111000: "Missile",
-
-    0b111111111111111111111111: "All",
-    0b000000000000000000000000: "None",
-}
 
 def PoLInfobox(data: dict):
     bonus = []

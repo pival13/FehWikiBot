@@ -5,8 +5,8 @@ import json
 from os.path import isfile
 from num2words import num2words
 
-from util import DATA, DIFFICULTIES
 import util
+from globals import DATA, DIFFICULTIES
 from Reverse import reverseMjolnirsStrike
 from reward import parseReward
 

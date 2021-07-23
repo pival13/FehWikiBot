@@ -5,15 +5,14 @@ import json
 from sys import stderr
 from num2words import num2words
 
-from util import DATA, DIFFICULTIES, ERROR, URL
 import util
 import mapUtil
 from wikiUtil import _exportPage
+from globals import DIFFICULTIES, ERROR, UNITS
 
-UNITS = {util.getName(u['id_tag']): u for u in util.fetchFehData("Common/SRPG/Enemy", False) + util.fetchFehData("Common/SRPG/Person", False)}
-WEAPON_TYPE = ['剣', '槍', '斧', '弓', '弓', '弓', '弓', '暗器', '暗器', '暗器', '暗器']
-MAGIC_TYPE = [['','',''],['ファイアー','エルファイアー','ボルガノン'],['サンダー','エルサンダー','トロン'],['ウインド','エルウインド','レクスカリバー'],['ライト','エルライト','シャイン'],['ミィル','ルイン','ノスフェラート'],['ロック','エルロック','アトラース']]
-BEAST_TYPE = ['歩行', '重装', '騎馬', '飛行']
+WEAPON_NAME = ['剣', '槍', '斧', '弓', '弓', '弓', '弓', '暗器', '暗器', '暗器', '暗器']
+MAGIC_NAME = [['','',''],['ファイアー','エルファイアー','ボルガノン'],['サンダー','エルサンダー','トロン'],['ウインド','エルウインド','レクスカリバー'],['ライト','エルライト','シャイン'],['ミィル','ルイン','ノスフェラート'],['ロック','エルロック','アトラース']]
+BEAST_NAME = ['歩行', '重装', '騎馬', '飛行']
 
 def exportEventMap(mapId1: str, mapId2: str=None):
     if mapId2:
@@ -36,27 +35,27 @@ def exportEventMap(mapId1: str, mapId2: str=None):
 def getDefaultWeapon(unit: dict, diff: int, level: int):
     weapon = unit['weapon_type']
     if diff == 0 and level == 5:
-        if weapon < len(WEAPON_TYPE):
-            return "SID_鉄の"+WEAPON_TYPE[weapon]
+        if weapon < len(WEAPON_NAME):
+            return "SID_鉄の"+WEAPON_NAME[weapon]
         elif weapon >= 11 and weapon <= 14:
-            return "SID_"+MAGIC_TYPE[unit['tome_class']][0]
+            return "SID_"+MAGIC_NAME[unit['tome_class']][0]
         elif weapon == 15:#Staff
             return "SID_アサルト"
         elif weapon >= 16 and weapon <= 19:#Breath
             return "SID_火のブレス"
         elif weapon >= 20 and weapon <= 23:#Beast
-            return "SID_幼獣の化身・" + BEAST_TYPE[unit['move_type']]
+            return "SID_幼獣の化身・" + BEAST_NAME[unit['move_type']]
     elif diff == 1 and level == 15:
-        if weapon < len(WEAPON_TYPE):
-            return "SID_鋼の"+WEAPON_TYPE[weapon]
+        if weapon < len(WEAPON_NAME):
+            return "SID_鋼の"+WEAPON_NAME[weapon]
         elif weapon >= 11 and weapon <= 14:
-            return "SID_"+MAGIC_TYPE[unit['tome_class']][1]
+            return "SID_"+MAGIC_NAME[unit['tome_class']][1]
         elif weapon == 15:#Staff
             return "SID_アサルト"
         elif weapon >= 16 and weapon <= 19:#Breath
             return "SID_火炎のブレス"#SID_灼熱のブレス
         elif weapon >= 20 and weapon <= 23:#Beast
-            return "SID_若獣の化身・" + BEAST_TYPE[unit['move_type']]#成獣の化身・
+            return "SID_若獣の化身・" + BEAST_NAME[unit['move_type']]#成獣の化身・
     return ""
 
 def EventMapInfobox(StageEvent: dict, group: str):

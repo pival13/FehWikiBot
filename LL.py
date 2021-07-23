@@ -5,10 +5,10 @@ import re
 from os.path import isfile
 from num2words import num2words
 
-from util import DATA, DIFFICULTIES
 import util
+from globals import DATA, DIFFICULTIES, MOVE_TYPE, WEAPON_TYPE
 from Reverse import reverseLostLore
-from reward import parseReward, MOVE, WEAPON
+from reward import parseReward
 from mapUtil import InOtherLanguage, Availability
 
 extraTeams = [20,60]
@@ -80,7 +80,7 @@ def LLUnit(data: dict, strikes: list):
         s += "{|class=\"wikitable\" style=\"text-align:center;\"\n!Foe!!HP!!Atk!!Spd!!Def!!Res\n"
         for foe in strike['units']:
             s += "|-\n|{{LostLoreEnemy\n|file=" + re.sub(r".*/([^/]*)\..*", r"\1.webp", foe["facePath"]) + "|size=100\n"
-            s += f"|rarity={foe['rarity']}\n|weapon={WEAPON[foe['weapon']]}\n|move={MOVE[foe['move']]}\n}}}}\n"
+            s += f"|rarity={foe['rarity']}\n|weapon={WEAPON_TYPE[foe['weapon']]}\n|move={MOVE_TYPE[foe['move']]}\n}}}}\n"
             s += ("[[" if foe['rarity'] != 3 else "") + util.getName(f"MID_TRIP_ENEMY_{strike['id_tag']}_{foe['name_id']}") + ("]]" if foe['rarity'] != 3 else "") + "\n"
             s += f"|\n|{foe['Atk']}\n|{foe['Spd']}\n|{foe['Def']}\n|{foe['Res']}\n"
     return s + "|-\n|colspan=\"6\"|<nowiki/>*The order of foes is randomized at the start of every strike.\n|}"

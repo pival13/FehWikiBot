@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from util import DATA, DIFFICULTIES, ROMAN
+from globals import DATA, DIFFICULTIES, ROMAN, ERROR
 import util
 import mapUtil
 from DerivedMapSettings import DERIVED_SETTINGS

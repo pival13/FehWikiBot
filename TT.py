@@ -3,12 +3,12 @@
 import json
 import re
 
-from util import DATA, DIFFICULTIES
 import util
+from globals import DATA, DIFFICULTIES, MOVE_TYPE
 import mapUtil
 from scenario import Story
 from HB import getHeroWithName
-from reward import MOVE, parseReward
+from reward import parseReward
 from Reverse import reverseTempestTrial
 
 TT_DIFFICULTIES = ["Normal/LV.8/3 battles","Normal/LV.14/3 battles","Normal/LV.20/3 battles","Hard/LV.25/4 battles","Hard/LV.30/5 battles","Lunatic/LV.35/5 battles","Lunatic/LV.40/7 battles"]
@@ -121,7 +121,7 @@ def TTUnitData(SRPGMaps: list, startTime: str):
     for i in range(len(randomUnit)):
         s += f"====Enemy {i+2}: {randomUnit[i]['weapon']} {randomUnit[i]['move'].lower()} unit====\n"
         s += f"{{{{RandomTTUnits|WeaponClass={randomUnit[i]['weapon']}|MoveType={randomUnit[i]['move']}|Date=" + startTime[:10] +\
-            (f"|boss={util.getName(boss['id_tag'])}" if 'regular_hero' in boss and boss['regular_hero'] and MOVE[boss['move_type']] == randomUnit[i]['move'] else "") +\
+            (f"|boss={util.getName(boss['id_tag'])}" if 'regular_hero' in boss and boss['regular_hero'] and MOVE_TYPE[boss['move_type']] == randomUnit[i]['move'] else "") +\
             ("|NoStaves=1" if randomUnit[i]['weapon'] == 'Ranged' and randomUnit[-1]['staff'] == 0 else '') + "}}\n"
 
     return s

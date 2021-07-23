@@ -82,11 +82,12 @@ def ResplendentHeroes(tagId: str):
 from sys import argv
 if __name__ == '__main__':
     for arg in argv[1:]:
+        pages = {}
         if re.match(r'\d+_\w+', arg):
             pages = ResplendentHeroes(arg)
         elif arg.find(':') != -1:
             pass
         elif arg.find('PID_') == 0:
             pages = ResplendentHero(arg)
-        for page in pages or {}:
+        for page in pages:
             print(page, pages[page])

@@ -18,7 +18,7 @@ XXX: 0x04
 from RevData  import parseMsg
 from RevSound import parseSound, parseStageBGM
 from RevMap   import parseField, parseSRPGMap, parseStageScenario, parseStageEvent, parseStagePuzzle
-from RevUnit  import parsePerson, parseEnemy
+from RevUnit  import parsePerson, parseEnemy, parseSubscriptionCostume
 from RevQuest import parseQuests
 
 from RevVG  import parseTournament
@@ -41,6 +41,10 @@ def parseAccessory(data):
         result += [{
             "id_tag": util.getString(data, offGr+0x00),
             "sprite": util.getString(data, offGr+0x08),
+            "id_num": util.getInt(data, offGr+0x10, 0xf765ad9c),
+            "sort_id": util.getInt(data, offGr+0x14, 0x0159b21d),
+            "acc_type": util.getInt(data, offGr+0x18, 0x8027f6f6),
+            "summoner": util.getBool(data, offGr+0x1c, 0xB7)
         }]
     return result
 
@@ -113,15 +117,15 @@ def reverseFile(file: str):
     elif file.find("/Sound/arc/") != -1:
         return parseSound(s)
     elif file.find("/DressAccessory/Data/") != -1:
-        print(json.dumps(parseAccessory(s), indent=2, ensure_ascii=False))
-        return
+        return parseAccessory(s)
     elif file.find("/SRPG/Skill/") != -1:
-        print(json.dumps(parseSkill(s), indent=2, ensure_ascii=False))
-        return
+        return parseSkill(s)
     elif file.find("/SRPG/Person/") != -1:
         return parsePerson(s)
     elif file.find("/SRPG/Enemy/") != -1:
         return parseEnemy(s)
+    elif file.find("/SubscriptionCostume/") != -1:
+        return parseSubscriptionCostume(s)
 
     elif file.find("/SRPG/Field/") != -1:
         return parseField(s)

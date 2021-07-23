@@ -6,67 +6,7 @@ from num2words import num2words
 
 import util
 import wikiUtil
-from reward import COLOR, MOVE
-
-SEALS = util.fetchFehData('Common/SRPG/SkillAccessory')
-CREATABLE_SEALS = util.fetchFehData('Common/SRPG/SkillAccessoryCreatable')
-_REFINES = util.fetchFehData('Common/SRPG/WeaponRefine', None)
-REFINES = {}
-for refine in _REFINES:
-    REFINES[refine['orig']] =  (REFINES[refine['orig']] if refine['orig'] in REFINES else []) + [refine]
-SKILLS = util.fetchFehData('Common/SRPG/Skill')
-
-WEAPON_CATEGORY = {
-    0b111111111111111111111111: "All",
-    0b000000000000000000000000: "None",
-
-    0b111111110000000000000111: "Close",
-    0b000000001111111111111000: "Ranged",
-
-    0b111100000000011111111111: "Physical",
-    0b000011111111100000000000: "Magical",
-
-    0b000000000000011111111000: "Missile",
-
-    0b000100010000100010001001: "Red",
-    0b001000100001000100010010: "Blue",
-    0b010001000010001000100100: "Green",
-    0b100010001100010001000000: "Colorless",
-
-    0b000000000000000000000111: "Melee",
-    0b000000000000000001111000: "Bow",
-    0b000000000000011110000000: "Dagger",
-    0b000000000111100000000000: "Magic",
-    0b000011110000000000000000: "Dragonstone",
-    0b111100000000000000000000: "Beast",
-
-    0b000000000000000000000001: "Sword",
-    0b000000000000000000000010: "Lance",
-    0b000000000000000000000100: "Axe",
-    0b000000000000000000001000: "Red Bow",
-    0b000000000000000000010000: "Blue Bow",
-    0b000000000000000000100000: "Green Bow",
-    0b000000000000000001000000: "Colorless Bow",
-    0b000000000000000010000000: "Red Dagger",
-    0b000000000000000100000000: "Blue Dagger",
-    0b000000000000001000000000: "Green Dagger",
-    0b000000000000010000000000: "Colorless Dagger",
-    0b000000000000100000000000: "Red Tome",
-    0b000000000001000000000000: "Blue Tome",
-    0b000000000010000000000000: "Green Tome",
-    0b000000000100000000000000: "Colorless Tome",
-    0b000000001000000000000000: "Colorless Staff",
-    0b000000010000000000000000: "Red Dragonstone",
-    0b000000100000000000000000: "Blue Dragonstone",
-    0b000001000000000000000000: "Green Dragonstone",
-    0b000010000000000000000000: "Colorless Dragonstone",
-    0b000100000000000000000000: "Red Beast",
-    0b001000000000000000000000: "Blue Beast",
-    0b010000000000000000000000: "Green Beast",
-    0b100000000000000000000000: "Colorless Beast",
-}
-
-PATHS = { 1: 'Skill1', 2: 'Skill2', 101: 'ATK', 102: 'SPD', 103: 'DEF', 104: 'RES' }
+from globals import SKILLS, SEALS, CREATABLE_SEALS, REFINES, COLOR, MOVE_TYPE, WEAPON_CATEGORY, WEAPON_MASK, REFINE_TYPE
 
 def refinePath(baseSkill, refSkill, refData):
     STATS_PATH = {
@@ -77,7 +17,7 @@ def refinePath(baseSkill, refSkill, refData):
         'RES': ([5,0,0,0,4], [2,0,0,0,3])
     }
     ICONS = {'神': 'Wrathful Staff W.png', '幻': 'Dazzling Staff W.png'}
-    path = PATHS[refSkill['refine_sort_id']] if refSkill['refine_sort_id'] in PATHS else 'Unknow'
+    path = REFINE_TYPE[refSkill['refine_sort_id']] if refSkill['refine_sort_id'] in REFINE_TYPE else 'Unknow'
     refine = SKILLS[refSkill['refine_id']] if refSkill['refine_id'] else None
 
     theoricRefStats = [a for a in STATS_PATH[path if path in STATS_PATH else ''][refSkill['range']-1]]
@@ -95,12 +35,12 @@ def refinePath(baseSkill, refSkill, refData):
 
 def refinePaths(baseSkill, refSkills, refCosts):
     ret = {}
-    paths = [PATHS[ref['refine_sort_id']] if ref['refine_sort_id'] in PATHS else 'Unknow' for ref in refSkills]
+    paths = [REFINE_TYPE[ref['refine_sort_id']] if ref['refine_sort_id'] in REFINE_TYPE else 'Unknow' for ref in refSkills]
     if any([path == 'Unknow' for path in paths]): print(util.TODO + util.getName(baseSkill['id_tag']) + ": Unknow refine path")
-    if  (baseSkill['exclusive'] and baseSkill['wep_equip'] == 0b000000001000000000000000 and paths == ['Skill1']) or \
-        (baseSkill['exclusive'] and baseSkill['wep_equip'] != 0b000000001000000000000000 and paths == ['ATK','SPD','DEF','RES','Skill1']) or \
-        (not baseSkill['exclusive'] and baseSkill['wep_equip'] == 0b000000001000000000000000 and paths == ['Skill1', 'Skill2']) or \
-        (not baseSkill['exclusive'] and baseSkill['wep_equip'] != 0b000000001000000000000000 and paths == ['ATK','SPD','DEF','RES']):
+    if  (baseSkill['exclusive'] and baseSkill['wep_equip'] == WEAPON_MASK['Colorless Staff'] and paths == ['Skill1']) or \
+        (baseSkill['exclusive'] and baseSkill['wep_equip'] != WEAPON_MASK['Colorless Staff'] and paths == ['Atk','Spd','Def','Res','Skill1']) or \
+        (not baseSkill['exclusive'] and baseSkill['wep_equip'] == WEAPON_MASK['Colorless Staff'] and paths == ['Skill1', 'Skill2']) or \
+        (not baseSkill['exclusive'] and baseSkill['wep_equip'] != WEAPON_MASK['Colorless Staff'] and paths == ['Atk','Spd','Def','Res']):
             ret['refinePaths'] = 'default'
     else:
         ret['refinePaths'] = ','.join(paths)
@@ -121,7 +61,7 @@ def refinePaths(baseSkill, refSkills, refCosts):
             effective += [val] if (baseSkill['wep_effective'] & key) != key else []
             effectiveness ^= key
     effectiveness = refSkills[0]['mov_effective']
-    for key, val in enumerate(MOVE):
+    for key, val in enumerate(MOVE_TYPE):
         if (effectiveness & (1<<key)) == (1<<key):
             effective += [val] if (baseSkill['mov_effective'] & (1<<key)) != (1<<key) else []
     stats = list(map(lambda k, v: refSkills[0]['stats'][k] - refSkills[0]['refine_stats'][k] + v, ['hp','atk','spd','def','res'], [0,refSkills[0]['might'],0,0,0]))
@@ -243,5 +183,3 @@ if __name__ == '__main__':
         #skills = SacredSeal(arg)
         #for name in skills:
         #    print(name, skills[name])
-        #wikiUtil.exportSeveralPages(SealsFrom(arg), 'Bot: Sacred Seal', True)
-        #wikiUtil.exportSeveralPages(RefinesFrom(arg), 'Bot: Refine', True)

@@ -34,19 +34,19 @@ def AccessoryObtention(tagid: str):
 
 def Accessory(sprite: str):
     data = util.fetchFehData('Common/DressAccessory/Data', 'sprite')[sprite.replace(' ', '_')]
-    
+
     s = AccessoryInfobox(data)
     s += AccessoryObtention(data['id_tag'])
     s += InOtherLanguage('M'+data['id_tag'])
     s += '{{Accessories Navbox}}'
-    return s
+    return {util.getName(data['id_tag']): s}
 
 def AccessoryOf(tag_update: str):
     datas = util.readFehData(f'Common/DressAccessory/Data/{tag_update}.json')
     ret = {}
     for data in datas:
         try:
-            ret[util.getName(data['id_tag'])] = Accessory(data['sprite'])
+            ret.update(Accessory(data['sprite']))
         except:
             print(util.ERROR + f"Accessory {util.getName(data['id_tag'])} ({data['sprite']})")
     return ret
@@ -55,10 +55,10 @@ from sys import argv, stderr
 
 if __name__ == '__main__':
     for arg in argv[1:]:
-        if re.match(r'^\d+_\w+$', arg):
+        if re.match(r'^\d+_[a-zA-Z0-9]+$', arg):
             acc = AccessoryOf(arg)
-        elif re.match(r'^(Acc[_ ])?\d \d{4} \d$', arg):
-            acc = Accessory(arg)
+        elif re.match(r'^(Acc[_ ])?\d[_ ]\d{4}[_ ]\d$', arg):
+            acc = Accessory(('Acc_' if arg[:4] != 'Acc_' else '') + arg)
         else:
             print("Invalid argument for accessory createion: expected a tag update or a sprite name, but got: " + arg, file=stderr)
         for ac in acc:

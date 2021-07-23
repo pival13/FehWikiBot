@@ -2,8 +2,8 @@
 
 import json
 import re
-from util import TIME_FORMAT, MIN_TIME, MAX_TIME
 import util
+from globals import TIME_FORMAT, MIN_TIME, MAX_TIME
 from reward import parseReward
 from datetime import datetime, timedelta
 

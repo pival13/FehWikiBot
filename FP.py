@@ -5,7 +5,6 @@ import json
 from os.path import isfile
 from num2words import num2words
 
-from util import DATA
 import util
 import mapUtil
 from Reverse import reverseFrontlinePhalanx

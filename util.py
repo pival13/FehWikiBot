@@ -13,11 +13,7 @@ import re
 URL = "https://feheroes.fandom.com/api.php"
 TODO = "\33[1;30;103mTODO\33[0m: "
 ERROR = "\33[1;101mERROR\33[0m: "
-DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
-ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-MIN_TIME = datetime.utcfromtimestamp(0).strftime(TIME_FORMAT)
-MAX_TIME = datetime.utcfromtimestamp(0x7FFFFFFF).strftime(TIME_FORMAT)
 
 SESSION = None
 
@@ -161,7 +157,7 @@ def getBgm(mapId: str):
     
     mapBgms = BGMS[mapId]
     if mapBgms["unknow_id"]:
-        askFor("", "Map "+mapId+" has 'unknow_id': "+tmp["unknow_id"])
+        askFor("", "Map "+mapId+" has 'unknow_id': "+mapBgms["unknow_id"])
     
     bgms = []
     for bgm in [mapBgms["bgm_id"], mapBgms["bgm2_id"]] + [boss["bgm"] for boss in mapBgms["bossMusics"]]:

@@ -4,11 +4,11 @@ from datetime import datetime
 import re
 import json
 
-from util import DATA, DIFFICULTIES, ERROR
 import util
 import mapUtil
-from scenario import Story, UNIT_IMAGE
+from scenario import Story
 from reward import parseReward
+from globals import DATA, DIFFICULTIES, ERROR, UNIT_IMAGE
 
 def getHeroWithName(name: str):
     heroes = util.fetchFehData("Common/SRPG/Person", None)
@@ -194,7 +194,7 @@ def RevivalHeroBattle(mapId: str):
         return {}
     
     starttime = datetime.strptime(StageEvent['avail']['start'], util.TIME_FORMAT)
-    if starttime >= datetime.strptime(util.timeDiff(StageEvent['avail']['finish'], -86400*5), util.TIME_FORMAT):
+    if starttime >= datetime.strptime(util.timeDiff(StageEvent['avail']['finish'], 86400*4), util.TIME_FORMAT):
         notification = ""
     else:
         kind = re.search(r"mapGroup\s*=\s*(.*)\n", content)[1]
@@ -236,17 +236,14 @@ from sys import argv
 
 if __name__ == '__main__':
     for arg in argv[1:]:
-        try:
-            if re.match(r'T\d{4}', arg) and util.getName(arg)[2] == '&':
-                maps = list(BoundHeroBattle(arg).items())[0]
-                print(maps[0], maps[1], sep='\n')
-            elif re.match(r'T\d{4}', arg):
-                print(GrandHeroBattle(arg))
-            elif re.match(r'L\d{4}', arg):
-                print(LegendaryHeroBattle(arg))
-            elif re.match(r'I\d{4}', arg):
-                print(LimitedHeroBattle(arg))
-            else:
-                print(util.ERROR, "Unknow argument", arg)
-        except:
-            print("Error with " + arg)
+        if re.match(r'T\d{4}', arg) and util.getName(arg)[2] == '&':
+            maps = list(BoundHeroBattle(arg).items())[0]
+            print(maps[0], maps[1], sep='\n')
+        elif re.match(r'T\d{4}', arg):
+            print(GrandHeroBattle(arg))
+        elif re.match(r'L\d{4}', arg):
+            print(LegendaryHeroBattle(arg))
+        elif re.match(r'I\d{4}', arg):
+            print(LimitedHeroBattle(arg))
+        else:
+            print(util.ERROR, "Unknow argument", arg)

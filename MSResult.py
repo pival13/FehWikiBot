@@ -4,7 +4,6 @@ import requests
 import re
 import json
 
-import util
 import wikiUtil
 
 from sys import argv

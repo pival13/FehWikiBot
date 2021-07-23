@@ -56,10 +56,18 @@ def parseSequentialMap(data):
                 "target": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x80))+0x08*i+0x00, 0x4e2d3d06),
                 "bonus": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x80))+0x08*i+0x04, 0xb48ec15a),
             } for i in range(util.getLong(data, util.getLong(data, offGr+0x80)+0x08, 0xEAF41B8B))],#0x25E8 b48e020a
+            "_unknow2": {
+                "_unknow1": hex(util.getLong(data, util.getLong(data, offGr+0x88))),
+                "_unknow2": {hex(util.getLong(data, util.getLong(data, offGr+0x88)+0x08)): 0x14},
+                "_unknow3": {hex(util.getLong(data, util.getLong(data, offGr+0x88)+0x10)): 0x19},
+                "_unknow4": {hex(util.getLong(data, util.getLong(data, offGr+0x88)+0x18)): 0x3C},
+                "_unknow5": {hex(util.getLong(data, util.getLong(data, offGr+0x88)+0x20)): 0x3C},
+                "_unknow6": {hex(util.getLong(data, util.getLong(data, offGr+0x88)+0x28)): 0x3C}
+            },
             "sets": []
         }]
-        for iSet in range(util.getLong(data, offGr+0x90, 0xc33b272f)):
-            offSet = util.getLong(data, util.getLong(data, offGr+0x88)+0x08*iSet)
+        for iSet in range(util.getLong(data, offGr+0x98, 0xc33b272f)):
+            offSet = util.getLong(data, util.getLong(data, offGr+0x90)+0x08*iSet)
             result[iGr]['sets'] += [{
                 "set_id": util.getString(data, offSet),
                 "battles": [{

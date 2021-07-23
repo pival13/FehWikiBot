@@ -4,8 +4,8 @@ import json
 from os.path import isfile
 from num2words import num2words
 
-from util import DATA
 import util
+from globals import DATA
 from Reverse import reverseHallOfForms
 from reward import parseReward
 

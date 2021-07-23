@@ -4,8 +4,8 @@ from os.path import isfile
 import json
 import re
 
-from util import TODO, ERROR, DATA
 import util
+from globals import TODO, ERROR, DATA
 from wikiUtil import exportPage, exportSeveralPages
 
 from StoryParalogue import StoryMap, StoryGroup, ParalogueMap, ParalogueGroup, UpdateStoryParalogueList
@@ -22,7 +22,7 @@ from TT import TempestTrials
 #from TB import TapBattle
 #from GC import GrandConquest
 from FB import exportForgingBonds
-#from RS import RokkrSieges
+from RS import RokkrSieges
 from LL import LostLore
 from HoF import HallOfForms
 from MS import MjolnirsStrike
@@ -160,7 +160,9 @@ def findEvents(tag: str):
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'):
         try: exportForgingBonds(tag)
         except: print(TODO + "Forging Bonds")
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'): print(TODO + "New Rokkr Sieges")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'):
+        try: exportSeveralPages(RokkrSieges(tag), 'Bot: new Rokkr Sieges', create=True)
+        except: print(TODO + "Rokkr Sieges")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'):
         try: exportSeveralPages(LostLore(tag), 'Bot: new Lost Lore', create=True)
         except: print(TODO + "Lost Lore")

@@ -3,8 +3,8 @@
 from datetime import datetime
 import re
 
-from util import DATA, DIFFICULTIES
 import util
+from globals import DATA, DIFFICULTIES
 import mapUtil
 
 TD_KIND = ['Basics', 'Skill Studies', 'Grandmaster']

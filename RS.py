@@ -3,8 +3,8 @@
 from datetime import datetime
 from os.path import isfile
 
-from util import DATA
 import util
+from globals import DATA
 from Reverse import reverseRokkrSieges
 from reward import parseReward
 

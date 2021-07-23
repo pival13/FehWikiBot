@@ -1,25 +1,25 @@
 #! /usr/bin/env python3
 
-from util import URL, DATA
 import util
 import mapUtil
+from globals import DATA
 
-SERIES_BGM = [
-    ["bgm_map_Brave_02.ogg", "bgm_menu_theme01.ogg"],
-    ["bgm_map_FE12_01.ogg", "bgm_battle_FE12_01.ogg"],
-    ["bgm_map_FE15_01.ogg", "bgm_battle_FE15_01.ogg"],
-    ["bgm_map_FE04_01.ogg", "bgm_battle_FE04_01.ogg"],
-    ["bgm_map_FE05_01.ogg", "bgm_battle_FE05_01.ogg"],
-    ["bgm_map_FE06_01.ogg", "bgm_battle_FE06_01.ogg"],
-    ["bgm_map_FE07_01.ogg", "bgm_battle_FE07_01.ogg"],
-    ["bgm_map_FE08_01.ogg", "bgm_battle_FE08_01.ogg"],
-    ["bgm_map_FE09_01.ogg", "bgm_battle_FE09_01.ogg"],
-    ["bgm_map_FE10_03.ogg", "bgm_battle_FE10_01.ogg"],
-    ["bgm_map_FE13_04.ogg", "bgm_battle_FE13_01.ogg"],
-    ["bgm_map_FE14_03.ogg", "bgm_battle_FE14_01.ogg"],
-    ["bgm_map_FE16_01.ogg", "bgm_battle_FE16_01.ogg"],
-    ["bgm_map_FEG_01.ogg", "bgm_menu_theme01.ogg"],
-]
+SERIES_BGM = {
+    0:  ["bgm_map_Brave_02.ogg", "bgm_menu_theme01.ogg"],
+    1:  ["bgm_map_FE12_01.ogg", "bgm_battle_FE12_01.ogg"],
+    2:  ["bgm_map_FE15_01.ogg", "bgm_battle_FE15_01.ogg"],
+    3:  ["bgm_map_FE04_01.ogg", "bgm_battle_FE04_01.ogg"],
+    4:  ["bgm_map_FE05_01.ogg", "bgm_battle_FE05_01.ogg"],
+    5:  ["bgm_map_FE06_01.ogg", "bgm_battle_FE06_01.ogg"],
+    6:  ["bgm_map_FE07_01.ogg", "bgm_battle_FE07_01.ogg"],
+    7:  ["bgm_map_FE08_01.ogg", "bgm_battle_FE08_01.ogg"],
+    8:  ["bgm_map_FE09_01.ogg", "bgm_battle_FE09_01.ogg"],
+    9:  ["bgm_map_FE10_03.ogg", "bgm_battle_FE10_01.ogg"],
+    10: ["bgm_map_FE13_04.ogg", "bgm_battle_FE13_01.ogg"],
+    11: ["bgm_map_FE14_03.ogg", "bgm_battle_FE14_01.ogg"],
+    12: ["bgm_map_FE16_01.ogg", "bgm_battle_FE16_01.ogg"],
+    13: ["bgm_map_FEG_01.ogg", "bgm_menu_theme01.ogg"],
+}
 
 def getHeroJson(heroId: int):
     HERO = util.fetchFehData("Common/SRPG/Person", False)
