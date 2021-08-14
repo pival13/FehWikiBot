@@ -11,10 +11,10 @@ from globals import SKILLS, SEALS, CREATABLE_SEALS, REFINES, COLOR, MOVE_TYPE, W
 def refinePath(baseSkill, refSkill, refData):
     STATS_PATH = {
         '': ([3,0,0,0,0], [0,0,0,0,0]),
-        'ATK': ([5,2,0,0,0], [2,1,0,0,0]),
-        'SPD': ([5,0,3,0,0], [2,0,2,0,0]),
-        'DEF': ([5,0,0,4,0], [2,0,0,3,0]),
-        'RES': ([5,0,0,0,4], [2,0,0,0,3])
+        'Atk': ([5,2,0,0,0], [2,1,0,0,0]),
+        'Spd': ([5,0,3,0,0], [2,0,2,0,0]),
+        'Def': ([5,0,0,4,0], [2,0,0,3,0]),
+        'Res': ([5,0,0,0,4], [2,0,0,0,3])
     }
     ICONS = {'神': 'Wrathful Staff W.png', '幻': 'Dazzling Staff W.png'}
     path = REFINE_TYPE[refSkill['refine_sort_id']] if refSkill['refine_sort_id'] in REFINE_TYPE else 'Unknow'
@@ -98,7 +98,7 @@ def Refine(skill_id):
     for i, (key, value) in enumerate(refData.items()):
         if re.search(f'\\|\\s*{key}\\s*=', page):
             continue
-        pattern = r'(Weapon Infobox.*?)(?=\|\s*properties|\}\})' if i == 0 else f'(\\|\\s*{list(refData.keys())[i-1]}\\s*=[^|}}]*)'
+        pattern = r'(Weapon Infobox(\{\{.*?\}\}|.)*?)(?=\|\s*properties|\}\})' if i == 0 else f'(\\|\\s*{list(refData.keys())[i-1]}\\s*=[^|}}]*)'
         value = ','.join(map(str, value)) if isinstance(value, list) else str(value).replace('\n\n', '<br /><br />').replace('\n',' ')
         page = re.sub(pattern, f"\\1|{key}={value}\n", page, flags=re.DOTALL)
 
@@ -181,5 +181,6 @@ if __name__ == '__main__':
     for arg in argv[1:]:
         pass
         #skills = SacredSeal(arg)
+        #skills = Refine(arg)
         #for name in skills:
         #    print(name, skills[name])

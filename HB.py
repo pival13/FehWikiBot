@@ -190,7 +190,7 @@ def RevivalHeroBattle(mapId: str):
     pageName = util.cargoQuery('Maps', where=f"Map='{StageEvent['banner_id']}'", limit=1)[0]['Page'].replace('&amp;', '&')
     content = getPageContent([pageName])[pageName]
 
-    if mapId[0] in ['I', 'Q'] or re.search(r"start\s*=\s*"+StageEvent['avail']['start']+r"\s*\|end\s*=\s*"+util.timeDiff(StageEvent['avail']['finish']), content):
+    if mapId[0] in ['I', 'Q', 'V'] or re.search(r"start\s*=\s*"+StageEvent['avail']['start']+r"\s*\|end\s*=\s*"+util.timeDiff(StageEvent['avail']['finish']), content):
         return {}
     
     starttime = datetime.strptime(StageEvent['avail']['start'], util.TIME_FORMAT)

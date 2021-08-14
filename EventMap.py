@@ -30,7 +30,7 @@ def exportEventMap(mapId1: str, mapId2: str=None):
             else:
                 append = util.askAgreed(f"\"{name}\" already exist. Should something be append to the name?", useTrueDefault=False, askTrue="What should be append?")
                 if not append:
-                    return
+                    break
 
 def getDefaultWeapon(unit: dict, diff: int, level: int):
     weapon = unit['weapon_type']

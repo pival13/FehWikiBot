@@ -20,5 +20,6 @@ from .RevHoF import reverseHallOfForms
 from .RevMS  import reverseMjolnirsStrike
 from .RevFP  import reverseFrontlinePhalanx
 from .RevPoL import reversePawnsOfLoki
+from .RevHJ  import reverseHeroesJourney
 
 sys.path.pop(0)

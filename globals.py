@@ -124,7 +124,8 @@ ITEM_KIND = {
     27: "Aether Stone", 28: "Throne", 29: "Summoning Ticket",
     30: "Dragonflower", 34: "Havoc Axe", 35: "Music", 36: "Forma Torch",
     37: "Midgard Gem", 39: "Divine Code", 43: "Forma Soul", 
-    44: "Guardian Shield", 45: "Trait Fruit"
+    44: "Guardian Shield", 45: "Trait Fruit",
+    'Memento Points': 'Memento Point'
 }
 
 AA_ITEM = [

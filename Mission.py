@@ -22,6 +22,7 @@ SORTING_PATTERN = [
     {'value': 23, 'pattern': r'MJOLNIR'}, #Mjölnir's Strike
 	{'value': 24, 'pattern': r'MAMORE'}, # Frontline Phalanx
 	{'value': 25, 'pattern': r'BOARDGAME'}, # Pawns of Loki
+	{'value': 26, 'pattern': r'JOURNEY'}, # Heroes Journey
     {'value': 31, 'pattern': r'HERO'}, # Grand Hero
     {'value': 32, 'pattern': r'KIZUNA'}, # Bound Hero
     #[] = {'pattern': r'CHARA'}, # Three Heroes

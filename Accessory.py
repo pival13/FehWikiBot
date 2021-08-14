@@ -25,9 +25,10 @@ def AccessoryObtention(tagid: str):
         s += '{{Forging Bonds accessory}}\n'
     #{{Rokkr Sieges accessory}}
     #{{Tap Battle accessory}}
+    #{{Heroes Journey accessory}}
     else:
         r = util.askFor(intro=f"How is obtain accessory {util.getName(tagid)} (except from shop) ?")
-        if r: s += ('' if s[0] == '{' or s[0] == '*' else '* ') + r + "\n"
+        if r: s += ('' if r[0] == '{' or r[0] == '*' else '* ') + r + "\n"
     if tagid in shops:
         s += '{{Shop accessory|' + str(shops[tagid]['price']) + '}}\n'
     return s

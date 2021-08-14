@@ -32,6 +32,7 @@ from RevHoF import parseIdolTower
 from RevMS  import parseMjolnir
 from RevFP  import parseEncourage
 from RevPoL import parseBoardGame
+from RevHJ  import parseJourney
 
 def parseAccessory(data):
     result = []
@@ -158,6 +159,8 @@ def reverseFile(file: str):
         return parseEncourage(s)
     elif file.find("/SRPG/BoardGame/") != -1:
         return parseBoardGame(s)
+    elif file.find("/Journey/Terms/") != -1:
+        return parseJourney(s)
     else:
         print(file + ": Unknow reversal method")
         return
