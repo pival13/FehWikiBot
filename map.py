@@ -178,6 +178,8 @@ def findEvents(tag: str):
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/BoardGame/' + tag + '.bin.lz'):
         try: exportSeveralPages(PawnsOfLoki(tag), 'Bot: new Pawns of Loki', create=True)
         except: print(TODO + "Pawns of Loki")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Journey/Terms/' + tag + '.bin.lz'):
+        print(TODO + 'New Heroes Journey')
 
 def findUpcoming():
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent/", False)

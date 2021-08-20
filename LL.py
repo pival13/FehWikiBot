@@ -27,7 +27,7 @@ def LLInfobox(data: dict, strikes: list):
 def LLRewards(data: dict):
     s = "==Rewards==\n{{#invoke:Reward/LostLore|lines|extraTeams=" + ",".join([str(t) for t in extraTeams]) + "\n"
     for r in data['loreRewards']:
-        if int(r['lines'] / 3600) in extraTeams: r['reward'] += [{"kind": -1, "_type": "Lost Lore Team", "count": 1}]
+        if int(r['lines'] / 3600) in extraTeams: r['reward'] += [{"kind": "Lost Lore Team", "count": 1}]
         #First format will transform it into {:<nb}, second format will return the number right padded to nb spaces
         score = "{{:<{}}}".format(len(str(int(data['loreRewards'][-1]['lines']/3600)))).format(int(r['lines']/3600))
         s += f" | {score} = " + parseReward(r['reward']) + "\n"
@@ -58,6 +58,7 @@ def LLLocation(data: dict):
             "image": re.sub(r".+/([^/]+)\..*", r"\1.webp", location['backgroundPath']),
             ("linesReq" if location['lines'] != 0 else "isCombat"): int(location['lines'] / 3600) if location['lines'] != 0 else 1,
             "rewards": parseReward(location['clearReward'] + [{"kind": -1, "_type": "Saga's " + util.getName(f"MID_TRIP_SAGA_SECTION_{data['maps'].index(location)+1}"), "count": 1}])
+                    .replace('<!--','').replace('-->','')
         }
         #Convert a json object into lua object
         loc = re.sub('": "?', "=", re.sub(r'"?, "', ";", json.dumps(loc).replace("{\"", "{").replace("\"}", "}")))
