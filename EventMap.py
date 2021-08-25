@@ -8,7 +8,7 @@ from num2words import num2words
 import util
 import mapUtil
 from wikiUtil import _exportPage
-from globals import DIFFICULTIES, ERROR, UNITS
+from globals import DIFFICULTIES, ERROR, UNIT_NAMES
 
 WEAPON_NAME = ['剣', '槍', '斧', '弓', '弓', '弓', '弓', '暗器', '暗器', '暗器', '暗器']
 MAGIC_NAME = [['','',''],['ファイアー','エルファイアー','ボルガノン'],['サンダー','エルサンダー','トロン'],['ウインド','エルウインド','レクスカリバー'],['ライト','エルライト','シャイン'],['ミィル','ルイン','ノスフェラート'],['ロック','エルロック','アトラース']]
@@ -95,7 +95,7 @@ def EventUnitData(StageEvent: dict, weaponKind):
         asked = util.askFor(r".+ ([a-f][1-8]|\?\?)", f"{num2words(len(askedUnits)+1, to='ordinal').capitalize()} enemy unit:")
         if asked:
             askedUnits += [{'unit': asked[:-3], 'pos': asked[-2:]}]
-            if not askedUnits[-1]['unit'] in UNITS:
+            if not askedUnits[-1]['unit'] in UNIT_NAMES:
                 print(ERROR + "Unknow unit: "+askedUnits[-1]['unit'], file=stderr)
                 askedUnits.remove(askedUnits[-1])
             elif askedUnits[-1]['pos'] == '??':
@@ -110,8 +110,8 @@ def EventUnitData(StageEvent: dict, weaponKind):
         s += '\n|' + DIFFICULTIES[StageEvent['scenarios'][idiff]['difficulty']] + '='
         units = []
         for i in range(len(askedUnits)):
-            units += [{'id_tag': UNITS[askedUnits[i]['unit']]['id_tag'], 'rarity': StageEvent['scenarios'][idiff]['stars'], 'true_lv': StageEvent['scenarios'][idiff]['true_lv']}]
-            u = UNITS[askedUnits[i]['unit']]
+            units += [{'id_tag': UNIT_NAMES[askedUnits[i]['unit']]['id_tag'], 'rarity': StageEvent['scenarios'][idiff]['stars'], 'true_lv': StageEvent['scenarios'][idiff]['true_lv']}]
+            u = UNIT_NAMES[askedUnits[i]['unit']]
             units[i]['weapon'] = u['skills'][4][0] if 'skills' in u and (weaponKind == 'P' or (weaponKind == 'D' and len(util.cargoQuery("Units", where="_pageName='"+askedUnits[i]['unit'].replace("'", "\\'")+"' AND (Properties__full LIKE \"%special%\" OR Properties__full LIKE \"%specDisplay%\")")) != 0)) else \
                                  util.askFor("", f"Weapon for \"{askedUnits[i]['unit']}\" at difficulty {DIFFICULTIES[StageEvent['scenarios'][idiff]['difficulty']]}:") if weaponKind == 'C' else \
                                  getDefaultWeapon(u, StageEvent['scenarios'][idiff]['difficulty'], StageEvent['scenarios'][idiff]['true_lv'])

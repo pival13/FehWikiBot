@@ -15,9 +15,10 @@ ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 _persons = fetchFehData("Common/SRPG/Person", False)
 _enemies = fetchFehData("Common/SRPG/Enemy", False)
 
-UNITS = {getName(u['id_tag']): u for u in _enemies + _persons}
+UNITS = {u['id_tag']: u for u in _enemies + _persons}
+UNIT_NAMES = {getName(u['id_tag']): u for u in _enemies + _persons}
 
-UNIT_IMAGE = {u['face_name']: u for u in _enemies + _persons}
+UNIT_IMAGE = {u['face_name2']: u for u in _enemies + _persons}
 UNIT_IMAGE.update({
     "ch00_00_Eclat_X_Normal":       {'name': "Kiran"},
     "ch00_00_Eclat_X_Avatar00":     {'name': "Kiran: Hero Summoner",    'id_tag': "EID_アバター"},
