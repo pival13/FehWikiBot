@@ -79,7 +79,7 @@ def getPageRevision(page: str, revision: int) -> str:
         else:
             return result[-1]['slots']['main']['*']
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        return getPageContent(pages)
+        return getPageRevision(page, revision)
 
 def getPageContent(pages: list) -> dict:
     if isinstance(pages, str): pages = [pages]
@@ -94,7 +94,7 @@ def getPageContent(pages: list) -> dict:
                 "rvslots": "*",
                 "format": "json"
             }).json()['query']['pages']
-            result = {result[pageId]['title']: result[pageId]['revisions'][0]['slots']['main']['*'] for pageId in result}
+            result = {result[pageId]['title']: result[pageId]['revisions'][0]['slots']['main']['*'] if 'revisions' in result[pageId] else None for pageId in result}
             result.update(getPageContent(pages[50:]))
             return result
         except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
@@ -104,17 +104,15 @@ def getPageContent(pages: list) -> dict:
 
 def deleteToRedirect(pageToDelete: str, redirectionTarget: str):
     S = util.fehBotLogin()
-    deleteR = S.post(url=util.URL, data={
-        "action": "delete",
-        "title": pageToDelete,
-        "reason": "Bot: delete to redirect",
-        "tags": "automated",
-        "watchlist": "nochange",
-        "token": util.getToken(),
-        "format": "json"
-    }).json()
-    redirectR = _exportPage(pageToDelete, f"#REDIRECT [[{redirectionTarget}]]", "Bot: redirect", create=True)
-    return (deleteR, redirectR)
+    deleteR = _deletePage(pageToDelete, 'Bot: Delete to redirect')
+    if 'error' in deleteR:
+        print(util.ERROR + f'Failed to delete page {pageToDelete}: {deleteR["error"]["info"]}')
+    elif 'delete' in deleteR:
+        redirectR = _exportPage(pageToDelete, f"#REDIRECT [[{redirectionTarget}]]", "Bot: redirect", create=True)
+        if 'error' in redirectR:
+            print(util.ERROR + f'Failed to redirect page {pageToDelete} to {redirectionTarget}: {redirectR["error"]["info"]}')
+        else:
+            print(f'Redirected page {pageToDelete} to {redirectionTarget}')
 
 def _exportPage(name: str, content: str, summary: str=None, minor: bool=False, create: bool=False, attempt=0):
     if attempt >= 3:
@@ -126,8 +124,8 @@ def _exportPage(name: str, content: str, summary: str=None, minor: bool=False, c
             "title": name,
             "text": content,
             "summary": summary,
-            "minor": minor,
-            ("createonly" if create else "nocreate"): True,
+            ("minor" if minor else "major"): True,
+            ("" if create == -1 else "createonly" if create else "nocreate"): True,
             "bot": True,
             "tags": "automated",
             "watchlist": "nochange",
@@ -137,6 +135,24 @@ def _exportPage(name: str, content: str, summary: str=None, minor: bool=False, c
         return result
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         return _exportPage(name, content, summary, minor, create, attempt+1)
+
+def _deletePage(name: str, summary: str=None, attempt=0):
+    if attempt >= 3:
+        return {'error': {'code':"deletefail",'info':'Maximum attempt reached.'}}
+    try:
+        S = util.fehBotLogin()
+        result = S.post(url=util.URL, data={
+            "action": "delete",
+            "title": name,
+            "reason": summary,
+            "tags": "automated",
+            "watchlist": "nochange",
+            "token": util.getToken(),
+            "format": "json"
+        }).json()
+        return result
+    except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
+        return _exportPage(name, summary, attempt+1)
 
 def exportPage(name: str, content: str, summary: str=None, minor: bool=False, create: bool=False):
     result = _exportPage(name, content, summary, minor, create)
@@ -149,11 +165,23 @@ def exportPage(name: str, content: str, summary: str=None, minor: bool=False, cr
             print(f"Page created: " + name)
         else:
             print(f"Page edited: " + name)
+    elif 'error' in result and 'info' in result['error']:
+        print(util.ERROR + f"Error on \"{name}\": {result['error']['info']}")
     else:
-        print(result)
+        print(util.ERROR + f'{result}')
+
+def deletePage(name: str, summary: str=None):
+    result = _deletePage(name, summary)
+    if 'error' in result:
+        print(util.ERROR + f"Failed to delete \"{name}\": {result['error']['info']}")
+    elif 'delete' in result:
+        print('Page deleted: ' + name)
+    else:
+        print(util.ERROR + f'{result}')
 
 def exportSeveralPages(group: dict, summary: str=None, minor: bool=False, create: bool=False):
     for name in group:
+        waitSec(5)
         exportPage(name, group[name], summary, minor, create)
 
 

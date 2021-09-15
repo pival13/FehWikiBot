@@ -17,6 +17,7 @@ _enemies = fetchFehData("Common/SRPG/Enemy", False)
 
 UNITS = {u['id_tag']: u for u in _enemies + _persons}
 UNIT_NAMES = {getName(u['id_tag']): u for u in _enemies + _persons}
+RESPLENDENTS = fetchFehData("Common/SubscriptionCostume", 'hero_id')
 
 UNIT_IMAGE = {u['face_name2']: u for u in _enemies + _persons}
 UNIT_IMAGE.update({

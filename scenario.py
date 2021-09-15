@@ -3,7 +3,13 @@
 import re
 
 import util
-from globals import UNIT_IMAGE
+from globals import UNIT_IMAGE, SOUNDS
+
+def getBgm(id):
+    if id in SOUNDS:
+        return SOUNDS[id]['list'][0]['file'] + '.ogg'
+    else:
+        return id
 
 def parseScenario(s: str, lang: str):
     wikitext = []
@@ -36,7 +42,7 @@ def parseScenario(s: str, lang: str):
         elif section[:2] == '$E':
             expr = section[2:]
         elif section[:4] == '$Sbp':
-            wikitext += ["{{StoryBGM|" + section[4:section.find(',')] + "}}"]
+            wikitext += ["{{StoryBGM|" + getBgm(section[4:section.find(',')]) + "}}"]
         elif section[:4] == '$Ssp':
             wikitext += ["{{StorySE|" + section[4:] + "}}"]
         elif section[:3] == '$Fo':
@@ -53,25 +59,25 @@ def parseStructure(obj, lang):
 
     for key in obj:
         if key == "MID_SCENARIO_OPENING_BGM":
-            opening += ["{{StoryBGM|" + obj[key] + "}}"]
+            opening += ["{{StoryBGM|" + getBgm(obj[key]) + "}}"]
         elif key == "MID_SCENARIO_OPENING_IMAGE":
             opening += ["{{StoryImage|" + obj[key] + "}}"]
         elif key == "MID_SCENARIO_OPENING":
             opening += parseScenario(obj[key], lang)
         elif key == "MID_SCENARIO_MAP_BEGIN_BGM":
-            mapBegin += ["{{StoryBGM|" + obj[key] + "}}"]
+            mapBegin += ["{{StoryBGM|" + getBgm(obj[key]) + "}}"]
         elif key == "MID_SCENARIO_MAP_BEGIN_IMAGE":
             mapBegin += ["{{StoryImage|" + obj[key] + "}}"]
         elif key == "MID_SCENARIO_MAP_BEGIN":
             mapBegin += parseScenario(obj[key], lang)
         elif key == "MID_SCENARIO_MAP_END_BGM":
-            mapEnd += ["{{StoryBGM|" + obj[key] + "}}"]
+            mapEnd += ["{{StoryBGM|" + getBgm(obj[key]) + "}}"]
         elif key == "MID_SCENARIO_MAP_END_IMAGE":
             mapEnd += ["{{StoryImage|" + obj[key] + "}}"]
         elif key == "MID_SCENARIO_MAP_END":
             mapEnd += parseScenario(obj[key], lang)
         elif key == "MID_SCENARIO_ENDING_BGM":
-            ending += ["{{StoryBGM|" + obj[key] + "}}"]
+            ending += ["{{StoryBGM|" + getBgm(obj[key]) + "}}"]
         elif key == "MID_SCENARIO_ENDING_IMAGE":
             ending += ["{{StoryImage|" + obj[key] + "}}"]
         elif key == "MID_SCENARIO_ENDING":
@@ -97,7 +103,7 @@ def Conversation(mapId, tag):
 
     if tag in enJSON:
         if tag + "_BGM" in enJSON:
-            wikiTextUSEN += ["{{StoryBGM|" + enJSON[tag+"_BGM"] + "}}"]
+            wikiTextUSEN += ["{{StoryBGM|" + getBgm(enJSON[tag+"_BGM"]) + "}}"]
         if tag + "_IMAGE" in enJSON:
             wikiTextUSEN += ["{{StoryImage|" + enJSON[tag+"_IMAGE"] + "}}"]
         wikiTextUSEN += parseScenario(enJSON[tag], "en")
@@ -106,7 +112,7 @@ def Conversation(mapId, tag):
 
     if tag in jaJSON:
         if tag + "_BGM" in jaJSON:
-            wikiTextJPJA += ["{{StoryBGM|" + jaJSON[tag+"_BGM"] + "}}"]
+            wikiTextJPJA += ["{{StoryBGM|" + getBgm(jaJSON[tag+"_BGM"]) + "}}"]
         if tag + "_IMAGE" in jaJSON:
             wikiTextJPJA += ["{{StoryImage|" + jaJSON[tag+"_IMAGE"] + "}}"]
         wikiTextJPJA += parseScenario(jaJSON[tag], "ja")

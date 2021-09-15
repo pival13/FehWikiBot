@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
 
+from datetime import datetime
+
 import util
 import mapUtil
 from globals import DATA
@@ -34,7 +36,8 @@ def HeroicOrdeals(mapId: str):
     hero = getHeroJson(heroId)
     SRPGMap = util.readFehData("Common/SRPGMap/" + mapId + ".json")
     diff = heroId < 191 and 'Normal' or heroId < 317 and 'Hard' or 'Lunatic'
-    release = util.cargoQuery("Units", "ReleaseDate", "IntID="+str(heroId), limit=1)[0]["ReleaseDate"]
+    release = util.cargoQuery("Units", "ReleaseDate", "IntID="+str(heroId), limit=1)
+    release = release[0]["ReleaseDate"] if release and len(release) > 0 else datetime.now().strftime("%Y-%m-%d")
 
     SRPGMap['field'].update({'player_pos': SRPGMap['player_pos']})
 

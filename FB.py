@@ -114,7 +114,7 @@ def exportForgingBonds(tagId: str):
     content = ForgingBonds(tagId)
     for name in content:
         isRevival = True if re.search(r"===\s*Rerun\s*===", content[name]) else False
-        exportPage(name, content[name], 'Bot: Forging Bonds revival' if isRevival else 'Bot: new Forging Bonds', create=not isRevival)
+        exportPage(name, content[name], 'Bot: Forging Bonds revival' if isRevival else 'Bot: new Forging Bonds', create=-1)
     return content
 
 

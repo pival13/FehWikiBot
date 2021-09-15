@@ -104,7 +104,7 @@ def RSUnits(data: dict):
                 s += f";a={util.getName(unit['a']) if unit['a'] else '-'}"
                 s += f";b={util.getName(unit['b']) if unit['b'] else '-'}"
                 s += f";c={util.getName(unit['c']) if unit['c'] else '-'}"
-                s += f";seal=" + util.getName(data['unit_data_common'][iDiff]['seal']) + "};\n"
+                s += f";seal=" + util.getName(unitData['seal']) + "};\n"
             s += "]\n"
         s += "}}"
     return s
