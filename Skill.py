@@ -1,12 +1,21 @@
 #! /usr/bin/env python3
 
 import re
-import json
 from num2words import num2words
+from os.path import exists
 
 import util
 import wikiUtil
+from mapUtil import InOtherLanguage
 from globals import SKILLS, SEALS, CREATABLE_SEALS, REFINES, COLOR, MOVE_TYPE, WEAPON_CATEGORY, WEAPON_MASK, REFINE_TYPE
+
+def wepMaskToList(ref):
+    l = []
+    for mask, name in WEAPON_CATEGORY.items():
+        if mask != 0 and (mask & ref) == mask:
+            ref ^= mask
+            l += [name]
+    return l
 
 def refinePath(baseSkill, refSkill, refData):
     STATS_PATH = {
@@ -99,7 +108,7 @@ def Refine(skill_id):
         if re.search(f'\\|\\s*{key}\\s*=', page):
             continue
         pattern = r'(Weapon Infobox(\{\{.*?\}\}|.)*?)(?=\|\s*properties|\}\})' if i == 0 else f'(\\|\\s*{list(refData.keys())[i-1]}\\s*=[^|}}]*)'
-        value = ','.join(map(str, value)) if isinstance(value, list) else str(value).replace('\n\n', '<br /><br />').replace('\n',' ')
+        value = ','.join(map(str, value)) if isinstance(value, list) else str(value).replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a', '')
         page = re.sub(pattern, f"\\1|{key}={value}\n", page, flags=re.DOTALL)
 
     if not re.search(r'\{\{\s*Weapon Upgrade List\s*\}\}', page):
@@ -176,11 +185,266 @@ def SealsFrom(tag_id: str):
             print(util.TODO + 'Error with Sacred Seal ' + util.getName(data['id_tag']))
     return res
 
+
+def buildInfobox(name, obj):
+    s = '{{' + name + '\n'
+    forces = []
+    if '__force' in obj:
+        forces = obj['__force']
+        obj['__force'] = None
+    for k, v in obj.items():
+        s += f"|{k}={','.join(v) if isinstance(v,list) else v}\n" if v or k in forces else ''
+    s += '}}'
+    return s
+
+def Notes():
+    return "*"
+
+def Weapon(skill):
+    obj = {
+        'tagid': skill['id_tag'], 'intID': skill['id_num'],
+        'noImg': None, 'image': None, 'userVersion1': None, 'userVersion2': None,
+        'exclusive': 1 if skill['exclusive'] else 0,
+        'weaponType': WEAPON_CATEGORY[skill['wep_equip']],
+        'canUseMove': [move for i, move in enumerate(MOVE_TYPE) if skill['mov_equip'] & (1 << i)] if skill['mov_equip'] != 0b1111 else None,
+        'cost': skill['sp_cost'],
+        'might': skill['might'], 'range':skill['range'],
+        'cooldown': skill['cooldown_count'] if skill['cooldown_count'] != 0 else None,
+        'effectiveness': [],
+        'effect': (util.DATA[skill['desc_id']] or "").replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a',''),
+        'statModifiers': list(map(lambda k, v: str(skill['stats'][k] + v), ['hp','atk','spd','def','res'], [0,skill['might'],0,0,0])),
+        'required': [util.getName(s) for s in skill['prerequisites'] if s] or ['-'],
+        'next': util.getName(skill['next_skill']),
+        'promotionRarity': skill['promotion_rarity'], 'promotionTier': skill['promotion_tier'],
+        'properties': [],
+        '__force': ['effect', 'properties']
+    }
+
+    sprites = [s for s in skill['sprites'][:2] if s]
+    if len(sprites) == 0:
+        obj['noImg'] = 1
+    elif len(sprites) == 1 and (sprites[0][4:6] != 'mg' or exists(util.WEBP_ASSETS_DIR_PATH + 'Common/Wep/' + sprites[0] + '.ssbp')):
+        obj['image'] = sprites[0]
+    else:
+        obj['userVersion1'] = 'Closed' if len(sprites) == 1 else 'Bow' if sprites[0][4:6] == 'bw' else 'Main'
+        obj['userVersion2'] = 'Open' if len(sprites) == 1 else 'Arrow' if sprites[0][4:6] == 'bw' else 'Sub'
+
+    obj['effectiveness'] += wepMaskToList(skill['wep_effective'])
+    for i, name in enumerate(MOVE_TYPE):
+        if skill['mov_effective'] & (1 << i) != 0:
+            obj['effectiveness'] += [name]
+
+    if skill['enemy_only']: obj['properties'] += ['enemy_only']
+    if skill['tt_inherit_base']: obj['properties'] += ['random_inherit_base']
+    if skill['random_allowed'] > 0:
+        if skill['random_mode'] == 1: obj['properties'] += ['random_all']
+        elif skill['random_mode'] == 2: obj['properties'] += ['random_owner']
+    obj['properties'] = ','.join(obj['properties'])
+
+    return obj
+
+def Special(skill_id):
+    """{{Special
+    |tagid=
+    |charge=
+    |effect=
+    |cost=
+    |exclusive=
+    |required=
+    |next=
+    |canUseMove=
+    |canUseWeapon=
+    |properties=
+    }}"""
+
+def Assist(skill_id):
+    """{{Assist
+    |tagid=
+    |name=
+    |range=
+    |effect=
+    |cost=
+    |exclusive=
+    |canUseMove=
+    |canUseWeapon=
+    |next=
+    |required=
+    |properties=
+    }}"""
+
+def Passive(skill):
+    obj = {
+        'type': ['A','B','C','S'][skill['category']-3],
+        '%dname': util.getName(skill['name_id']),
+        'alt%dname': util.cleanStr(util.getName(skill['name_id']).replace('/',' ')),
+        '%dtagid': skill['id_tag'],
+        '%dexclusive': 1 if skill['exclusive'] else 0,
+        'canUseWeapon%d': f"{{{{WeaponList|{'exclude=Staff' if skill['wep_equip'] == WEAPON_MASK['All']^WEAPON_MASK['Colorless Staff'] else ','.join(wepMaskToList(skill['wep_equip']))}}}}}",
+        'canUseMove%d': f"{{{{MoveList|{'All' if skill['mov_equip'] == 0b1111 else ','.join([move for i, move in enumerate(MOVE_TYPE) if skill['mov_equip'] & (1 << i)])}}}}}",
+        '%dcost': skill['sp_cost'],
+        '%dcooldown': skill['cooldown_count'],
+        '%deffect': util.DATA[skill['desc_id']].replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a',''),
+        'statModifiers%d': list(map(lambda k, v: str(skill['stats'][k] + v), ['hp','atk','spd','def','res'], [0,skill['might'],0,0,0])) if max(skill['stats'].values()) != 0 else None,
+        '%drequired': [util.getName(s) for s in skill['prerequisites'] if s] or ['-'],
+        '%dnext': util.getName(skill['next_skill']) or '-',
+        '%dpromotionRarity': skill['promotion_rarity'],
+        '%dpromotionTier': skill['promotion_tier'],
+        'properties%d': [],
+    }
+    if skill['enemy_only']: obj['properties%d'] += ['enemy_only']
+    if skill['tt_inherit_base']: obj['properties%d'] += ['random_inherit_base']
+    if skill['random_allowed'] > 0:
+        if skill['random_mode'] == 1: obj['properties%d'] += ['random_all']
+        elif skill['random_mode'] == 2: obj['properties%d'] += ['random_owner']
+    if obj['alt%dname'] == obj['%dname']: obj['alt%dname'] = None
+    return obj
+
+def createPassivePage(skills):
+    obj = {
+        'type': skills[0]['type'],
+        'name': re.sub(r'\s*\d+$','',skills[0]['%dname'])
+    }
+    for k in ['%dexclusive', 'canUseWeapon%d', 'canUseMove%d', 'properties%d']:
+        if len([1 for skill in skills if skill[k] != skills[0][k]]) == 0:
+            obj[k.replace('%d','')] = skills[0][k]
+            for skill in skills: skill[k] = None
+    for i, skill in enumerate(skills):
+        for k in skill:
+            obj[k.replace('%d',str(i+1))] = skill[k]
+    for i in range(1, len(skills)+1):
+        if f"{i-1}name" in obj and len(obj[f'{i}required']) == 1 and obj[f'{i-1}name'] == obj[f'{i}required'][0]:
+            obj[f'{i}required'] = []
+        if (f"{i+1}name" in obj and obj[f'{i+1}name'] == obj[f'{i}next']) or (not f"{i+1}name" in obj and obj[f'{i}next'] == '-'):
+            obj[f'{i}next'] = None
+
+    s = "{{SkillPage Tabs}}"
+    s += buildInfobox('Passive', obj) + '\n'
+    s += "==Notes==\n" + Notes() + "\n"
+    s += "==List of owners==\n{{Skill Hero List}}\n"
+    s += "==Trivia==\n* \n"
+    s += re.sub(r'\s*\d+$','', InOtherLanguage('M'+skills[0]['%dtagid'], skills[0]['alt%dname']), flags=re.MULTILINE)
+    s += "==See also==\n* \n"
+    s += ("{{Passives Navbox|" + skills[0]['type'] + '}}') if skills[0]['type'] != 'S' else '{{Seals Navbox}}'
+    return s
+
+def updatePassivePage(page, skills):
+    obj = {
+        'type': skills[0]['type'],
+        'name': re.sub(r'\s*\d+$','',skills[0]['%dname'])
+    }
+    for k in ['%dexclusive', 'canUseWeapon%d', 'canUseMove%d', 'properties%d']:
+        if len([1 for skill in skills if skill[k] != skills[0][k]]) == 0:
+            obj[k.replace('%d','')] = skills[0][k]
+            for skill in skills: skill[k] = None
+    for i, skill in enumerate(skills):
+        for k in skill:
+            obj[k.replace('%d',str(i+1))] = skill[k]
+    for i in range(1, len(skills)+1):
+        if f"{i-1}name" in obj and len(obj[f'{i}required']) == 1 and obj[f'{i-1}name'] == obj[f'{i}required'][0]:
+            obj[f'{i}required'] = []
+        if (f"{i+1}name" in obj and obj[f'{i+1}name'] == obj[f'{i}next']) or (not f"{i+1}name" in obj and obj[f'{i}next'] == '-'):
+            obj[f'{i}next'] = None
+
+    prevKey = r'\{\{\s*Passive\s*'
+    reEndArg = r'(\{\{([^}]|\}(?!\}))*\}\}|[^{])*?(?=\|\s*\w+\s*=|\}\})'
+    for k, v in obj.items():
+        key = '\\|\\s*'+k+'\\s*=\\s*'
+        if re.search(key, page):
+            if k[1:] == 'effect':
+                pass
+            elif v:
+                page = re.sub('('+key+r')'+reEndArg, f"\\g<1>{v if not isinstance(v, list) else ','.join(v)}\n", page)
+            else:
+                page = re.sub(key+reEndArg, '', page)
+        elif v:
+            page = re.sub('('+prevKey+reEndArg+')', f"\\g<1>|{k}={v if not isinstance(v, list) else ','.join(v)}\n", page)
+        else:
+            continue
+        prevKey = key
+    return page
+
+def PassivePage(skills):
+    passives = list(map(Passive, skills))
+    pageName = re.sub(r' (\d+|I|II|III|IV)$', '', passives[0]['%dname']).replace('/', ' ')
+    page = wikiUtil.getPageContent(pageName)[pageName]
+    if page:
+        page = updatePassivePage(page, passives)
+    else:
+        page = createPassivePage(passives)
+    return {pageName: page}
+
+def ActivePage(skill):
+    NAVBOX = {0:'{{Weapons Navbox}}',1:'{{Assists Navbox}}',2:'{{Specials Navbox}}'}
+
+    s = ""
+    s += "{{SkillPage Tabs}}"
+    if skill['category'] == 0:
+        s += buildInfobox('Weapon Infobox', Weapon(skill)) + '\n'
+    s += "==Notes==\n" + Notes() + "\n"
+    s += "==List of owners==\n{{Skill Hero List}}\n"
+    s += "==Trivia==\n* \n"
+    s += InOtherLanguage(skill['name_id'])
+    s += "==See also==\n* \n"
+    s += NAVBOX[skill['category']]
+    return s
+
+def Skill(tag_id):
+    if tag_id in SKILLS and SKILLS[tag_id]['category'] < 3:
+        skill = SKILLS[tag_id]
+        if skill['category'] in [0]:#, 1, 2]:
+            return {util.getName(tag_id): ActivePage(skill)}
+        elif skill['category'] in [1,2]:
+            print(util.TODO + 'Unsupported skill: ' + util.getName(skill['name_id']))
+    elif tag_id in SKILLS and not tag_id[-1] in '12345':
+        skill = SKILLS[tag_id]
+        if skill['category'] in [3,4,5,6]:
+            return PassivePage([SKILLS[tag_id]])
+        else:
+            print(util.TODO + f"Unknow skill: {util.getName(tag_id)} ({tag_id})")
+            return {}
+    else:
+        if tag_id in SKILLS and tag_id[-1] in '12345':
+            tag_id = tag_id[:-1]
+        i = 1
+        skills = []
+        while f"{tag_id}{i}" in SKILLS:
+            skills += [SKILLS[f"{tag_id}{i}"]]
+            i += 1
+        if len(skills) == 0:
+            return {}
+        else:
+            return PassivePage(skills)
+
+def SkillsFrom(tag_id: str):
+    datas = util.readFehData('Common/SRPG/Skill/' + tag_id + '.json')
+    passives = {}
+    res = {}
+    for data in datas:
+        if data['id_tag'] != data['name_id'][1:] or util.getName(data['name_id']) == data['name_id']:
+            print('Skipping ' + util.getName(data['id_tag']))
+        elif data['category'] in [1, 2]:
+            print(util.TODO + 'Unsupported skill: ' + util.getName(data['name_id']))
+        elif data['category'] in [0, 1, 2]:
+            res[util.getName(data['name_id'])] = ActivePage(data)
+        else:
+            name = re.sub(r' (%d+|I|II|III|IV|V)$', '', util.getName(data['name_id']))
+            if name in passives:
+                passives[name] += data
+            else:
+                passives[name] = [data]
+    for skills in passives.values():
+        res.update(PassivePage(skills))
+    return res
+
 from sys import argv
 if __name__ == '__main__':
     for arg in argv[1:]:
-        pass
-        #skills = SacredSeal(arg)
-        #skills = Refine(arg)
-        #for name in skills:
-        #    print(name, skills[name])
+        try:
+            if re.match(r'SID_\S+', arg):
+                print(Skill(arg))
+            elif re.match(r'\d+_\w+', arg):
+                print(SkillsFrom(arg))
+            else:
+                print('Invalid argument:', arg)
+        except:
+            print('Error with ' + arg)
