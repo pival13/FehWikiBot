@@ -4,8 +4,10 @@ import re
 
 import util
 import wikiUtil
+import globals
 
 from util import DATA as ENDATA
+from MiniUnit import createMiniUnit, uploadMiniUnit, useMiniUnit
 
 def addResplendentHeroQuotes(unit: dict):
     name = util.getName(unit['hero_id'])
@@ -39,6 +41,21 @@ def addResplendentHeroQuotes(unit: dict):
 
     return {name+"/Quotes": page}
 
+def updateResplendentHeroMisc(unit: dict):
+    name = util.getName(unit['hero_id'])
+
+    createMiniUnit(unit['id_tag'], only=[unit['face_name2']+'EX01'])
+    uploadMiniUnit()
+    page = useMiniUnit([unit['id_tag']])[name + '/Misc']
+    if not page:
+        page = wikiUtil.getPageContent(name + '/Misc')[name + '/Misc']
+
+    if not re.search('Resplendent BtlFace BU\\.', page):
+        page = re.sub('(BtlFace BU D.*)', f"\\1\nFile:{util.cleanStr(name)} Resplendent BtlFace BU.webp", 1)
+    if not re.search('Resplendent BtlFace BU D\\.', page):
+        page = re.sub('(Resplendent BtlFace BU.*)', f"\\1\nFile:{util.cleanStr(name)} Resplendent BtlFace BU D.webp", 1)
+
+    return {name+'/Misc', page}
 
 def updateResplendentHeroPage(unit: dict):
     name = util.getName(unit['hero_id'])
@@ -66,17 +83,22 @@ def updateResplendentHeroPage(unit: dict):
     
 
 def ResplendentHero(unitId: str):
-    data = util.fetchFehData('Common/SubscriptionCostume/', 'hero_id')[unitId] or None
+    data = globals.RESPLENDENTS[unitId] or None
     res = updateResplendentHeroPage(data)
     res.update(addResplendentHeroQuotes(data))
+    res.update(updateResplendentHeroMisc(data))
     return res
 
-def ResplendentHeroes(tagId: str):
+def ResplendentHeroesFrom(tagId: str):
     datas = util.readFehData('Common/SubscriptionCostume/' + tagId + '.json')
     res = {}
     for data in datas:
-        res.update(updateResplendentHeroPage(data))
-        res.update(addResplendentHeroQuotes(data))
+        try:
+            res.update(updateResplendentHeroPage(data))
+            res.update(addResplendentHeroQuotes(data))
+            res.update(updateResplendentHeroMisc(data))
+        except:
+            print(util.TODO + 'Error with Resplendent hero ' + util.getName(data['id_tag']))
     return res
 
 from sys import argv
@@ -84,7 +106,7 @@ if __name__ == '__main__':
     for arg in argv[1:]:
         pages = {}
         if re.match(r'\d+_\w+', arg):
-            pages = ResplendentHeroes(arg)
+            pages = ResplendentHeroesFrom(arg)
         elif arg.find(':') != -1:
             pass
         elif arg.find('PID_') == 0:

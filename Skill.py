@@ -425,7 +425,10 @@ def SkillsFrom(tag_id: str):
         elif data['category'] in [1, 2]:
             print(util.TODO + 'Unsupported skill: ' + util.getName(data['name_id']))
         elif data['category'] in [0, 1, 2]:
-            res[util.getName(data['name_id'])] = ActivePage(data)
+            try:
+                res[util.getName(data['name_id'])] = ActivePage(data)
+            except:
+                print(util.TODO + 'Error with Skill ' + util.getName(data['name_id']))
         else:
             name = re.sub(r' (%d+|I|II|III|IV|V)$', '', util.getName(data['name_id']))
             if name in passives:
@@ -433,7 +436,10 @@ def SkillsFrom(tag_id: str):
             else:
                 passives[name] = [data]
     for skills in passives.values():
-        res.update(PassivePage(skills))
+        try:
+            res.update(PassivePage(skills))
+        except:
+            print(util.TODO + 'Error with Skill ' + util.getName(skills[0]['name_id']))
     return res
 
 from sys import argv

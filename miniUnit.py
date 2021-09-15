@@ -111,7 +111,7 @@ def getSpriteSheets(unit):
                     break
     return files
 
-def spriteSaverCommand(unit):
+def spriteSaverCommand(unit, only=None):
     commands = []
     wepR = wepL = None
     names = [unit['face_name2']]
@@ -158,6 +158,7 @@ def spriteSaverCommand(unit):
 
     wepFolder = os.path.realpath(util.WEBP_ASSETS_DIR_PATH + 'Common/Wep')
     for name in names:
+        if only and not name in only: continue
         s = os.path.realpath(util.WEBP_ASSETS_DIR_PATH + f"Common/Unit/{name}/{name}.ssbp")
         if not re.search(r'(Dragon|TransBattle|TransMap|Sub)$', name):
             if wepR:
@@ -177,10 +178,10 @@ def spriteSaverCommand(unit):
         commands += [re.sub(r'\B/mnt/(\w)/', '\\1:/', s)]
     return '\n'.join(commands) + '\n'
 
-def createMiniUnit(id_tag):
+def createMiniUnit(id_tag, only=None):
     unit = globals.UNITS[id_tag]
     n = unit['face_name2']
-    subprocess.run('./spriteSaver.exe', input=spriteSaverCommand(unit).encode())
+    subprocess.run('./spriteSaver.exe', input=spriteSaverCommand(unit, only).encode())
 
 def uploadMiniUnit():
     dir = "./Screenshots/"
@@ -211,6 +212,7 @@ def uploadMiniUnit():
             print(util.ERROR + "Error with " + c)
 
 def useMiniUnit(id_tags):
+    pages = {}
     for id_tag in id_tags:
         unit = globals.UNITS[id_tag]
         name = util.getName(unit['id_tag'])
@@ -228,14 +230,15 @@ def useMiniUnit(id_tags):
             for f in spritesheets:
                 if not re.search(f.replace(' ', '_').replace('_','[_ ]').replace('File:',''), page):
                     page = re.sub(f"({f[:f.rindex(' ')]} Mini Unit)", f+'\n\\1', page, 1)
-            wikiUtil.exportPage(name + '/Misc', page, 'Bot: Add Mini unit', minor=True)
+            pages[name + '/Misc', page]
         except:
             print('Error with ' + name)
+    return pages
 
 def MiniUnit(id_tag):
     createMiniUnit(id_tag)
     uploadMiniUnit()
-    useMiniUnit([id_tag])
+    return list(useMiniUnit([id_tag]).values())[0]
 
 def MiniUnitsFrom(update_tag):
     person = util.readFehData('Common/SRPG/Person/' + update_tag + '.json')
@@ -243,9 +246,9 @@ def MiniUnitsFrom(update_tag):
     for p in person:
         createMiniUnit(p['id_tag'])
     uploadMiniUnit()
-    useMiniUnit([p['id_tag'] for p in person])
+    return useMiniUnit([p['id_tag'] for p in person])
 
 from sys import argv
 if __name__ == '__main__':
     for arg in argv[1:]:
-        MiniUnit(arg)
+        print(MiniUnit(arg))
