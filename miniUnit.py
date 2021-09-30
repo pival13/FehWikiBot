@@ -91,6 +91,8 @@ def getSpriteSheets(unit):
     name = util.cleanStr(util.getName(unit['id_tag']))
     dir = util.WEBP_ASSETS_DIR_PATH + 'Common/Unit/'
     files = [f"File:{name} {d.replace('.png','.webp')}" for d in listdir(dir + n + '/tex/')]
+    if unit['id_tag'] in globals.RESPLENDENTS:
+        files += [f"File:{name} Resplendent {d.replace('.png','.webp')}" for d in listdir(dir + n + 'EX01/tex/')]
     if (1 << unit['weapon_type']) & globals.WEAPON_MASK['Beast']:
         if os.path.exists(dir + n + '_TransMap'):
             files += [f"File:{name} TransformMap {d.replace('.png','.webp')}" for d in listdir(dir + n + '_TransMap/tex/')]
@@ -220,6 +222,12 @@ def useMiniUnit(id_tags):
         spritesheets = getSpriteSheets(unit)
         try:
             page = wikiUtil.getPageContent(name + '/Misc')[name + '/Misc']
+            
+            #if not re.search('BtlFace BU\\.', page):
+            #    page = re.sub('(<gallery>)', f"\\1\nFile:{util.cleanStr(name)} BtlFace BU.webp", page, 1)
+            #if not re.search('BtlFace BU D\\.', page):
+            #    page = re.sub('(BtlFace BU.*)', f"\\1\nFile:{util.cleanStr(name)} BtlFace BU D.webp", page, 1)
+
             if not re.search(r'===\s*Sprites?\s*===', page):
                 page = re.sub('(</gallery>)', '\\1\n===Sprite===\n<gallery>\n</gallery>', page, 1)
             prev = r'Sprite.*\n<gallery>.*'
@@ -230,7 +238,7 @@ def useMiniUnit(id_tags):
             for f in spritesheets:
                 if not re.search(f.replace(' ', '_').replace('_','[_ ]').replace('File:',''), page):
                     page = re.sub(f"({f[:f.rindex(' ')]} Mini Unit)", f+'\n\\1', page, 1)
-            pages[name + '/Misc', page]
+            pages[name + '/Misc'] = page
         except:
             print('Error with ' + name)
     return pages
@@ -243,9 +251,11 @@ def MiniUnit(id_tag):
 def MiniUnitsFrom(update_tag):
     person = util.readFehData('Common/SRPG/Person/' + update_tag + '.json')
     person += util.readFehData('Common/SRPG/Enemy/' + update_tag + '.json')
-    for p in person:
-        createMiniUnit(p['id_tag'])
-    uploadMiniUnit()
+    try:
+        for p in person:
+            createMiniUnit(p['id_tag'])
+        uploadMiniUnit()
+    except: pass
     return useMiniUnit([p['id_tag'] for p in person])
 
 from sys import argv

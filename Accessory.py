@@ -23,9 +23,10 @@ def AccessoryObtention(tagid: str):
         s += '{{Gold accessory}}\n'
     elif tagid[-2:] == '・極' or ('M'+tagid+'・極') in util.DATA:
         s += '{{Forging Bonds accessory}}\n'
+    elif "their journeys together" in util.DATA['M'+tagid.replace('_', '_H_', 1)]:
+        s += '{{Heroes Journey accessory}}\n'
     #{{Rokkr Sieges accessory}}
     #{{Tap Battle accessory}}
-    #{{Heroes Journey accessory}}
     else:
         r = util.askFor(intro=f"How is obtain accessory {util.getName(tagid)} (except from shop) ?")
         if r: s += ('' if r[0] == '{' or r[0] == '*' else '* ') + r + "\n"

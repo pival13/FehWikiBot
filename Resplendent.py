@@ -43,19 +43,20 @@ def addResplendentHeroQuotes(unit: dict):
 
 def updateResplendentHeroMisc(unit: dict):
     name = util.getName(unit['hero_id'])
+    face = globals.UNITS[unit['hero_id']]['face_name2'] + 'EX01'
 
-    createMiniUnit(unit['id_tag'], only=[unit['face_name2']+'EX01'])
+    createMiniUnit(unit['hero_id'], only=[face])
     uploadMiniUnit()
-    page = useMiniUnit([unit['id_tag']])[name + '/Misc']
+    page = useMiniUnit([unit['hero_id']])[name + '/Misc']
     if not page:
         page = wikiUtil.getPageContent(name + '/Misc')[name + '/Misc']
 
     if not re.search('Resplendent BtlFace BU\\.', page):
-        page = re.sub('(BtlFace BU D.*)', f"\\1\nFile:{util.cleanStr(name)} Resplendent BtlFace BU.webp", 1)
+        page = re.sub('(BtlFace BU D.*)', f"\\1\nFile:{util.cleanStr(name)} Resplendent BtlFace BU.webp", page, 1)
     if not re.search('Resplendent BtlFace BU D\\.', page):
-        page = re.sub('(Resplendent BtlFace BU.*)', f"\\1\nFile:{util.cleanStr(name)} Resplendent BtlFace BU D.webp", 1)
+        page = re.sub('(Resplendent BtlFace BU.*)', f"\\1\nFile:{util.cleanStr(name)} Resplendent BtlFace BU D.webp", page, 1)
 
-    return {name+'/Misc', page}
+    return {name+'/Misc': page}
 
 def updateResplendentHeroPage(unit: dict):
     name = util.getName(unit['hero_id'])
@@ -98,7 +99,7 @@ def ResplendentHeroesFrom(tagId: str):
             res.update(addResplendentHeroQuotes(data))
             res.update(updateResplendentHeroMisc(data))
         except:
-            print(util.TODO + 'Error with Resplendent hero ' + util.getName(data['id_tag']))
+            print(util.TODO + 'Error with Resplendent hero ' + util.getName(data['hero_id']))
     return res
 
 from sys import argv
