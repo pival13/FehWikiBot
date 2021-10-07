@@ -30,6 +30,7 @@ def getName(folderName):
             if folderName[:-6] in globals.UNIT_IMAGE: folderName = folderName[:-6]
             elif folderName[:-7] in globals.UNIT_IMAGE: folderName = folderName[:-7]
             elif folderName[:-6]+"Normal" in globals.UNIT_IMAGE: folderName = folderName[:-6]+'Normal'
+            elif folderName[:-6]+"Pair" in globals.UNIT_IMAGE: folderName = folderName[:-6]+'Pair'
             elif folderName[:-11] in globals.UNIT_IMAGE: folderName = folderName[:-11]
             #elif folderName[:-10]+"Legend01" in globals.UNIT_IMAGE: pass
             else:

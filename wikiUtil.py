@@ -30,36 +30,10 @@ def getPagesWith(content: str) -> list:
             "format": "json",
         }).json()['query']['search']
         pages = getPageContent([r['title'] for r in result])
-        pageList = [p if pages[p].find(content) != -1 else None for p in list(pages.keys())]
-        while pageList.count(None): pageList.remove(None)
+        pageList = [p for p in list(pages.keys()) if pages[p].find(content) != -1]
         return pageList
     except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
         return getPagesWith(content)
-
-def getPages(nameLike: str) -> list:
-    ret = []
-    try:
-        S = util.fehBotLogin()
-        offset = 0
-        while True:
-            result = S.get(url=util.URL, params={
-                "action": "cargoquery",
-                "tables": "_pageData",
-                "fields": "_pageName=Page",
-                "where": "_pageName RLIKE \""+nameLike.replace('"', '\\"')+"\"",
-                "limit": "max",
-                "offset": offset,
-                "order_by": "_ID",
-                "format": "json"
-            }).json()
-            limit = result['limits']['cargoquery']
-            offset += limit
-            ret += [m['title']['Page'] for m in result['cargoquery']]
-            if len(result['cargoquery']) < limit:
-                break
-        return ret
-    except(requests.exceptions.Timeout, requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError):
-        return getPages(nameLike)
 
 def getPageRevision(page: str, revision: int) -> str:
     try:

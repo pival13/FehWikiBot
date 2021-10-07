@@ -113,7 +113,7 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
         elif 'id' in field and field['id'][0] == 'H':
             mapType = "\n|type=HO"
             backdrop = 'Wave'
-        elif 'id' in field and field['id'][0] == 'Y':
+        elif 'id' in field and field['id'][0] in 'YOX':
             mapType = "\n|type=RD"
             backdrop = 'Wave'
     elif 'id' in field and field['id'][0] != 'V':
