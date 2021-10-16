@@ -20,7 +20,7 @@ from EventMap import exportEventMap
 #from VG import VotingGauntlet
 from TT import TempestTrials
 from TB import TapBattle, EncoreTapBattle
-from GC import GrandConquests
+from GC import GrandConquests, uploadGrandConquestWorld
 from FB import exportForgingBonds
 from RS import RokkrSieges
 from LL import LostLore
@@ -160,7 +160,9 @@ def findEvents(tag: str):
         try: exportSeveralPages(TempestTrials(tag), 'Bot: new Tempest Trials', create=True)
         except: print(TODO + "Tempest Trials")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Occupation/Data/' + tag + '.bin.lz'):
-        try: exportSeveralPages(GrandConquests(tag), 'Bot: new Grand Conquests', create=True)
+        try:
+            exportSeveralPages(GrandConquests(tag), 'Bot: new Grand Conquests', create=True)
+            uploadGrandConquestWorld(tag)
         except: print(TODO + "New Grand Conquests")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'):
         try: exportForgingBonds(tag)

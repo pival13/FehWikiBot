@@ -10,6 +10,8 @@ from scenario import Story
 from Reverse import reverseGrandConquests
 from reward import parseReward
 from wikiUtil import exportSeveralPages
+import GCWorld
+from uploadImage import exportImage
 
 BONUS = {
     '歩行能力強化': 'Infantry Boost',
@@ -102,6 +104,15 @@ def GrandConquests(tag: str):
         s += "==Trivia==\n*\n{{Main Events Navbox}}"
         ret[f"Grand Conquests {nb}"] = s
     return ret
+
+def uploadGrandConquestWorld(tag: str):
+    datas = reverseGrandConquests(tag)
+    for data in datas:
+        res = util.cargoQuery('GrandConquests', 'Number', f"StartTime={data['battles'][0]['avail']['start']}", limit=1)
+        if len(res) == 0:
+            res = util.cargoQuery('GrandConquests', 'COUNT(_pageName)=Number')
+        world = GCWorld.GCDefaultWorld(data['str1'], data['battles'][0]['world_id'])
+        exportImage(f"File:Grand Conquests {res[0]['Number']} Area.png", world, '[[Category:Grand Conquests overworld map files]]', 'Bot: Grand Conquests areas', True)
 
 from sys import argv
 
