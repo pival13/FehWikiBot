@@ -14,7 +14,7 @@ def wepMaskToList(ref):
     for mask, name in WEAPON_CATEGORY.items():
         if mask != 0 and (mask & ref) == mask:
             ref ^= mask
-            l += [name.replace('stone','')]
+            l += [name]
     return l
 
 def refinePath(baseSkill, refSkill, refData):
@@ -208,7 +208,7 @@ def Weapon(skill):
         'weaponType': WEAPON_CATEGORY[skill['wep_equip']],
         'canUseMove': [move for i, move in enumerate(MOVE_TYPE) if skill['mov_equip'] & (1 << i)] if skill['mov_equip'] != 0b1111 else None,
         'cost': skill['sp_cost'],
-        'might': skill['might'], 'range':skill['range'],
+        'might': skill['might'], 'range': skill['range'],
         'cooldown': skill['cooldown_count'] if skill['cooldown_count'] != 0 else None,
         'effectiveness': [],
         'effect': (util.DATA[skill['desc_id']] or "").replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a',''),
@@ -268,20 +268,30 @@ def Special(skill):
 
     return obj
 
-def Assist(skill_id):
-    """{{Assist
-    |tagid=
-    |name=
-    |range=
-    |effect=
-    |cost=
-    |exclusive=
-    |canUseMove=
-    |canUseWeapon=
-    |next=
-    |required=
-    |properties=
-    }}"""
+def Assist(skill):
+    obj = {
+        'tagid': skill['id_tag'], 'intID': skill['id_num'],
+        'exclusive': 1 if skill['exclusive'] else 0,
+        'canUseWeapon': f"{{{{WeaponList|{'exclude=Staff' if skill['wep_equip'] == WEAPON_MASK['All']^WEAPON_MASK['Colorless Staff'] else ','.join(wepMaskToList(skill['wep_equip']))}}}}}",
+        'canUseMove': f"{{{{MoveList|{','.join([move for i, move in enumerate(MOVE_TYPE) if skill['mov_equip'] & (1 << i)]) if skill['mov_equip'] != 0b1111 else 'All'}}}}}",
+        'cost': skill['sp_cost'],
+        'range': skill['range'],
+        'effect': (util.DATA[skill['desc_id']] or "").replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a',''),
+        'required': [util.getName(s) for s in skill['prerequisites'] if s] or ['-'],
+        'next': util.getName(skill['next_skill']),
+        'promotionRarity': skill['promotion_rarity'], 'promotionTier': skill['promotion_tier'],
+        'properties': [],
+        '__force': ['exclusive', 'effect', 'properties']
+    }
+
+    if skill['enemy_only']: obj['properties'] += ['enemy_only']
+    if skill['tt_inherit_base']: obj['properties'] += ['random_inherit_base']
+    if skill['random_allowed'] > 0:
+        if skill['random_mode'] == 1: obj['properties'] += ['random_all']
+        elif skill['random_mode'] == 2: obj['properties'] += ['random_owner']
+    obj['properties'] = ','.join(obj['properties'])
+
+    return obj
 
 def Passive(skill):
     obj = {
@@ -393,6 +403,8 @@ def ActivePage(skill):
     s += "{{SkillPage Tabs}}"
     if skill['category'] == 0:
         s += buildInfobox('Weapon Infobox', Weapon(skill)) + '\n'
+    elif skill['category'] == 1:
+        s += buildInfobox('Assist', Assist(skill)) + '\n'
     elif skill['category'] == 2:
         s += buildInfobox('Special', Special(skill)) + '\n'
     s += "==Notes==\n" + Notes() + "\n"
@@ -406,11 +418,9 @@ def ActivePage(skill):
 def Skill(tag_id):
     if tag_id in SKILLS and SKILLS[tag_id]['category'] < 3:
         skill = SKILLS[tag_id]
-        if skill['category'] in [0, 2]:#, 1]:
+        if skill['category'] in [0, 1, 2]:
             return {util.getName(tag_id): ActivePage(skill)}
-        elif skill['category'] in [1,2]:
-            print(util.TODO + 'Unsupported skill: ' + util.getName(skill['name_id']))
-    elif tag_id in SKILLS and not tag_id[-1] in '12345':
+    elif tag_id in SKILLS and not tag_id[-1] in '12345' and tag_id[-2:] != '・承':
         skill = SKILLS[tag_id]
         if skill['category'] in [3,4,5,6]:
             return PassivePage([SKILLS[tag_id]])
@@ -422,6 +432,8 @@ def Skill(tag_id):
             tag_id = tag_id[:-1]
         i = 1
         skills = []
+        if tag_id[-2:] == '・承' and tag_id[:-2] in SKILLS:
+            skills = [SKILLS[tag_id[:-2]], SKILLS[tag_id]]
         while f"{tag_id}{i}" in SKILLS:
             skills += [SKILLS[f"{tag_id}{i}"]]
             i += 1

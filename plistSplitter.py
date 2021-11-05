@@ -34,4 +34,4 @@ if __name__ == '__main__':
         xml = parseXml(filename)
         img = Image.open(re.sub(r'\.plist$', '.png', filename))
         for subImage in xml['frames']:
-            extractImage(img, xml['frames'][subImage]).save("../Cropped/"+subImage)
+            extractImage(img, xml['frames'][subImage]).save("./Cropped/"+subImage)

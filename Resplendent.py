@@ -22,20 +22,22 @@ def addResplendentHeroQuotes(unit: dict):
     reg = re.compile(r'[a-zA-Z]')
 
     s = ["==Resplendent Hero=="]
-    for (title, tag, init, count, template, extra) in [("Attack", "ATTACK", 0, 2, "Audio", None),
-                                                        ("Damage", "DAMAGE", 2, 2, "Audio", None),
-                                                        ("Special trigger", "SKILL", 4, 4, "Audio", None),
-                                                        ("Defeat", "DEAD", 8, 1, "Audio", None),
-                                                        ("Status page", "STATUS", 9, 8, "Status", lambda d: 1 if d < 4 else 4 if d < 6 else 5),
-                                                        ("Turn action", "MAP", 17, 3, "Audio", None)]:
+    for (title, tag, init, count, template, extra) in [("Attack", "ATTACK", 1, 2, "Audio", None),
+                                                        ("Damage", "DAMAGE", 3, 2, "Audio", None),
+                                                        ("Special trigger", "SKILL", 5, 4, "Audio", None),
+                                                        ("Defeat", "DEAD", 9, 1, "Audio", None),
+                                                        ("Status page", "STATUS", 10, 8, "Status", lambda d: 1 if d < 4 else 4 if d < 6 else 5),
+                                                        ("Turn action", "MAP", 18, 3, "Audio", None)]:
         s += ["==="+title+"===\n{{"+template+"TableHeader}}"]
         for i in range(count):
             v = f"|{extra(i)}" if extra else ""
-            s += ["{{"+template+"TableRow|VOICE_{{MF|1={{BASEPAGENAME}}}}_Resplendent_"+f"{tag}_{i+1}.wav|"+(EN[init+i]["value"] if reg.search(EN[init+i]["value"]) else "")+v+"}}"]
+            text = [obj['value'] for obj in EN if obj['key'] == f'MID_{romanized}_EX01_VOICE{init+i:02}' and reg.search(obj['value'])]
+            s += ["{{"+template+"TableRow|VOICE_{{MF|1={{BASEPAGENAME}}}}_Resplendent_"+f"{tag}_{i+1}.wav|"+(text[0] if len(text) else "")+v+"}}"]
         s += ["|}\n{{"+template+"TableHeader|ja}}"]
         for i in range(count):
             v = f"|{extra(i)}" if extra else ""
-            s += ["{{"+template+"TableRow|VOICE_{{MF|1={{BASEPAGENAME}}}}_Resplendent_"+f"{tag}_{i+1}_jp.wav|"+JP[init+i]["value"]+v+"|ja}}"]
+            text = [obj['value'] for obj in JP if obj['key'] == f'MID_{romanized}_EX01_VOICE{init+i:02}']
+            s += ["{{"+template+"TableRow|VOICE_{{MF|1={{BASEPAGENAME}}}}_Resplendent_"+f"{tag}_{i+1}_jp.wav|"+text[0]+v+"|ja}}"]
         s += ["|}\n{{Clear}}"]
     page = re.sub(r'(\{\{StoryAppearances\}\})', "\n".join(s) + "\n\\1", page)
 
@@ -45,8 +47,8 @@ def updateResplendentHeroMisc(unit: dict):
     name = util.getName(unit['hero_id'])
     face = globals.UNITS[unit['hero_id']]['face_name2'] + 'EX01'
 
-    createMiniUnit(unit['hero_id'], only=[face])
-    uploadMiniUnit()
+    #createMiniUnit(unit['hero_id'], only=[face])
+    #uploadMiniUnit()
     page = useMiniUnit([unit['hero_id']])[name + '/Misc']
     if not page:
         page = wikiUtil.getPageContent(name + '/Misc')[name + '/Misc']

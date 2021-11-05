@@ -3,12 +3,13 @@
 from datetime import datetime
 import re
 import json
+from math import trunc
 
 import util
 import mapUtil
 from scenario import Story
 from reward import parseReward
-from globals import DATA, DIFFICULTIES, ERROR, UNIT_IMAGE
+from globals import DATA, DIFFICULTIES, ERROR, UNIT_IMAGE, UNITS
 
 def getHeroWithName(name: str):
     heroes = util.fetchFehData("Common/SRPG/Person", None)
@@ -16,6 +17,24 @@ def getHeroWithName(name: str):
         if util.getName(hero['id_tag']) == name:
             return hero
     return {}
+
+HP_STATS_MODIFIERS = [1.2, 1.3, 1.4, 1.5, 1.7]
+def getStats(unitId: str, rarity: int=5, level: int=40):
+    unit = UNITS[unitId]
+    stats = {}
+    statsOrder = list(unit['base_stats'].keys())
+    statsOrder.sort(key=lambda k: unit['base_stats'][k], reverse=True)
+    for key in unit['base_stats']:
+        stats[key] = unit['base_stats'][key] - 1 + trunc((level - 1) * trunc(unit['growth_rates'][key] * (0.79+0.07*rarity)) / 100)
+    for i in range(1, rarity):
+        if i % 2 == 1:
+            stats[statsOrder[1]] += 1
+            stats[statsOrder[2]] += 1
+        else:
+            stats[statsOrder[0]] += 1
+            stats[statsOrder[3]] += 1
+            stats[statsOrder[4]] += 1
+    return stats
 
 def getBHBHero(mapId: str):
     scenario = util.readFehData("USEN/Message/Scenario/"+mapId+".json")
@@ -93,6 +112,10 @@ def HBUnitData(StageEvent: dict, SRPGMap: dict, hero):
             for i, h in enumerate(hero):
                 units[i]['id_tag'] = h['id_tag']
                 units[i]['cooldown_count'] = None
+                units[i]['stats'] = getStats(h['id_tag'], scenario['stars'], scenario['true_lv'])
+                units[i]['stats']['hp'] = int(units[i]['stats']['hp'] * HP_STATS_MODIFIERS[scenario['difficulty']])
+                if scenario['difficulty'] >= 4:
+                    for k in units[i]['stats']: units[i]['stats'][k] += 4
             if scenario['reinforcements']:
                 units += [{'rarity': scenario['stars'], 'true_lv': scenario['true_lv'], 'spawn_count': 0}]
                 if scenario['difficulty'] > 2: units[-1]['refine'] = True
@@ -213,13 +236,13 @@ def RevivalHeroBattle(mapId: str):
                 notification = f'Legendary Hero Remix ({datetime(year=year,month=month,day=1).strftime("%b %Y")}) (Notification)'
     
         elif kind.find('Bound') != -1:
-            if content.find('Bound Hero Battle Revival') == -1:
+            if content.find('=Bound Hero Battle Revival') == -1:
                 notification = f"Bound Hero Battle Revival: {pageName[:pageName.find(':')]} (Notification)"
             else:
                 notification = f"Bound Hero Battle Revival: {pageName[:pageName.find(':')]} ({starttime.strftime('%b %Y')}) (Notification)"
 
         elif kind.find('Grand') != -1:
-            if content.find('Grand Hero Battle Revival') == -1:
+            if content.find('=Grand Hero Battle Revival') == -1:
                 notification = f"Grand Hero Battle Revival - {pageName[:pageName.find(' (')]} (Notification)"
             else:
                 notification = f"Grand Hero Battle Revival - {pageName[:pageName.find(' (')]} ({starttime.strftime('%b %Y')}) (Notification)"

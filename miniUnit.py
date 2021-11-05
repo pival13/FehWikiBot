@@ -78,7 +78,7 @@ def getFiles(unit):
     if unit['refresher']:
         files.insert(files.index('Damage')+1, 'Cheer')
     if 'legendary' in unit and unit['legendary'] and unit['legendary']['element'] == 0:
-        extra = ['Main ' + f for f in ['Idle No Wep']+files] + ['Sub Idle No Wep' 'Sub Idle', 'Sub Ok', 'Sub Attack1', 'Sub Damage'] + extra
+        extra = ['Main ' + f for f in ['Idle No Wep']+files] + ['Sub Idle No Wep', 'Sub Idle', 'Sub Ok', 'Sub Attack1', 'Sub Damage'] + extra
         files.insert(files.index('Ok')+1, 'Pairpose')
     if ((1 << unit['weapon_type']) & globals.WEAPON_MASK['Beast']) == 0:
         files.insert(files.index('Idle'), 'Idle No Wep')
@@ -114,7 +114,7 @@ def getSpriteSheets(unit):
                     break
     return files
 
-def spriteSaverCommand(unit, only=None):
+def ssbpSaverCommand(unit, only=None):
     commands = []
     wepR = wepL = None
     names = [unit['face_name2']]
@@ -166,25 +166,27 @@ def spriteSaverCommand(unit, only=None):
         if not re.search(r'(Dragon|TransBattle|TransMap|Sub)$', name):
             if wepR:
                 if os.path.exists(wepFolder + '/' + wepR + '.ssbp'):
-                    s += f" -b Wep_BaseR:{wepFolder}/{wepR}.ssbp:{wepR}/Wep_Normal -b Wep_BaseR_Add:{wepR}:{wepR}/Wep_Normal"
+                    s += f" ~Wep_BaseR,{wepFolder}/{wepR}.ssbp,{wepR}/Wep_Normal ~Wep_BaseR_Add,{wepFolder}/{wepR}.ssbp,{wepR}/Wep_Normal"
                 else:
-                    s += f" -b Wep_BaseR:{wepFolder}/{wepR}.png -b Wep_BaseR_Add:{wepFolder}/{wepR}.png"
+                    s += f" ~{wepR[:6]},{wepFolder}/{wepR}.png"
             if wepL:
                 if os.path.exists(wepFolder + '/' + wepL + '.ssbp'):
-                    s += f" -b Wep_BaseL:{wepFolder}/{wepL}.ssbp:{wepL}/Wep_Normal -b Wep_BaseL_Add:{wepL}:{wepL}/Wep_Normal"
+                    s += f" ~Wep_BaseL,{wepFolder}/{wepL}.ssbp,{wepL}/Wep_Normal ~Wep_BaseL_Add,{wepFolder}/{wepL}.ssbp,{wepL}/Wep_Normal"
                 else:
-                    s += f" -b Wep_BaseL:{wepFolder}/{wepL}.png -b Wep_BaseL_Add:{wepFolder}/{wepL}.png"
+                    s += f" ~{wepL[:6]}_L,{wepFolder}/{wepL}.png"
         if re.search(r"_[Pp]air$", name):
             s += ' -w 1000 -h 1500'
         elif re.search(r"Dragon|TransBattle", name):
             s += ' -w 1500 -h 1500'
+        else:
+            s += ' -w 500 -h 500'
         commands += [re.sub(r'\B/mnt/(\w)/', '\\1:/', s)]
     return '\n'.join(commands) + '\n'
 
 def createMiniUnit(id_tag, only=None):
     unit = globals.UNITS[id_tag]
     n = unit['face_name2']
-    subprocess.run('./spriteSaver.exe', input=spriteSaverCommand(unit, only).encode())
+    subprocess.run('./SsbpSaver.exe', input=ssbpSaverCommand(unit, only).encode())
 
 def uploadMiniUnit():
     dir = "./Screenshots/"
@@ -224,10 +226,10 @@ def useMiniUnit(id_tags):
         try:
             page = wikiUtil.getPageContent(name + '/Misc')[name + '/Misc']
             
-            #if not re.search('BtlFace BU\\.', page):
-            #    page = re.sub('(<gallery>)', f"\\1\nFile:{util.cleanStr(name)} BtlFace BU.webp", page, 1)
-            #if not re.search('BtlFace BU D\\.', page):
-            #    page = re.sub('(BtlFace BU.*)', f"\\1\nFile:{util.cleanStr(name)} BtlFace BU D.webp", page, 1)
+            if not re.search('BtlFace BU\\.', page):
+                page = re.sub('(<gallery>)', f"\\1\nFile:{util.cleanStr(name)} BtlFace BU.webp", page, 1)
+            if not re.search('BtlFace BU D\\.', page):
+                page = re.sub('(BtlFace BU.*)', f"\\1\nFile:{util.cleanStr(name)} BtlFace BU D.webp", page, 1)
 
             if not re.search(r'===\s*Sprites?\s*===', page):
                 page = re.sub('(</gallery>)', '\\1\n===Sprite===\n<gallery>\n</gallery>', page, 1)

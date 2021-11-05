@@ -83,7 +83,7 @@ def LLUnit(data: dict, strikes: list):
             s += "|-\n|{{LostLoreEnemy\n|file=" + re.sub(r".*/([^/]*)\..*", r"\1.webp", foe["facePath"]) + "|size=100\n"
             s += f"|rarity={foe['rarity']}\n|weapon={WEAPON_TYPE[foe['weapon']]}\n|move={MOVE_TYPE[foe['move']]}\n}}}}\n"
             s += ("[[" if foe['rarity'] != 3 else "") + util.getName(f"MID_TRIP_ENEMY_{strike['id_tag']}_{foe['name_id']}") + ("]]" if foe['rarity'] != 3 else "") + "\n"
-            s += f"|\n|{foe['Atk']}\n|{foe['Spd']}\n|{foe['Def']}\n|{foe['Res']}\n"
+            s += f"|{foe['HP']}\n|{foe['Atk']}\n|{foe['Spd']}\n|{foe['Def']}\n|{foe['Res']}\n"
     return s + "|-\n|colspan=\"6\"|<nowiki/>*The order of foes is randomized at the start of every strike.\n|}"
 
 def LostLore(tag: str):

@@ -9,22 +9,7 @@ from globals import DATA, WEAPON_CATEGORY, UNITS
 from Reverse import reverseRokkrSieges
 from reward import parseReward
 
-def getStats(unitId: str, rarity: int=5, level: int=40):
-    unit = UNITS[unitId]
-    stats = {}
-    statsOrder = list(unit['base_stats'].keys())
-    statsOrder.sort(key=lambda k: unit['base_stats'][k], reverse=True)
-    for key in unit['base_stats']:
-        stats[key] = unit['base_stats'][key] - 1 + trunc((level - 1) * trunc(unit['growth_rates'][key] * (0.79+0.07*rarity)) / 100)
-    for i in range(1, rarity):
-        if i % 2 == 1:
-            stats[statsOrder[1]] += 1
-            stats[statsOrder[2]] += 1
-        else:
-            stats[statsOrder[0]] += 1
-            stats[statsOrder[3]] += 1
-            stats[statsOrder[4]] += 1
-    return stats
+from HB import getStats
 
 def RSInfobox(data: dict, nb: int):
     units = []
@@ -96,8 +81,8 @@ def RSUnits(data: dict):
                 stats = getStats(unit['id_tag'], unitData['rarity'], unitData['level'])
                 s += "{unit=" + util.getName(unit['id_tag'])
                 s += f";rarity={unitData['rarity']};slot=-"
-                s += f";level={unitData['level']};"
-                s += f"stats=[??;{';'.join([str(unitData['stats'][key] + trunc(stats[key]/5) + unit['stat_modifier'][key]) for key in ['atk','spd','def','res']])}];"
+                s += f";level={unitData['level']}"
+                s += f";stats=[??;{';'.join([str(unitData['stats'][key] + trunc(stats[key]/5) + unit['stat_modifier'][key]) for key in ['atk','spd','def','res']])}]"
                 s += f";weapon=Umbra Burst ({nameToWeapon(unit['id_tag'])})"
                 s += f";assist={util.getName(unit['assist']) if unit['assist'] else '-'}"
                 s += f";special={util.getName(unitData['special'])}"

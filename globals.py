@@ -34,8 +34,6 @@ UNIT_IMAGE.update({
     "ch00_13_Gustaf_M_Normal":      {'name': "Gustav",                  'id_tag': 'PID_グスタフ'},
     "ch00_14_Henriette_F_Normal":   {'name': "Henriette",               'id_tag': 'PID_ヘンリエッテ'},
     "ch00_16_Freeze_M_Normal":      {'name': "Hríd"},
-    "ch00_22_Tor_F_Normal":         {'name': "Thórr",                   'id_tag': 'PID_トール'},
-    "ch00_31_Otr_M_Stain":          {'name': 'Ótr: Kingsbrother (Stain)'},
     "ch00_32_Fafnir2_M_Normal":     {'name': 'Fáfnir: King of Desolation (Dragon)','id_tag': 'EID_ファフニール2'},
     "ch00_35_Eitri_F_Normal":       {'name': 'Eitri',                   'id_tag': 'EID_エイトリ'},
     "ch00_36_MysteryHood_X_Normal": {'name': 'Mystery Hood'},
