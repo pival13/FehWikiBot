@@ -9,7 +9,8 @@ import mapUtil
 from scenario import Story
 from Reverse import reverseGrandConquests
 from reward import parseReward
-from wikiUtil import exportSeveralPages
+from wikiUtil import exportSeveralPages, getPageContent
+from redirect import redirect
 import GCWorld
 from uploadImage import exportImage
 
@@ -113,6 +114,8 @@ def uploadGrandConquestWorld(tag: str):
             res = util.cargoQuery('GrandConquests', 'COUNT(_pageName)=Number')
         world = GCWorld.GCDefaultWorld(data['str1'], data['battles'][0]['world_id'])
         exportImage(f"File:Grand Conquests {res[0]['Number']} Area.png", world, '[[Category:Grand Conquests overworld map files]]', 'Bot: Grand Conquests areas', True)
+        if not getPageContent(f"File:Grand Conquests {res[0]['Number']} Map.png")[f"File:Grand Conquests {res[0]['Number']} Map.png"]:
+            redirect(f"File:Grand Conquests {res[0]['Number']} Map.png", f"File:GC {data['world']}.webp")
 
 from sys import argv
 
@@ -125,6 +128,7 @@ if __name__ == '__main__':
             print(f'No Grand Conquests are related to the tag "{arg}"')
             continue
         GCs = GrandConquests(arg)
-        exportSeveralPages(GCs, create=False, minor=True)
+        #uploadGrandConquestWorld(arg)
+        #exportSeveralPages(GCs, create=False, minor=True)
         for GC in GCs:
             print(GC, GCs[GC])

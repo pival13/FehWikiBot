@@ -9,7 +9,7 @@ from wikiUtil import getPageContent, exportPage, waitSec
 from os.path import exists
 from globals import WEAPONS
 
-lastWeaponID = 156333
+lastWeaponID = 160600
 
 def categorizeWeapon(name: str, content: str, wepType: int, exclusive: bool):
     openCloseTome = False if re.match(r'File:Wep mg', name) else True
