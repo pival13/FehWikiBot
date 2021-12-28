@@ -200,6 +200,8 @@ def main(arg):
     if len(arg) < 2:
         print("Enter at least one map id")
         exit(0)
+    elif len(arg) == 3 and arg[1] == 'event' and re.match(r"\d+_\w+", arg[2]):
+        findEvents(arg[2])
     elif len(arg) == 2 and re.match(r"\d+_\w+", arg[1]):
         parseTagUpdate(arg[1])
     elif len(arg) == 2 and arg[1] == 'upcoming':

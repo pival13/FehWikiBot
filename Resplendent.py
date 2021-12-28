@@ -47,8 +47,8 @@ def updateResplendentHeroMisc(unit: dict):
     name = util.getName(unit['hero_id'])
     face = globals.UNITS[unit['hero_id']]['face_name2'] + 'EX01'
 
-    #createMiniUnit(unit['hero_id'], only=[face])
-    #uploadMiniUnit()
+    createMiniUnit(unit['hero_id'], only=[face])
+    uploadMiniUnit()
     page = useMiniUnit([unit['hero_id']])[name + '/Misc']
     if not page:
         page = wikiUtil.getPageContent(name + '/Misc')[name + '/Misc']

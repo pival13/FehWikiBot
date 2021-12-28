@@ -77,7 +77,7 @@ def getFiles(unit):
         files = ['Idle', 'Ok', 'Damage', 'Transform']
     if unit['refresher']:
         files.insert(files.index('Damage')+1, 'Cheer')
-    if 'legendary' in unit and unit['legendary'] and unit['legendary']['element'] == 0:
+    if 'legendary' in unit and unit['legendary'] and unit['legendary']['kind'] in (2,3):
         extra = ['Main ' + f for f in ['Idle No Wep']+files] + ['Sub Idle No Wep', 'Sub Idle', 'Sub Ok', 'Sub Attack1', 'Sub Damage'] + extra
         files.insert(files.index('Ok')+1, 'Pairpose')
     if ((1 << unit['weapon_type']) & globals.WEAPON_MASK['Beast']) == 0:

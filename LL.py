@@ -55,7 +55,7 @@ def LLLocation(data: dict):
     for location in data["maps"]:
         loc = {
             "name": util.getName(f"MID_TRIP_PLACE_{location['id_tag']}"),
-            "image": re.sub(r".+/([^/]+)\..*", r"\1.webp", location['backgroundPath']),
+            "image": re.sub(r".+[/\\]([^\\/]+)[/\\]([^\\/]+)\..*", r"\1 \2.webp", location['backgroundPath']),
             ("linesReq" if location['lines'] != 0 else "isCombat"): int(location['lines'] / 3600) if location['lines'] != 0 else 1,
             "rewards": parseReward(location['clearReward'] + [{"kind": -1, "_type": "Saga's " + util.getName(f"MID_TRIP_SAGA_SECTION_{data['maps'].index(location)+1}"), "count": 1}])
                     .replace('<!--','').replace('-->','')
@@ -80,7 +80,7 @@ def LLUnit(data: dict, strikes: list):
         if len(strikes) != 1: s += f"===Strike {i+1}===\n"
         s += "{|class=\"wikitable\" style=\"text-align:center;\"\n!Foe!!HP!!Atk!!Spd!!Def!!Res\n"
         for foe in strike['units']:
-            s += "|-\n|{{LostLoreEnemy\n|file=" + re.sub(r".*/([^/]*)\..*", r"\1.webp", foe["facePath"]) + "|size=100\n"
+            s += "|-\n|{{LostLoreEnemy\n|file=Trip_" + re.sub(r".*/([^/]*)\..*", r"\1.webp", foe["facePath"]) + "|size=100\n"
             s += f"|rarity={foe['rarity']}\n|weapon={WEAPON_TYPE[foe['weapon']]}\n|move={MOVE_TYPE[foe['move']]}\n}}}}\n"
             s += ("[[" if foe['rarity'] != 3 else "") + util.getName(f"MID_TRIP_ENEMY_{strike['id_tag']}_{foe['name_id']}") + ("]]" if foe['rarity'] != 3 else "") + "\n"
             s += f"|{foe['HP']}\n|{foe['Atk']}\n|{foe['Spd']}\n|{foe['Def']}\n|{foe['Res']}\n"

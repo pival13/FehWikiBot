@@ -8,7 +8,7 @@ def parsePerson(data):
     result = []
     nbGroup = util.getLong(data,0x08, 0xde51ab793c3ab9e1)
     for iGr in range(nbGroup):
-        offGr = util.getLong(data, 0x00)+0x2A0*iGr
+        offGr = util.getLong(data, 0x00)+0x2A8*iGr
         result += [{
             "id_tag": util.getString(data, offGr),
             "roman": util.getString(data, offGr+0x08),

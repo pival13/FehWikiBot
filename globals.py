@@ -35,8 +35,8 @@ UNIT_IMAGE.update({
     "ch00_14_Henriette_F_Normal":   {'name': "Henriette",               'id_tag': 'PID_ヘンリエッテ'},
     "ch00_16_Freeze_M_Normal":      {'name': "Hríd"},
     "ch00_32_Fafnir2_M_Normal":     {'name': 'Fáfnir: King of Desolation (Dragon)','id_tag': 'EID_ファフニール2'},
-    "ch00_35_Eitri_F_Normal":       {'name': 'Eitri',                   'id_tag': 'EID_エイトリ'},
     "ch00_36_MysteryHood_X_Normal": {'name': 'Mystery Hood'},
+    "ch00_41_Letizia_F_Normal":     {'name': 'Letizia'},
     "ch90_02_FighterAX_M_Normal":   {'name': ''} # This is the tag used for non-face unit on scenarios
 })
 

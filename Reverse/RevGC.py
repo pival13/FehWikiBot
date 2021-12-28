@@ -19,7 +19,7 @@ def parseOccupation(data):
             } for i in range(3)],
             # 0x18
             'leaders': [util.getString(data, offGr+0x100+0x08*i) for i in range(3)],
-            'str1': util.getString(data, offGr+0x118),
+            'world': util.getString(data, offGr+0x118),
             'str2': util.getString(data, offGr+0x120),
             'rewards': [{
                 'type': util.getInt(data, util.getLong(data, offGr+0x128)+0x08+0x38*i+0x00, 0xeb2a77ac),

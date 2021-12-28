@@ -18,7 +18,7 @@ def getHeroWithName(name: str):
             return hero
     return {}
 
-HP_STATS_MODIFIERS = [1.2, 1.3, 1.4, 1.5, 1.7]
+HP_STATS_MODIFIERS = [1.2, 1.3, 1.4, 1.5, 1.65]
 def getStats(unitId: str, rarity: int=5, level: int=40):
     unit = UNITS[unitId]
     stats = {}
@@ -113,9 +113,9 @@ def HBUnitData(StageEvent: dict, SRPGMap: dict, hero):
                 units[i]['id_tag'] = h['id_tag']
                 units[i]['cooldown_count'] = None
                 units[i]['stats'] = getStats(h['id_tag'], scenario['stars'], scenario['true_lv'])
-                units[i]['stats']['hp'] = int(units[i]['stats']['hp'] * HP_STATS_MODIFIERS[scenario['difficulty']])
                 if scenario['difficulty'] >= 4:
                     for k in units[i]['stats']: units[i]['stats'][k] += 4
+                units[i]['stats']['hp'] = int(units[i]['stats']['hp'] * HP_STATS_MODIFIERS[scenario['difficulty']])
             if scenario['reinforcements']:
                 units += [{'rarity': scenario['stars'], 'true_lv': scenario['true_lv'], 'spawn_count': 0}]
                 if scenario['difficulty'] > 2: units[-1]['refine'] = True

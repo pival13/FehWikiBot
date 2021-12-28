@@ -228,6 +228,8 @@ def Weapon(skill):
     else:
         obj['userVersion1'] = 'Closed' if len(sprites) == 1 else 'Bow' if sprites[0][4:6] == 'bw' else 'Main'
         obj['userVersion2'] = 'Open' if len(sprites) == 1 else 'Arrow' if sprites[0][4:6] == 'bw' else 'Sub'
+    if obj['weaponType'] == 'Beast':
+        obj['noImg'] = None
 
     obj['effectiveness'] += wepMaskToList(skill['wep_effective'])
     for i, name in enumerate(MOVE_TYPE):
@@ -339,8 +341,7 @@ def createPassivePage(skills):
         if (f"{i+1}name" in obj and obj[f'{i+1}name'] == obj[f'{i}next']) or (not f"{i+1}name" in obj and obj[f'{i}next'] == '-'):
             obj[f'{i}next'] = None
 
-    s = "{{SkillPage Tabs}}"
-    s += buildInfobox('Passive', obj) + '\n'
+    s = buildInfobox('Passive', obj) + '\n'
     s += "==Notes==\n" + Notes() + "\n"
     s += "==List of owners==\n{{Skill Hero List}}\n"
     s += "==Trivia==\n* \n"
@@ -352,7 +353,8 @@ def createPassivePage(skills):
 def updatePassivePage(page, skills):
     obj = {
         'type': skills[0]['type'],
-        'name': re.sub(r'\s*\d+$','',skills[0]['%dname'])
+        'name': re.sub(r'\s*\d+$','',skills[0]['%dname']),
+        '__force': ['exclusive']
     }
     for k in ['%dexclusive', 'canUseWeapon%d', 'canUseMove%d', 'properties%d']:
         if len([1 for skill in skills if skill[k] != skills[0][k]]) == 0:
@@ -377,7 +379,7 @@ def updatePassivePage(page, skills):
                 pass
             elif v:
                 page = re.sub('('+key+r')'+reEndArg, f"\\g<1>{v if not isinstance(v, list) else ','.join(v)}\n", page)
-            else:
+            elif k not in '__force':
                 page = re.sub(key+reEndArg, '', page)
         elif v or ('__force' in obj and k in obj['__force']):
             page = re.sub('('+prevKey+reEndArg+')', f"\\g<1>|{k}={v if not isinstance(v, list) else ','.join(v)}\n", page)
@@ -400,7 +402,6 @@ def ActivePage(skill):
     NAVBOX = {0:'{{Weapons Navbox}}',1:'{{Assists Navbox}}',2:'{{Specials Navbox}}'}
 
     s = ""
-    s += "{{SkillPage Tabs}}"
     if skill['category'] == 0:
         s += buildInfobox('Weapon Infobox', Weapon(skill)) + '\n'
     elif skill['category'] == 1:

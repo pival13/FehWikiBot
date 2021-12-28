@@ -9,6 +9,7 @@ from os.path import isfile
 from sys import stdin, stderr
 from datetime import datetime, timedelta
 import re
+from Reverse import reverse
 
 URL = "https://feheroes.fandom.com/api.php"
 TODO = "\33[1;30;103mTODO\33[0m: "
@@ -81,6 +82,25 @@ def readFehData(path: str, isFull: bool=False):
     except:
         stderr.write("Error with file: " + path + "\n")
     return data
+
+def fetchFehDataFromAssets(path: str, easySort="id_tag"):
+    directory = BINLZ_ASSETS_DIR_PATH + path
+    files = [directory + "/" + f for f in listdir(directory) if isfile(directory + "/" + f)]
+
+    data = []
+    for file in files:
+        try:
+            d = reverse(file)
+            if d:
+                data += d if isinstance(d, list) else [d]
+            else: raise Exception()
+        except:
+            print('Error with file ' + file, file=stderr)
+
+    if easySort and len(data) > 0 and easySort in data[0]:
+        return { data[i][easySort] : data[i] for i in range(len(data)) }
+    else:
+        return data
 
 def fetchFehData(path: str, easySort="id_tag"):
     """Return a list of all objects presents in all files from directory `path`. If `easySort`, return an object with keys as field `easySort` of each object.
@@ -265,7 +285,7 @@ def fehBotLogin(attempt=0):
             return fehBotLogin(attempt+1)
         raise e
 
-def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: str=None, group: str=None, order: str="_pageID", limit: int="max"):
+def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: str=None, group: str=None, having: str=None, order: str="_pageID", limit: int="max"):
     """Return the result of a cargo query.
 
     Args:
@@ -274,6 +294,7 @@ def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: 
         where (str): Default "1"
         join (str): Default None
         group (str): Default None
+        having (str): Default None
         order (str): Default "_pageID"
         limit (str): Default "max"
     
@@ -282,6 +303,10 @@ def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: 
     """
     ret = []
     offset = 0
+    if tables.find(',') != -1:
+        if order == '_pageID': order = None
+        if fields == '_pageName=page':
+            raise ValueError("Using several tables requires an overload of 'fields'")
     try:
         S = fehBotLogin()
         while True:
@@ -292,6 +317,7 @@ def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: 
                 "where": where,
                 "join_on": join,
                 "group_by": group,
+                "having": having,
                 "limit": limit,
                 "offset": offset,
                 "order_by": order,
@@ -305,6 +331,7 @@ def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: 
                     "where": where,
                     "join_on": join,
                     "group_by": group,
+                    "having": having,
                     "limit": limit,
                     "offset": offset,
                     "order_by": order,
