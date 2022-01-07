@@ -17,6 +17,11 @@ def wepMaskToList(ref):
             l += [name]
     return l
 
+def clearedDescription(desc):
+    desc = desc.replace('$a','').replace('\n\n','<br /><br />')
+    desc = re.sub(r'(?:\n|<br />)((?:Effect:\s*)?【.+?】)(?:\n|<br />)', '<br />\\1<br />', desc)
+    return desc.replace('\n',' ')
+
 def refinePath(baseSkill, refSkill, refData):
     STATS_PATH = {
         '': ([3,0,0,0,0], [0,0,0,0,0]),
@@ -108,7 +113,7 @@ def Refine(skill_id):
         if re.search(f'\\|\\s*{key}\\s*=', page):
             continue
         pattern = r'(Weapon Infobox(\{\{.*?\}\}|.)*?)(?=\|\s*properties|\}\})' if i == 0 else f'(\\|\\s*{list(refData.keys())[i-1]}\\s*=[^|}}]*)'
-        value = ','.join(map(str, value)) if isinstance(value, list) else str(value).replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a', '')
+        value = ','.join(map(str, value)) if isinstance(value, list) else clearedDescription(str(value))
         page = re.sub(pattern, f"\\1|{key}={value}\n", page, flags=re.DOTALL)
 
     if not re.search(r'\{\{\s*Weapon Upgrade List\s*\}\}', page):
@@ -211,7 +216,7 @@ def Weapon(skill):
         'might': skill['might'], 'range': skill['range'],
         'cooldown': skill['cooldown_count'] if skill['cooldown_count'] != 0 else None,
         'effectiveness': [],
-        'effect': (util.DATA[skill['desc_id']] or "").replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a',''),
+        'effect': clearedDescription(util.DATA[skill['desc_id']] or ""),
         'statModifiers': list(map(lambda k, v: str(skill['stats'][k] + v), ['hp','atk','spd','def','res'], [0,skill['might'],0,0,0])),
         'required': [util.getName(s) for s in skill['prerequisites'] if s] or ['-'],
         'next': util.getName(skill['next_skill']),
@@ -253,7 +258,7 @@ def Special(skill):
         'canUseMove': f"{{{{MoveList|{','.join([move for i, move in enumerate(MOVE_TYPE) if skill['mov_equip'] & (1 << i)]) if skill['mov_equip'] != 0b1111 else 'All'}}}}}",
         'cost': skill['sp_cost'],
         'cooldown': skill['cooldown_count'] if skill['cooldown_count'] != 0 else None,
-        'effect': (util.DATA[skill['desc_id']] or "").replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a',''),
+        'effect': clearedDescription(util.DATA[skill['desc_id']] or ""),
         'required': [util.getName(s) for s in skill['prerequisites'] if s] or ['-'],
         'next': util.getName(skill['next_skill']),
         'promotionRarity': skill['promotion_rarity'], 'promotionTier': skill['promotion_tier'],
@@ -278,7 +283,7 @@ def Assist(skill):
         'canUseMove': f"{{{{MoveList|{','.join([move for i, move in enumerate(MOVE_TYPE) if skill['mov_equip'] & (1 << i)]) if skill['mov_equip'] != 0b1111 else 'All'}}}}}",
         'cost': skill['sp_cost'],
         'range': skill['range'],
-        'effect': (util.DATA[skill['desc_id']] or "").replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a',''),
+        'effect': clearedDescription(util.DATA[skill['desc_id']] or ""),
         'required': [util.getName(s) for s in skill['prerequisites'] if s] or ['-'],
         'next': util.getName(skill['next_skill']),
         'promotionRarity': skill['promotion_rarity'], 'promotionTier': skill['promotion_tier'],
@@ -306,7 +311,7 @@ def Passive(skill):
         'canUseMove%d': f"{{{{MoveList|{'All' if skill['mov_equip'] == 0b1111 else ','.join([move for i, move in enumerate(MOVE_TYPE) if skill['mov_equip'] & (1 << i)])}}}}}",
         '%dcost': skill['sp_cost'],
         '%dcooldown': skill['cooldown_count'],
-        '%deffect': util.DATA[skill['desc_id']].replace('\n\n', '<br /><br />').replace('】\n', '】<br />').replace('\n',' ').replace('$a',''),
+        '%deffect': clearedDescription(util.DATA[skill['desc_id']] or ""),
         'statModifiers%d': list(map(lambda k, v: str(skill['stats'][k] + v), ['hp','atk','spd','def','res'], [0,skill['might'],0,0,0])) if max(skill['stats'].values()) != 0 else None,
         '%drequired': [util.getName(s) for s in skill['prerequisites'] if s] or ['-'],
         '%dnext': util.getName(skill['next_skill']) or '-',
@@ -329,7 +334,7 @@ def createPassivePage(skills):
         '__force': ['exclusive']
     }
     for k in ['%dexclusive', 'canUseWeapon%d', 'canUseMove%d', 'properties%d']:
-        if len([1 for skill in skills if skill[k] != skills[0][k]]) == 0:
+        if len([True for skill in skills if skill[k] != skills[0][k]]) == 0:
             obj[k.replace('%d','')] = skills[0][k]
             for skill in skills: skill[k] = None
     for i, skill in enumerate(skills):
@@ -379,7 +384,7 @@ def updatePassivePage(page, skills):
                 pass
             elif v:
                 page = re.sub('('+key+r')'+reEndArg, f"\\g<1>{v if not isinstance(v, list) else ','.join(v)}\n", page)
-            elif k not in '__force':
+            elif k not in obj['__force']:
                 page = re.sub(key+reEndArg, '', page)
         elif v or ('__force' in obj and k in obj['__force']):
             page = re.sub('('+prevKey+reEndArg+')', f"\\g<1>|{k}={v if not isinstance(v, list) else ','.join(v)}\n", page)
@@ -464,7 +469,7 @@ if __name__ == '__main__':
         try:
             if re.match(r'SID_\S+', arg):
                 print(Skill(arg))
-            elif re.match(r'\d+_\w+', arg):
+            elif re.match(r'\d+_\w+|v\d{4}[a-e]_\w+', arg):
                 print(SkillsFrom(arg))
             else:
                 print('Invalid argument:', arg)

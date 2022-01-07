@@ -305,7 +305,7 @@ def cargoQuery(tables: str, fields: str="_pageName=Page", where: str="1", join: 
     offset = 0
     if tables.find(',') != -1:
         if order == '_pageID': order = None
-        if fields == '_pageName=page':
+        if fields == '_pageName=Page':
             raise ValueError("Using several tables requires an overload of 'fields'")
     try:
         S = fehBotLogin()

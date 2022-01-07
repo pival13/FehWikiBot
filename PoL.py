@@ -1,9 +1,7 @@
 #! /usr/bin/env python3
 
 from datetime import datetime
-import json
 from os.path import isfile
-from num2words import num2words
 
 import util
 from globals import WEAPON_CATEGORY
@@ -27,7 +25,7 @@ def PoLInfobox(data: dict):
 def PoLAvailability(data: dict):
     s = "==Availability==\nThis [[Pawns of Loki]] event was made available:\n" + \
         f"* {{{{HT|{data['event_avail']['start']}}}}} – {{{{HT|{util.timeDiff(data['event_avail']['finish'])}}}}} " + \
-        f"([[Pawns of Loki Is Here! ({datetime.strptime(data['event_avail']['start'], util.TIME_FORMAT).strftime('%b %d, %Y').replace(' 0', ' ')}) (Notification)|Notification]])"
+        f"([[Pawns of Loki Is Here! ({datetime.strptime(data['event_avail']['start'], util.TIME_FORMAT).strftime('%b %Y').replace(' 0', ' ')}) (Notification)|Notification]])"
     if data['nbRound'] > 1:
         for r in range(data['nbRound']):
             s += f"\n** '''Round {r+1}''': " + \
@@ -53,7 +51,6 @@ def PawnsOfLoki(tag: str):
     for data in datas:
         nb = int(data['id_tag'][3:])
         s = PoLInfobox(data) + "\n"
-        s += f"The {num2words(nb, to='ordinal')} [[Pawns of Loki]] event." + "\n"
         s += PoLAvailability(data) + "\n"
         s += PoLRewards(data) + "\n"
         s += "==Trivia==\n*\n{{Main Events Navbox}}"

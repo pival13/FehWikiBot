@@ -14,7 +14,7 @@ from Reverse import reverseTempestTrial
 TT_DIFFICULTIES = ["Normal/LV.8/3 battles","Normal/LV.14/3 battles","Normal/LV.20/3 battles","Hard/LV.25/4 battles","Hard/LV.30/5 battles","Lunatic/LV.35/5 battles","Lunatic/LV.40/7 battles"]
 
 def getTTTag(mapId: str):
-    return util.askFor(r"\d+_\w+", f"Which update is this TT related to ({mapId})?")
+    return util.askFor(r"\d+_\w+|v\d{4}[a-e]_\w+", f"Which update is this TT related to ({mapId})?")
 
 def TTInfobox(StageEvent: str):
     name = util.getName('MID_SEQUENTIAL_MAP_TERM_' + StageEvent['id_tag'])
@@ -148,7 +148,7 @@ def TTContent(StageEvent: dict):
 def TempestTrials(mapTagId: str) -> dict:
     if re.match(r'W\d{4}', mapTagId):
         tagId = getTTTag(mapTagId)
-    elif re.match(r'\d+_\w+', mapTagId):
+    elif re.match(r'\d+_\w+|v\d{4}[a-e]_\w+', mapTagId):
         tagId = mapTagId
     
     datas = reverseTempestTrial(tagId)
@@ -163,7 +163,7 @@ from sys import argv
 
 if __name__ == '__main__':
     for arg in argv[1:]:
-        if re.match(r'W\d{4}', arg) or re.match(r'\d+_\w+', arg):
+        if re.match(r'W\d{4}', arg) or re.match(r'\d+_\w+|v\d{4}[a-e]_\w+', arg):
             r = TempestTrials(arg)
             for tt in r:
                 print(tt, r[tt])

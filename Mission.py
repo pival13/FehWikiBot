@@ -7,6 +7,8 @@ from globals import TIME_FORMAT, MIN_TIME, MAX_TIME
 from reward import parseReward
 from datetime import datetime, timedelta
 
+from MissionTemplated import templateMissions
+
 SORTING_PATTERN = [
     {'value': 1, 'pattern': r'YEAR'},
     {'value': 2, 'pattern': r'^W?_?M'}, # Monthly
@@ -33,6 +35,21 @@ SORTING_PATTERN = [
     #[] = {'pattern': r'BIND'} # Movetype 'Mastery'
     {'value': 50, 'pattern': r'SUBSC'}, # FeH Pass
 ]
+
+def stringifyQuests(groups: list):
+    for i,group in enumerate(groups):
+        if isinstance(group,str):
+            groups[i] = {'template': group}
+        else:
+            groups[i]['quests'] = [
+                json.dumps(quest, indent=0, ensure_ascii=False)\
+                    .replace("\\\"", "\\@").replace("\": ", "=").replace("\"", "").replace("\\@", "\"")\
+                    .replace(",\n", ";").replace('}\n','};').replace('\n','')
+            for quest in group['quests']]
+    quests = json.dumps(groups, indent=2, ensure_ascii=False)
+    quests = quests.replace("\\\"", "\\@").replace("\": ", "=").replace("\"", "").replace("\\@", "\"")
+    quests = quests.replace(",\n", ";\n")
+    return quests
 
 def groupQuestJsonToStr(groups: list):
     groups = parseQuestGroup(groups)
@@ -65,8 +82,8 @@ def groupQuestJsonToStr(groups: list):
             gr.pop('availTime')
             gr.pop('cycleTime')
 
-    return json.dumps(mergeGroup, indent=2, ensure_ascii=False)\
-        .replace(",\n", ";\n").replace("\\\"", "\\@").replace("\": ", "=").replace("\"", "").replace("\\@", "\"").replace("\\n", "<br>")
+    templateMissions(mergeGroup)
+    return stringifyQuests(mergeGroup)
 
 def parseSortValue(quests: dict):
     for cond in SORTING_PATTERN:
@@ -102,16 +119,22 @@ def parseQuests(questDiffs: dict, startTime: str):
     quests = []
     for qDiff in questDiffs:
         for quest in qDiff['quests']:
-            qu = "{name=" + util.getName('MID_MISSION_' + (quest['common_id'] or quest['quest_id'])) + \
-                ";description=" + util.getName('MID_MISSION_H_' + (quest['common_id'] or quest['quest_id'])).replace("\\n", "<br>")
-            if quest['times'] != 1:
-                qu += f";times={quest['times']}"
-            qu += ";reward=" + parseReward(quest['reward']) + parseStage(quest, startTime)
+            qu = {
+                'name': util.getName('MID_MISSION_' + (quest['common_id'] or quest['quest_id'])),
+                'description': util.getName('MID_MISSION_H_' + (quest['common_id'] or quest['quest_id'])).replace("\n", "<br>"),
+                'times': quest['times'],
+                'reward': parseReward(quest['reward']),
+            }
+            if quest['times'] == 1:
+                qu.pop('times')
+            stage = parseStage(quest, startTime)
+            if stage:
+                qu['stage'] = stage[7:]
             if quest['unit_reqs']['hero_id']:
-                qu += ";unit=" + util.getName(quest['unit_reqs']['hero_id'])
+                qu['unit'] = util.getName(quest['unit_reqs']['hero_id'])
             if qDiff['difficulty']:
-                qu += ";difficulty=" + qDiff['difficulty'].capitalize()
-            quests += [qu + (";}" if qu[-1] == "}" else "}")]
+                qu['difficulty'] = qDiff['difficulty'].capitalize()
+            quests.append(qu)
     return quests
 
 def parseQuestGroup(missions: list):

@@ -16,22 +16,29 @@ def parseScenario(s: str, lang: str):
     data = {a['key']: a['value'] for a in util.fetchFehData(("USEN" if lang == 'en' else "JPJA") + "/Message/Data")}
 
     s = s.replace("$k", "").replace("$p", "\t").replace("$Nu", "{{Summoner}}").replace("$Nf", "{{Friend}}")
+    s = re.sub(r"\$c([,0-9]+)(?:(\|$)|\|)", "@COLOR@\\1@\\2", s)
 
     sections = []
     for section in re.findall(r'\$[^$]*', s):
         for part in section.split('|'):
             sections += [part.strip().replace('\t', '<br>').replace('\n', '<br>')] if part != "" else []
 
+    print(sections)
     name = ""
     heroJSON = {}
     expr = ""
     for section in sections:
-        if section[0] != '$' and len(section) > 0:
-            nameplate = "|" if 'id_tag' in heroJSON and name == data['M'+heroJSON['id_tag']] else f"|duo={name}|" if 'legendary' in heroJSON and heroJSON['legendary'] and (heroJSON['legendary']['kind'] == 2 or heroJSON['legendary']['kind'] == 3) else f"|nameplate={name}|"
+        if len(section) == 0: continue
+        if section[0] != '$':
+            nameplate = '' if 'id_tag' in heroJSON and name == data['M'+heroJSON['id_tag']] else f"|duo={name}" if 'legendary' in heroJSON and 'kind' in heroJSON['legendary'] and heroJSON['legendary']['kind'] in [2,3] else f"|nameplate={name}"
+            if len(re.findall(r'@COLOR@', section)) == 2 and section[:7] == '@COLOR@' and section[-23:] == '@COLOR@255,255,255,255@':
+                section = re.sub(r"^@COLOR@([^@]+)@(.*)@COLOR@.*$", "color=\\1|\\2", section)
+            else:
+                section = re.sub(r"@COLOR@([^@]+)@(.*?)(?:@!COLOR@|(@COLOR@))", "{{#tag:span style='color:rgb(\\1)'|\\2}}\\3", section.replace('@COLOR@255,255,255,255@','@!COLOR@'))
             wikitext += ["{{StoryTextTable" + nameplate +
                         (util.getName(heroJSON['id_tag']) if not 'name' in heroJSON else heroJSON['name']) +
-                        (f"|expression={expr[5:]}|" if expr != 'Face' else '|') +
-                        section + ('|ja}}' if lang == 'ja' else '}}')]
+                        (f"|expression={expr[5:]}" if expr != 'Face' else '') +
+                        '|' + section + ('|ja}}' if lang == 'ja' else '}}')]
         elif section[:3] == '$Wm':
             info = section[3:].split(',')
             name = data[info[0]]
@@ -47,6 +54,10 @@ def parseScenario(s: str, lang: str):
             wikitext += ["{{StorySE|" + section[4:] + "}}"]
         elif section[:3] == '$Fo':
             wikitext += ["{{StoryFo|" + section[3:].replace(',','|') + "}}"]
+        elif section[:3] == '$Fi': continue# Fade In (remove the fade panel)
+        elif section[:4] == '$Sbs': continue# Stop BGM
+        else:
+            print(util.TODO + 'Unsupported story flag: ' + section)
 
     return wikitext
 

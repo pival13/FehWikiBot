@@ -108,7 +108,7 @@ from sys import argv
 if __name__ == '__main__':
     for arg in argv[1:]:
         pages = {}
-        if re.match(r'\d+_\w+', arg):
+        if re.match(r'\d+_\w+|v\d{4}[a-e]_\w+', arg):
             pages = ResplendentHeroesFrom(arg)
         elif arg.find(':') != -1:
             pass

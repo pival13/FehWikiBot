@@ -57,7 +57,7 @@ from sys import argv, stderr
 
 if __name__ == '__main__':
     for arg in argv[1:]:
-        if re.match(r'^\d+_[a-zA-Z0-9]+$', arg):
+        if re.match(r'^\d+_\w+|v\d{4}[a-e]_\w+$', arg):
             acc = AccessoryOf(arg)
         elif re.match(r'^(Acc[_ ])?\d[_ ]\d{4}[_ ]\d$', arg):
             acc = Accessory(('Acc_' if arg[:4] != 'Acc_' else '') + arg)

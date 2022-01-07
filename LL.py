@@ -24,6 +24,17 @@ def LLInfobox(data: dict, strikes: list):
         f"|startTime={data['avail']['start']}\n" + \
         f"|endTime={util.timeDiff(data['avail']['finish'])}"+"\n}}"
 
+def LLIntro(data: dict):
+    query = util.cargoQuery('LostLore','World',group='_pageName')
+    entries = list(map(str,sorted([d for d in data['bonusEntry']][:data['entryCount']])))
+    world = util.getName('MID_TRIP_WORLD_'+'_'.join(entries))
+    nb = len(query)
+    nb2 = len([True for o in query if o['World'] == world])
+    
+    return f"The {num2words(nb+1, to='ordinal')} [[Lost Lore]] event, " + \
+        f"and the {num2words(nb2+1, to='ordinal')} taking place in" + \
+        '{{EntryIcon|' + ','.join(entries) + '}}' + ('the ' if world[:4] != 'The ' else '') + world + '.'
+
 def LLRewards(data: dict):
     s = "==Rewards==\n{{#invoke:Reward/LostLore|lines|extraTeams=" + ",".join([str(t) for t in extraTeams]) + "\n"
     for r in data['loreRewards']:
@@ -96,6 +107,7 @@ def LostLore(tag: str):
             continue
         enemies = [d['strike'] for d in data['maps'] if d['strike']]
         s = LLInfobox(data, enemies) + "\n"
+        s += LLIntro(data) + "\n"
         s += Availability(data['avail'], f"Lost Lore ({util.getName('MID_TRIP_TITLE_' + data['id_tag'])}) (Notification)", "[[Lost Lore]] event") + "\n"
         s += LLRewards(data) + "\n"
         s += LLSaga(data, tag) + "\n"

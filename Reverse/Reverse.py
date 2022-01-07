@@ -127,6 +127,35 @@ def parseSkill(data):
         }]
     return result
 
+def parseWeaponRefine(data):
+    result = []
+    nbGroup = util.getLong(data,0x08, 0x45162C00432CFD73)
+    for iGr in range(nbGroup):
+        offGr = util.getLong(data, 0x00) + 0x20 * iGr
+        result += [{
+            'orig': util.getString(data, offGr+0x00),
+            'refined': util.getString(data, offGr+0x08),
+            'use': [{
+                'res_type': util.getShort(data, offGr+0x10+i*0x04, 0x439C),
+                'count': util.getShort(data, offGr+0x12+i*0x04, 0x7444),
+            } for i in range(2)],
+            'give': {
+                'res_type': util.getShort(data, offGr+0x18, 0x439C),
+                'count': util.getShort(data, offGr+0x1A, 0x7444),
+            }
+        }]
+    return result
+
+def parseSkillAccessoryCreatable(data):
+    result = []
+    nbGroup = util.getLong(data,0x08, 0x0605B9F01A117E27)
+    for iGr in range(nbGroup):
+        offGr = util.getLong(data, 0x00) + 0x08 * iGr
+        result += [{
+            'id_tag': util.getString(data, offGr+0x00)
+        }]
+    return result
+
 def parseFriendDouble(data):#Allegiance Battle
     result = []
     nbGroup = util.getLong(data,0x08, 0xc0f4be0d2ed1f055)
@@ -287,6 +316,10 @@ def reverseFile(file: str):
         return parseAccessory(s)
     elif file.find("/SRPG/Skill/") != -1:
         return parseSkill(s)
+    elif file.find("/SRPG/WeaponRefine/") != -1:
+        return parseWeaponRefine(s)
+    elif file.find("/SRPG/SkillAccessoryCreatable/") != -1:
+        return parseSkillAccessoryCreatable(s)
     elif file.find("/SRPG/Person/") != -1:
         return parsePerson(s)
     elif file.find("/SRPG/Enemy/") != -1:
@@ -311,6 +344,8 @@ def reverseFile(file: str):
         return parseSequentialMap(s)
     elif file.find("/TapAction/TapBattleData/") != -1:
         return parseTapAction(s)
+    elif file.find("/Occupation/Data/") != -1:
+        return parseOccupation(s)
     elif file.find("/Portrait/") != -1:
         return parsePortrait(s)
     elif file.find("/Shadow/") != -1:
@@ -389,7 +424,7 @@ from stat import S_ISDIR, S_ISREG
 
 exec(open(dirname(dirname(realpath(__file__)))+'/PersonalData.py', 'r').read())
 if __name__ == "__main__":
-    if len(argv) == 2 and search(r'^\d+_\w+$', argv[1]):
+    if len(argv) == 2 and search(r'^\d+_\w+|v\d{4}[a-e]_\w+$', argv[1]):
         parseDir(util.BINLZ_ASSETS_DIR_PATH, argv[1])
     elif len(argv) == 1:
         parseDirTime(util.BINLZ_ASSETS_DIR_PATH, datetime.strptime(date.today().strftime("%Y-%m-%dT00:00:00Z"), "%Y-%m-%dT%H:%M:%SZ").timestamp())

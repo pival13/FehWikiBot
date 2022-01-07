@@ -226,7 +226,7 @@ def RevivalHeroBattle(mapId: str):
             year = int(StageEvent['avail']['start'][:4])
             month = int(StageEvent['avail']['start'][5:7])
             day = int(StageEvent['avail']['start'][8:10])
-            if day > 25 or day < 3:
+            if day > 22 or day < 3:
                 if day < 3: month -= 1
                 if month % 2 == 0:
                     notification = f"Legendary Hero Battle! ({datetime(year=year,month=month,day=1).strftime('%b %Y')}) (Notification)"

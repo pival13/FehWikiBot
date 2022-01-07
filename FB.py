@@ -120,7 +120,7 @@ def exportForgingBonds(tagId: str):
 
 if __name__ == '__main__':
     for arg in argv[1:]:
-        if re.match(r'^\d+_\w+$', arg):
+        if re.match(r'^\d+_\w+|v\d{4}[a-e]_\w+$', arg):
             a = ForgingBonds(arg)
             for k in a:
                 print(k, a[k])

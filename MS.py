@@ -1,9 +1,7 @@
 #! /usr/bin/env python3
 
 from datetime import datetime, timedelta
-import json
 from os.path import isfile
-from num2words import num2words
 
 import util
 from globals import DATA, DIFFICULTIES
@@ -51,7 +49,6 @@ def MjolnirsStrike(tag: str):
     for data in datas:
         nb = int(data['id_tag'][2:])
         s = MSInfobox(data, nb) + "\n"
-        s += f"The {num2words(nb, to='ordinal')} [[Mjölnir's Strike]] event." + "\n"
         s += MSAvailability(data, nb, data == datas[0]) + "\n"
         s += MSRewards(data) + "\n"
         s += "==Final results==\n{{MjolnirStrikeResults\n"

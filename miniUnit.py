@@ -254,11 +254,9 @@ def MiniUnit(id_tag):
 def MiniUnitsFrom(update_tag):
     person = util.readFehData('Common/SRPG/Person/' + update_tag + '.json')
     person += util.readFehData('Common/SRPG/Enemy/' + update_tag + '.json')
-    try:
-        for p in person:
-            createMiniUnit(p['id_tag'])
-        uploadMiniUnit()
-    except: pass
+    for p in person:
+        createMiniUnit(p['id_tag'])
+    uploadMiniUnit()
     return useMiniUnit([p['id_tag'] for p in person])
 
 from sys import argv
