@@ -13,7 +13,7 @@ from Reverse import reverseForgingBonds
 
 from wikiUtil import exportPage, getPageContent
 
-COLORS = ['Red', 'Orange', 'Green', 'Blue']
+FB_COLORS = ['Red', 'Orange', 'Green', 'Blue']
 
 def FBInfobox(data):
     # Perform a cargo query to get forging bonds number.
@@ -28,7 +28,7 @@ def FBInfobox(data):
 def FBRewards(data):
     s = "==Rewards==\n{{#invoke:Reward/ForgingBonds|main"
     s += "\n|wikiname=" + util.cleanStr(f"{util.getName(data['title'])} {datetime.strptime(data['event_avail']['start'], util.TIME_FORMAT).strftime('%Y%m%d')}")
-    for i, color in enumerate(COLORS):
+    for i, color in enumerate(FB_COLORS):
         s += f"\n|{color}={{"
         for r in data['hero_rewards']:
             if r['unit'] == i+1:
@@ -95,7 +95,7 @@ def ForgingBondsRevival(data):
     if not re.search(r"===\s*Original [rR]un\s*===", page):
         page = re.sub("(==\s*Rewards\s*==\n)", "\\1===Original run===\n", page)
     if not re.search(f"wikiname\\s*=\\s*{wikiname}", page):
-        page = re.sub(r"\}\}\n(\n*==\s*Special [cC]onversations\s*==)", "}}\n===Rerun===\n"+rewards+"\\1", page)
+        page = re.sub(r"\}\}\n(\n*==\s*Special [cC]onversations\s*==)", "}}\n===Rerun===\n"+rewards+"\n\\1", page)
     
     return (name, page)
 
@@ -114,13 +114,13 @@ def exportForgingBonds(tagId: str):
     content = ForgingBonds(tagId)
     for name in content:
         isRevival = True if re.search(r"===\s*Rerun\s*===", content[name]) else False
-        exportPage(name, content[name], 'Bot: Forging Bonds revival' if isRevival else 'Bot: new Forging Bonds', create=not isRevival)
+        exportPage(name, content[name], 'Bot: Forging Bonds revival' if isRevival else 'Bot: new Forging Bonds', create=-1)
     return content
 
 
 if __name__ == '__main__':
     for arg in argv[1:]:
-        if re.match(r'^\d+_\w+$', arg):
+        if re.match(r'^\d+_\w+|v\d{4}[a-e]_\w+$', arg):
             a = ForgingBonds(arg)
             for k in a:
                 print(k, a[k])

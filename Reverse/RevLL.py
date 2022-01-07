@@ -58,7 +58,7 @@ def parseTrip(data):
                         'weapon': util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x1A+0x20*j, 0xA9),
                         'move': util.getByte(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x1B+0x20*j, 0xE3),
                         'effectivness': util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x1C+0x20*j, 0x7583),
-                        'HP': util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x1E+0x20*j),#TODO
+                        'HP': util.getSShort(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x1E+0x20*j, 0xCBEB),
                         'Atk': util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x20+0x20*j, 0xB2DF),
                         'Spd': util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x22+0x20*j, 0xAE7E),
                         'Def': util.getShort(data, util.getLong(data, util.getLong(data, offGr+0x88)+0x48*i+0x40)+0x24+0x20*j, 0x71D6),

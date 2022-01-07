@@ -4,8 +4,8 @@ from os.path import isfile
 import json
 import re
 
-from util import TODO, ERROR, DATA
 import util
+from globals import TODO, ERROR, DATA
 from wikiUtil import exportPage, exportSeveralPages
 
 from StoryParalogue import StoryMap, StoryGroup, ParalogueMap, ParalogueGroup, UpdateStoryParalogueList
@@ -19,15 +19,16 @@ from EventMap import exportEventMap
 
 #from VG import VotingGauntlet
 from TT import TempestTrials
-#from TB import TapBattle
-#from GC import GrandConquest
+from TB import TapBattle, EncoreTapBattle
+from GC import GrandConquests, uploadGrandConquestWorld
 from FB import exportForgingBonds
-#from RS import RokkrSieges
+from RS import RokkrSieges
 from LL import LostLore
 from HoF import HallOfForms
 from MS import MjolnirsStrike
 from FP import FrontlinePhalanx
 from PoL import PawnsOfLoki
+from HJ import HeroesJourney
 
 def parseMapId(mapId: str):
     if "MID_STAGE_"+mapId in DATA:
@@ -141,7 +142,7 @@ from datetime import datetime
 from mapUtil import MapAvailability
 
 def findEvents(tag: str):
-    lastTBRevival = 8#Here to change
+    lastTBRevival = 9#Here to change
     lastTB = 20#Here to change
 
     #if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Tournament' + tag + '.bin.lz'): print(TODO + "New Voting Gauntlet")
@@ -150,17 +151,25 @@ def findEvents(tag: str):
         with open(__file__, 'r') as f: __file__Content = f.read()
         with open(__file__, 'w') as f: f.write(re.sub(r"lastTB = \d+#Here to change", f"lastTB = {lastTB+1}#Here to change", __file__Content))
     if isfile(util.BINLZ_ASSETS_DIR_PATH + f'Common/TapAction/TapBattleData/TDID_{lastTBRevival+1:04}_01.bin.lz'):
-        print(TODO + "New Tap Battle Revival")
-        with open(__file__, 'r') as f: __file__Content = f.read()
-        with open(__file__, 'w') as f: f.write(re.sub(r"lastTBRevival = \d+#Here to change", f"lastTBRevival = {lastTBRevival+1}#Here to change", __file__Content))
+        try:
+            exportPage(util.getName(f'MID_TAP_BATTLE_DATA_TITLE_{lastTBRevival+1:04}'), EncoreTapBattle(lastTBRevival+1), 'Bot: Encore Tap Battle', create=False)
+            with open(__file__, 'r') as f: __file__Content = f.read()
+            with open(__file__, 'w') as f: f.write(re.sub(r"lastTBRevival = \d+#Here to change", f"lastTBRevival = {lastTBRevival+1}#Here to change", __file__Content))
+        except: print(TODO + "Encore Tap Battle")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/SequentialMap/' + tag + '.bin.lz'):
         try: exportSeveralPages(TempestTrials(tag), 'Bot: new Tempest Trials', create=True)
         except: print(TODO + "Tempest Trials")
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Occupation/Data/' + tag + '.bin.lz'): print(TODO + "New Grand Conquests")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Occupation/Data/' + tag + '.bin.lz'):
+        try:
+            exportSeveralPages(GrandConquests(tag), 'Bot: new Grand Conquests', create=True)
+            uploadGrandConquestWorld(tag)
+        except: print(TODO + "New Grand Conquests")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Portrait/' + tag + '.bin.lz'):
         try: exportForgingBonds(tag)
         except: print(TODO + "Forging Bonds")
-    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'): print(TODO + "New Rokkr Sieges")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Shadow/' + tag + '.bin.lz'):
+        try: exportSeveralPages(RokkrSieges(tag), 'Bot: new Rokkr Sieges', create=True)
+        except: print(TODO + "Rokkr Sieges")
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Trip/Terms/' + tag + '.bin.lz'):
         try: exportSeveralPages(LostLore(tag), 'Bot: new Lost Lore', create=True)
         except: print(TODO + "Lost Lore")
@@ -176,19 +185,27 @@ def findEvents(tag: str):
     if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/SRPG/BoardGame/' + tag + '.bin.lz'):
         try: exportSeveralPages(PawnsOfLoki(tag), 'Bot: new Pawns of Loki', create=True)
         except: print(TODO + "Pawns of Loki")
+    if isfile(util.BINLZ_ASSETS_DIR_PATH + 'Common/Journey/Terms/' + tag + '.bin.lz'):
+        try:  exportSeveralPages(HeroesJourney(tag), 'Bot: new Heroes Journey', create=True)
+        except: print(TODO + 'New Heroes Journey')
 
 def findUpcoming():
     StageEvent = util.fetchFehData("Common/SRPG/StageEvent/", False)
     print('Upcoming special maps:')
     for stage in StageEvent:
         if datetime.strptime(stage['avail']['start'], util.TIME_FORMAT) > datetime.now():
-            exportSeveralPages(RevivalHeroBattle(stage['id_tag']), 'Bot: new revival', minor=True, create=False)
+            try:
+                exportSeveralPages(RevivalHeroBattle(stage['id_tag']), 'Bot: new revival', minor=True, create=False)
+            except:
+                print(util.TODO + 'New Revival: ' + stage['id_tag'])
 
 def main(arg):
     if len(arg) < 2:
         print("Enter at least one map id")
         exit(0)
-    elif len(arg) == 2 and re.match(r"\d+_\w+", arg[1]):
+    elif len(arg) == 3 and arg[1] == 'event' and re.match(r"\d+_\w+|v\d{4}[a-e]_\w+", arg[2]):
+        findEvents(arg[2])
+    elif len(arg) == 2 and re.match(r"\d+_\w+|v\d{4}[a-e]_\w+", arg[1]):
         parseTagUpdate(arg[1])
     elif len(arg) == 2 and arg[1] == 'upcoming':
         findUpcoming()

@@ -10,6 +10,6 @@ for filename in argv[1:]:
     img = Image.open(imgName)
 
     newImage = img.crop((0, 0, 56, 64))
-    newImage.save("../Cropped/"+name[:-4]+"_1.png")
+    newImage.save("./Cropped/"+name[:-4]+"_1.png")
     newImage = img.crop((48, 0, 128, 64))
-    newImage.save("../Cropped/"+name[:-4]+"_2.png")
+    newImage.save("./Cropped/"+name[:-4]+"_2.png")

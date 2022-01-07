@@ -7,9 +7,9 @@ import util
 from util import cargoQuery
 from wikiUtil import getPageContent, exportPage, waitSec
 from os.path import exists
-from redirect import SKILL_DATA
+from globals import WEAPONS
 
-lastWeaponID = 141934
+lastWeaponID = 160600
 
 def categorizeWeapon(name: str, content: str, wepType: int, exclusive: bool):
     openCloseTome = False if re.match(r'File:Wep mg', name) else True
@@ -78,9 +78,9 @@ def categorizeWeapons():
     newID = cargoQuery('_pageData', fields='_pageID=ID', where=f'_pageName="{pagesName[-1]}"', limit=1)[0]['ID']
     pagesName = list(wikiPages.keys())
 
-    WEAPONS = {skill['sprites'][0]: skill for skill in SKILL_DATA if skill['sprites'][0]}
-    WEAPONS.update({skill['sprites'][1]: skill for skill in SKILL_DATA if skill['sprites'][1]})
-    WEAPONS.update({util.cleanStr(util.getName(skill['id_tag'])): skill for skill in SKILL_DATA if skill['might'] != 0})
+    WEP_SPRITES = {weapon['sprites'][0]: weapon for weapon in WEAPONS.values() if weapon['sprites'][0]}
+    WEP_SPRITES.update({weapon['sprites'][1]: weapon for weapon in WEAPONS.values() if weapon['sprites'][1]})
+    WEP_NAMES = {util.cleanStr(util.getName(wepTag)): WEAPONS[wepTag] for wepTag in WEAPONS}
 
     regWebp = re.compile(r'File:Wep (\w{5}(?: up)?)\.webp')
     regPng = re.compile(r'File:Weapon (.*?)(?: V\d+)?\.png')
@@ -88,9 +88,9 @@ def categorizeWeapons():
         res1 = regWebp.match(weapon)
         res2 = regPng.match(weapon)
         if res1:
-            wobject = WEAPONS[f"wep_{res1[1].lower().replace(' ', '_')}"]
-        elif res2 and res2[1] in WEAPONS:
-            wobject = WEAPONS[res2[1]]
+            wobject = WEP_SPRITES[f"wep_{res1[1].lower().replace(' ', '_')}"]
+        elif res2 and res2[1] in WEP_NAMES:
+            wobject = WEP_NAMES[res2[1]]
         else:
             print(util.TODO, f'Cannot categorize {weapon}')
             continue

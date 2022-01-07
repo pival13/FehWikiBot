@@ -14,14 +14,14 @@ def parseSound(data):
     for iGr in range(nbGroup):
         offGr = util.getLong(data, util.getLong(data, 0x00)+0x08*iGr)
         obj = {
-            "id_tag":  getStringSound(data, offGr+0x00),
+            "id_tag": util.getString(data, offGr+0x00, util.SOUND_XORKEY),
             "count": util.getByte(data, offGr+0x08),
             "kind": util.getByte(data, offGr+0x09),#8 -> Simple music, 10 -> addition musics, 12 -> random music, 16 & 24 -> link to another music
             "_unknow3": hex(util.getShort(data, offGr+0x0A)),
             "audio_kind": util.getInt(data, offGr+0x0C),#0 -> BGM, 1 -> Sound, 2 -> Voice
             "list": [{
-                "file": getStringSound(data, util.getLong(data, offGr+0x10+0x08*iMsc)+0x00),
-                "archive": getStringSound(data, util.getLong(data, offGr+0x10+0x08*iMsc)+0x08),
+                "file": util.getString(data, util.getLong(data, offGr+0x10+0x08*iMsc)+0x00, util.SOUND_XORKEY),
+                "archive": util.getString(data, util.getLong(data, offGr+0x10+0x08*iMsc)+0x08, util.SOUND_XORKEY),
                 #"_ptr1": {
                 #    "_unknow1": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x10+0x08*iMsc)+0x10)),
                 #    "_unknow2": util.getInt(data, util.getLong(data, util.getLong(data, offGr+0x10+0x08*iMsc)+0x10)+0x04),

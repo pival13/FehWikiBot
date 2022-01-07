@@ -1,11 +1,8 @@
 #! /usr/bin/env python3
 
 from datetime import datetime
-import json
 from os.path import isfile
-from num2words import num2words
 
-from util import DATA
 import util
 import mapUtil
 from Reverse import reverseFrontlinePhalanx
@@ -41,7 +38,6 @@ def FrontlinePhalanx(tag: str):
     for data in datas:
         nb = int(util.cargoQuery('FrontlinePhalanx', 'COUNT(DISTINCT _pageName)=Nb')[0]['Nb']) + 1
         s = FPInfobox(data, nb) + "\n"
-        s += f"The {num2words(nb, to='ordinal')} [[Frontline Phalanx]] event." + "\n"
         s += mapUtil.Availability(data['avail'], f"Frontline Phalanx ({datetime.strptime(data['avail']['start'], util.TIME_FORMAT).strftime('%b %Y')}) (Notification)", "[[Frontline Phalanx]] event") + "\n"
         s += "<!--** However, it actually ended at {{HT|}} with the defeat of the third boss.-->\n"
         s += FPRewards(data) + "\n"

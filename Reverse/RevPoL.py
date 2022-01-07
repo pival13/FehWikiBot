@@ -8,7 +8,7 @@ import REutil as util
 def parseBoardGame(data):#TODO
     result = []
     for iGr in range(util.getLong(data, 0x08, 0x8C04448B9C6192D6)):
-        offGr = util.getLong(data, 0x00)+iGr*0x90
+        offGr = util.getLong(data, 0x00)+iGr*0x80
         nbRound = util.getByte(data, offGr+0x78, 0xEF)
         result += [{
             "id_tag": util.getString(data, offGr+0x00),

@@ -5,10 +5,10 @@ import re
 from os.path import isfile
 from num2words import num2words
 
-from util import DATA, DIFFICULTIES
 import util
+from globals import DATA, DIFFICULTIES, MOVE_TYPE, WEAPON_TYPE
 from Reverse import reverseLostLore
-from reward import parseReward, MOVE, WEAPON
+from reward import parseReward
 from mapUtil import InOtherLanguage, Availability
 
 extraTeams = [20,60]
@@ -24,10 +24,21 @@ def LLInfobox(data: dict, strikes: list):
         f"|startTime={data['avail']['start']}\n" + \
         f"|endTime={util.timeDiff(data['avail']['finish'])}"+"\n}}"
 
+def LLIntro(data: dict):
+    query = util.cargoQuery('LostLore','World',group='_pageName')
+    entries = list(map(str,sorted([d for d in data['bonusEntry']][:data['entryCount']])))
+    world = util.getName('MID_TRIP_WORLD_'+'_'.join(entries))
+    nb = len(query)
+    nb2 = len([True for o in query if o['World'] == world])
+    
+    return f"The {num2words(nb+1, to='ordinal')} [[Lost Lore]] event, " + \
+        f"and the {num2words(nb2+1, to='ordinal')} taking place in" + \
+        '{{EntryIcon|' + ','.join(entries) + '}}' + ('the ' if world[:4] != 'The ' else '') + world + '.'
+
 def LLRewards(data: dict):
     s = "==Rewards==\n{{#invoke:Reward/LostLore|lines|extraTeams=" + ",".join([str(t) for t in extraTeams]) + "\n"
     for r in data['loreRewards']:
-        if int(r['lines'] / 3600) in extraTeams: r['reward'] += [{"kind": -1, "_type": "Lost Lore Team", "count": 1}]
+        if int(r['lines'] / 3600) in extraTeams: r['reward'] += [{"kind": "Lost Lore Team", "count": 1}]
         #First format will transform it into {:<nb}, second format will return the number right padded to nb spaces
         score = "{{:<{}}}".format(len(str(int(data['loreRewards'][-1]['lines']/3600)))).format(int(r['lines']/3600))
         s += f" | {score} = " + parseReward(r['reward']) + "\n"
@@ -55,9 +66,10 @@ def LLLocation(data: dict):
     for location in data["maps"]:
         loc = {
             "name": util.getName(f"MID_TRIP_PLACE_{location['id_tag']}"),
-            "image": re.sub(r".+/([^/]+)\..*", r"\1.webp", location['backgroundPath']),
+            "image": re.sub(r".+[/\\]([^\\/]+)[/\\]([^\\/]+)\..*", r"\1 \2.webp", location['backgroundPath']),
             ("linesReq" if location['lines'] != 0 else "isCombat"): int(location['lines'] / 3600) if location['lines'] != 0 else 1,
             "rewards": parseReward(location['clearReward'] + [{"kind": -1, "_type": "Saga's " + util.getName(f"MID_TRIP_SAGA_SECTION_{data['maps'].index(location)+1}"), "count": 1}])
+                    .replace('<!--','').replace('-->','')
         }
         #Convert a json object into lua object
         loc = re.sub('": "?', "=", re.sub(r'"?, "', ";", json.dumps(loc).replace("{\"", "{").replace("\"}", "}")))
@@ -79,10 +91,10 @@ def LLUnit(data: dict, strikes: list):
         if len(strikes) != 1: s += f"===Strike {i+1}===\n"
         s += "{|class=\"wikitable\" style=\"text-align:center;\"\n!Foe!!HP!!Atk!!Spd!!Def!!Res\n"
         for foe in strike['units']:
-            s += "|-\n|{{LostLoreEnemy\n|file=" + re.sub(r".*/([^/]*)\..*", r"\1.webp", foe["facePath"]) + "|size=100\n"
-            s += f"|rarity={foe['rarity']}\n|weapon={WEAPON[foe['weapon']]}\n|move={MOVE[foe['move']]}\n}}}}\n"
+            s += "|-\n|{{LostLoreEnemy\n|file=Trip_" + re.sub(r".*/([^/]*)\..*", r"\1.webp", foe["facePath"]) + "|size=100\n"
+            s += f"|rarity={foe['rarity']}\n|weapon={WEAPON_TYPE[foe['weapon']]}\n|move={MOVE_TYPE[foe['move']]}\n}}}}\n"
             s += ("[[" if foe['rarity'] != 3 else "") + util.getName(f"MID_TRIP_ENEMY_{strike['id_tag']}_{foe['name_id']}") + ("]]" if foe['rarity'] != 3 else "") + "\n"
-            s += f"|\n|{foe['Atk']}\n|{foe['Spd']}\n|{foe['Def']}\n|{foe['Res']}\n"
+            s += f"|{foe['HP']}\n|{foe['Atk']}\n|{foe['Spd']}\n|{foe['Def']}\n|{foe['Res']}\n"
     return s + "|-\n|colspan=\"6\"|<nowiki/>*The order of foes is randomized at the start of every strike.\n|}"
 
 def LostLore(tag: str):
@@ -95,6 +107,7 @@ def LostLore(tag: str):
             continue
         enemies = [d['strike'] for d in data['maps'] if d['strike']]
         s = LLInfobox(data, enemies) + "\n"
+        s += LLIntro(data) + "\n"
         s += Availability(data['avail'], f"Lost Lore ({util.getName('MID_TRIP_TITLE_' + data['id_tag'])}) (Notification)", "[[Lost Lore]] event") + "\n"
         s += LLRewards(data) + "\n"
         s += LLSaga(data, tag) + "\n"

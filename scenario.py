@@ -1,49 +1,44 @@
 #! /usr/bin/env python3
 
-import util
 import re
 
-UNIT_IMAGE = util.fetchFehData("Common/SRPG/Person", "face_name")
-UNIT_IMAGE.update(util.fetchFehData("Common/SRPG/Enemy", "face_name"))
-UNIT_IMAGE.update({"ch00_00_Eclat_X_Normal": {'name': "Kiran"},
-                    "ch00_00_Eclat_X_Avatar00": {'name': "Kiran: Hero Summoner", 'id_tag': "EID_アバター"},
-                    "ch00_00_Eclat_M_Avatar01": {'name': "Kiran: Hero Summoner M01"},
-                    "ch00_00_Eclat_M_Avatar02": {'name': "Kiran: Hero Summoner M02"},
-                    "ch00_00_Eclat_M_Avatar03": {'name': "Kiran: Hero Summoner M03"},
-                    "ch00_00_Eclat_M_Avatar04": {'name': "Kiran: Hero Summoner M04"},
-                    "ch00_00_Eclat_F_Avatar01": {'name': "Kiran: Hero Summoner F01"},
-                    "ch00_00_Eclat_F_Avatar02": {'name': "Kiran: Hero Summoner F02"},
-                    "ch00_00_Eclat_F_Avatar03": {'name': "Kiran: Hero Summoner F03"},
-                    "ch00_00_Eclat_F_Avatar04": {'name': "Kiran: Hero Summoner F04"},
-                    "ch00_13_Gustaf_M_Normal": {'name': "Gustav", 'id_tag': 'PID_グスタフ'},
-                    "ch00_14_Henriette_F_Normal": {'name': "Henriette", 'id_tag': 'PID_ヘンリエッテ'},
-                    "ch00_16_Freeze_M_Normal": {'name': "Hríd"},
-                    "ch00_22_Tor_F_Normal": {'name': "Thórr", 'id_tag': 'PID_トール'},
-                    "ch00_35_Eitri_F_Normal": {'name': 'Eitri', 'id_tag': 'EID_エイトリ'},
-                    "ch00_36_MysteryHood_X_Normal": {'name': 'Mystery Hood'},
-                    "ch90_02_FighterAX_M_Normal": {'name': ''}})
+import util
+from globals import UNIT_IMAGE, SOUNDS
+
+def getBgm(id):
+    if id in SOUNDS:
+        return SOUNDS[id]['list'][0]['file'] + '.ogg'
+    else:
+        return id
 
 def parseScenario(s: str, lang: str):
     wikitext = []
     data = {a['key']: a['value'] for a in util.fetchFehData(("USEN" if lang == 'en' else "JPJA") + "/Message/Data")}
 
     s = s.replace("$k", "").replace("$p", "\t").replace("$Nu", "{{Summoner}}").replace("$Nf", "{{Friend}}")
+    s = re.sub(r"\$c([,0-9]+)(?:(\|$)|\|)", "@COLOR@\\1@\\2", s)
 
     sections = []
     for section in re.findall(r'\$[^$]*', s):
         for part in section.split('|'):
             sections += [part.strip().replace('\t', '<br>').replace('\n', '<br>')] if part != "" else []
 
+    print(sections)
     name = ""
     heroJSON = {}
     expr = ""
     for section in sections:
-        if section[0] != '$' and len(section) > 0:
-            nameplate = "|" if 'id_tag' in heroJSON and name == data['M'+heroJSON['id_tag']] else f"|duo={name}|" if 'legendary' in heroJSON and heroJSON['legendary'] and (heroJSON['legendary']['kind'] == 2 or heroJSON['legendary']['kind'] == 3) else f"|nameplate={name}|"
+        if len(section) == 0: continue
+        if section[0] != '$':
+            nameplate = '' if 'id_tag' in heroJSON and name == data['M'+heroJSON['id_tag']] else f"|duo={name}" if 'legendary' in heroJSON and 'kind' in heroJSON['legendary'] and heroJSON['legendary']['kind'] in [2,3] else f"|nameplate={name}"
+            if len(re.findall(r'@COLOR@', section)) == 2 and section[:7] == '@COLOR@' and section[-23:] == '@COLOR@255,255,255,255@':
+                section = re.sub(r"^@COLOR@([^@]+)@(.*)@COLOR@.*$", "color=\\1|\\2", section)
+            else:
+                section = re.sub(r"@COLOR@([^@]+)@(.*?)(?:@!COLOR@|(@COLOR@))", "{{#tag:span style='color:rgb(\\1)'|\\2}}\\3", section.replace('@COLOR@255,255,255,255@','@!COLOR@'))
             wikitext += ["{{StoryTextTable" + nameplate +
                         (util.getName(heroJSON['id_tag']) if not 'name' in heroJSON else heroJSON['name']) +
-                        (f"|expression={expr[5:]}|" if expr != 'Face' else '|') +
-                        section + ('|ja}}' if lang == 'ja' else '}}')]
+                        (f"|expression={expr[5:]}" if expr != 'Face' else '') +
+                        '|' + section + ('|ja}}' if lang == 'ja' else '}}')]
         elif section[:3] == '$Wm':
             info = section[3:].split(',')
             name = data[info[0]]
@@ -54,11 +49,15 @@ def parseScenario(s: str, lang: str):
         elif section[:2] == '$E':
             expr = section[2:]
         elif section[:4] == '$Sbp':
-            wikitext += ["{{StoryBGM|" + section[4:section.find(',')] + "}}"]
+            wikitext += ["{{StoryBGM|" + getBgm(section[4:section.find(',')]) + "}}"]
         elif section[:4] == '$Ssp':
             wikitext += ["{{StorySE|" + section[4:] + "}}"]
         elif section[:3] == '$Fo':
             wikitext += ["{{StoryFo|" + section[3:].replace(',','|') + "}}"]
+        elif section[:3] == '$Fi': continue# Fade In (remove the fade panel)
+        elif section[:4] == '$Sbs': continue# Stop BGM
+        else:
+            print(util.TODO + 'Unsupported story flag: ' + section)
 
     return wikitext
 
@@ -71,25 +70,25 @@ def parseStructure(obj, lang):
 
     for key in obj:
         if key == "MID_SCENARIO_OPENING_BGM":
-            opening += ["{{StoryBGM|" + obj[key] + "}}"]
+            opening += ["{{StoryBGM|" + getBgm(obj[key]) + "}}"]
         elif key == "MID_SCENARIO_OPENING_IMAGE":
             opening += ["{{StoryImage|" + obj[key] + "}}"]
         elif key == "MID_SCENARIO_OPENING":
             opening += parseScenario(obj[key], lang)
         elif key == "MID_SCENARIO_MAP_BEGIN_BGM":
-            mapBegin += ["{{StoryBGM|" + obj[key] + "}}"]
+            mapBegin += ["{{StoryBGM|" + getBgm(obj[key]) + "}}"]
         elif key == "MID_SCENARIO_MAP_BEGIN_IMAGE":
             mapBegin += ["{{StoryImage|" + obj[key] + "}}"]
         elif key == "MID_SCENARIO_MAP_BEGIN":
             mapBegin += parseScenario(obj[key], lang)
         elif key == "MID_SCENARIO_MAP_END_BGM":
-            mapEnd += ["{{StoryBGM|" + obj[key] + "}}"]
+            mapEnd += ["{{StoryBGM|" + getBgm(obj[key]) + "}}"]
         elif key == "MID_SCENARIO_MAP_END_IMAGE":
             mapEnd += ["{{StoryImage|" + obj[key] + "}}"]
         elif key == "MID_SCENARIO_MAP_END":
             mapEnd += parseScenario(obj[key], lang)
         elif key == "MID_SCENARIO_ENDING_BGM":
-            ending += ["{{StoryBGM|" + obj[key] + "}}"]
+            ending += ["{{StoryBGM|" + getBgm(obj[key]) + "}}"]
         elif key == "MID_SCENARIO_ENDING_IMAGE":
             ending += ["{{StoryImage|" + obj[key] + "}}"]
         elif key == "MID_SCENARIO_ENDING":
@@ -115,7 +114,7 @@ def Conversation(mapId, tag):
 
     if tag in enJSON:
         if tag + "_BGM" in enJSON:
-            wikiTextUSEN += ["{{StoryBGM|" + enJSON[tag+"_BGM"] + "}}"]
+            wikiTextUSEN += ["{{StoryBGM|" + getBgm(enJSON[tag+"_BGM"]) + "}}"]
         if tag + "_IMAGE" in enJSON:
             wikiTextUSEN += ["{{StoryImage|" + enJSON[tag+"_IMAGE"] + "}}"]
         wikiTextUSEN += parseScenario(enJSON[tag], "en")
@@ -124,7 +123,7 @@ def Conversation(mapId, tag):
 
     if tag in jaJSON:
         if tag + "_BGM" in jaJSON:
-            wikiTextJPJA += ["{{StoryBGM|" + jaJSON[tag+"_BGM"] + "}}"]
+            wikiTextJPJA += ["{{StoryBGM|" + getBgm(jaJSON[tag+"_BGM"]) + "}}"]
         if tag + "_IMAGE" in jaJSON:
             wikiTextJPJA += ["{{StoryImage|" + jaJSON[tag+"_IMAGE"] + "}}"]
         wikiTextJPJA += parseScenario(jaJSON[tag], "ja")

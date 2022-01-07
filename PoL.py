@@ -1,40 +1,12 @@
 #! /usr/bin/env python3
 
 from datetime import datetime
-import json
 from os.path import isfile
-from num2words import num2words
 
-from util import DATA
 import util
+from globals import WEAPON_CATEGORY
 from Reverse import reversePawnsOfLoki
 from reward import parseReward
-
-WEAPON_CATEGORY = {
-    0b000000000000000000000111: "Melee",
-    0b000000000000000001111000: "Bow",
-    0b000000000000011110000000: "Dagger",
-    0b000000000111100000000000: "Magic",
-    0b000000001000000000000000: "Staff",
-    0b000011110000000000000000: "Dragonstone",
-    0b111100000000000000000000: "Beast",
-    
-    0b000100010000100010001001: "Red",
-    0b001000100001000100010010: "Blue",
-    0b010001000010001000100100: "Green",
-    0b100010001100010001000000: "Colorless",
-
-    0b111111110000000000000111: "Close",
-    0b000000001111111111111000: "Ranged",
-    
-    0b111100000000011111111111: "Physical",
-    0b000011111111100000000000: "Magical",
-    
-    0b000000000000011111111000: "Missile",
-
-    0b111111111111111111111111: "All",
-    0b000000000000000000000000: "None",
-}
 
 def PoLInfobox(data: dict):
     bonus = []
@@ -53,7 +25,7 @@ def PoLInfobox(data: dict):
 def PoLAvailability(data: dict):
     s = "==Availability==\nThis [[Pawns of Loki]] event was made available:\n" + \
         f"* {{{{HT|{data['event_avail']['start']}}}}} – {{{{HT|{util.timeDiff(data['event_avail']['finish'])}}}}} " + \
-        f"([[Pawns of Loki Is Here! ({datetime.strptime(data['event_avail']['start'], util.TIME_FORMAT).strftime('%b %d, %Y').replace(' 0', ' ')}) (Notification)|Notification]])"
+        f"([[Pawns of Loki Is Here! ({datetime.strptime(data['event_avail']['start'], util.TIME_FORMAT).strftime('%b %Y').replace(' 0', ' ')}) (Notification)|Notification]])"
     if data['nbRound'] > 1:
         for r in range(data['nbRound']):
             s += f"\n** '''Round {r+1}''': " + \
@@ -79,7 +51,6 @@ def PawnsOfLoki(tag: str):
     for data in datas:
         nb = int(data['id_tag'][3:])
         s = PoLInfobox(data) + "\n"
-        s += f"The {num2words(nb, to='ordinal')} [[Pawns of Loki]] event." + "\n"
         s += PoLAvailability(data) + "\n"
         s += PoLRewards(data) + "\n"
         s += "==Trivia==\n*\n{{Main Events Navbox}}"

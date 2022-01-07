@@ -2,8 +2,8 @@
 
 import re
 
-from util import DATA, DIFFICULTIES, ROMAN
 import util
+from globals import DATA, DIFFICULTIES, ROMAN
 import mapUtil
 import wikiUtil
 from scenario import Story

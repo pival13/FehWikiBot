@@ -3,18 +3,12 @@
 from PIL import Image
 import re
 
-from util import DATA, DIFFICULTIES, TIME_FORMAT
-from reward import parseReward
 import util
+from globals import DATA, DIFFICULTIES, WEAPONS, REFINES, REFINE_TYPE
+from reward import parseReward
 
 USE_ALLY_STATS = ['PID_ヘルビンディ味方', 'PID_レーギャルン味方', 'PID_レーヴァテイン味方', 'PID_ロキ味方', 'PID_スルト味方', 'PID_スラシル味方', 'PID_リーヴ味方', 'PID_ヘル味方', 'PID_プルメリア味方']
 USE_ENEMY_STATS = ['EID_ヘルビンディ', 'EID_レーギャルン', 'EID_レーヴァテイン', 'EID_ロキ', 'EID_スルト', 'EID_スラシル', 'EID_リーヴ', 'EID_ヘル', 'EID_プルメリア']
-
-WEAPONS = util.fetchFehData("Common/SRPG/Skill")
-WEAPONS = {skillTag: WEAPONS[skillTag] for skillTag in WEAPONS if WEAPONS[skillTag]['might'] != 0}
-REFINED = [n for n in WEAPONS if WEAPONS[n]['refine_sort_id'] != 0]
-
-REFINED_TYPE = {1: 'Skill1', 2: 'Skill2', 101: 'Atk', 102: 'Spd', 103: 'Def', 104: 'Res'}
 
 def mapTerrain(terrain: list, wallStyle: str, x: int, y: int, useDebris: bool):
     """Return the content of a cell on a terrain, as a string
@@ -119,7 +113,7 @@ def MapImage(field: dict, simpleMap: bool=False, useDebris: bool=False, units: d
         elif 'id' in field and field['id'][0] == 'H':
             mapType = "\n|type=HO"
             backdrop = 'Wave'
-        elif 'id' in field and field['id'][0] == 'Y':
+        elif 'id' in field and field['id'][0] in 'YOX':
             mapType = "\n|type=RD"
             backdrop = 'Wave'
     elif 'id' in field and field['id'][0] != 'V':
@@ -301,7 +295,7 @@ def UnitData(SRPGMap):
 
         weaponId = unit['skills'][0] if 'skills' in unit else unit['weapon'] if 'weapon' in unit else ''
         weapon = util.getName(WEAPONS[weaponId]['name_id']) if weaponId in WEAPONS else None
-        if weaponId in REFINED: weapon += ';refine=' + REFINED_TYPE[WEAPONS[weaponId]['refine_sort_id']]
+        if weaponId in WEAPONS and WEAPONS[weaponId]['refine_sort_id'] != 0: weapon += ';refine=' + REFINE_TYPE[WEAPONS[weaponId]['refine_sort_id']]
 
         s += f"weapon={weapon or '-'};" if weapon else "weapon=;refine=;" if 'refine' in unit else "weapon=;"
         s += f"assist={util.getName(unit['skills'][1]) or '-'};" if 'skills' in unit else "assist=;"

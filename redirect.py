@@ -5,16 +5,13 @@ from datetime import datetime
 import json
 import re
 
-from util import URL, TODO, DATA
 import util
+from globals import URL, TODO, DATA, SKILLS, ACCESSORIES
 from wikiUtil import _exportPage
-
-SKILL_DATA = util.fetchFehData("Common/SRPG/Skill", False)
-ACCESSORY_DATA = util.fetchFehData("Common/DressAccessory/Data", "sprite")
 
 def getWeaponName(sprite: str):
     nameId = None
-    for skill in SKILL_DATA:
+    for skill in SKILLS.values():
         if nameId:
             break
         for s in skill['sprites']:
@@ -24,8 +21,8 @@ def getWeaponName(sprite: str):
         return "File:Weapon " + util.cleanStr(DATA[nameId]) + (" V2" if sprite.find("ar") != -1 else "") + ".png"
 
 def getAccessoryName(sprite: str):
-    if sprite in ACCESSORY_DATA:
-        return f"File:Accessory {util.cleanStr(util.getName(ACCESSORY_DATA[sprite]['id_tag']))}.png"
+    if sprite in ACCESSORIES:
+        return f"File:Accessory {util.cleanStr(util.getName(ACCESSORIES[sprite]['id_tag']))}.png"
 
 def redirect(name: str, redirect: str):
     result = _exportPage(redirect or name.replace(".webp", ".png"),

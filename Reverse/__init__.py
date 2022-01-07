@@ -1,4 +1,4 @@
-from os.path import dirname, realpath
+from os.path import dirname, realpath, isfile
 import sys
 
 sys.path.insert(0, dirname(realpath(__file__)))
@@ -20,5 +20,15 @@ from .RevHoF import reverseHallOfForms
 from .RevMS  import reverseMjolnirsStrike
 from .RevFP  import reverseFrontlinePhalanx
 from .RevPoL import reversePawnsOfLoki
+from .RevHJ  import reverseHeroesJourney
+
+def reverseMjolnirFacility(tag: str):
+    from .Reverse import parseMjolnirFacility
+    from .REutil import BINLZ_ASSETS_DIR_PATH
+
+    fpath = BINLZ_ASSETS_DIR_PATH + f"/Common/Mjolnir/FacilityData/{tag}.bin.lz"
+    if isfile(fpath):
+        data = decompress(fpath)
+        return parseMjolnirFacility(data[0x20:])
 
 sys.path.pop(0)

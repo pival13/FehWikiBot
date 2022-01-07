@@ -8,10 +8,13 @@ import REutil as util
 def parseMsg(data):
     numberElem = util.getLong(data, 0)
     result = []
+    data2 = data + [0]
     for i in range(numberElem):
+        idxKey = util.getLong(data2,i*16+8)
+        idxValue = util.getLong(data2,i*16+16)
         result += [{
-            "key": util.xorString(data[util.getLong(data,i*16+8):], util.MSG_XORKEY),
-            "value": util.xorString(data[util.getLong(data,i*16+16):], util.MSG_XORKEY)
+            "key": util.xorString(data2[idxKey:data2.index(0,idxKey)], util.MSG_XORKEY),
+            "value": util.xorString(data2[idxValue:data2.index(0,idxValue)], util.MSG_XORKEY)
         }]
     return result
 

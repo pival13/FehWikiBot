@@ -1,11 +1,9 @@
 #! /usr/bin/env python3
 
-import json
 from os.path import isfile
-from num2words import num2words
 
-from util import DATA
 import util
+from globals import DATA
 from Reverse import reverseHallOfForms
 from reward import parseReward
 
@@ -33,7 +31,6 @@ def HallOfForms(tag: str):
     for data in datas:
         nb = int(util.cargoQuery('HallOfForms', 'COUNT(_pageName)=Nb')[0]['Nb']) + 1
         s = HoFInfobox(data, nb) + "\n"
-        s += f"The {num2words(nb, to='ordinal')} [[Hall of Forms]] event." + "\n"
         s += HoFRewards(data) + "\n"
         s += "==Trivia==\n*\n{{Main Events Navbox}}"
         ret[f"Hall of Forms {nb}"] = s

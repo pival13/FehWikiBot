@@ -1,12 +1,15 @@
 #! /usr/bin/env python3
 
 from datetime import datetime
+from math import trunc
 from os.path import isfile
 
-from util import DATA
 import util
+from globals import DATA, WEAPON_CATEGORY, UNITS
 from Reverse import reverseRokkrSieges
 from reward import parseReward
+
+from HB import getStats
 
 def RSInfobox(data: dict, nb: int):
     units = []
@@ -66,6 +69,7 @@ def RSRewards(data: dict):
     return s
 
 def RSUnits(data: dict):
+    nameToWeapon = lambda id: WEAPON_CATEGORY[1 << UNITS[id]['weapon_type']].replace('Tome','Magic').replace('Red ','').replace('Blue ','').replace('Green ','').replace('Colorless ','')
     s = "==Unit data=="
     for iBattle in range(3):
         s += f"\n===Battle {iBattle+1}===\n{{{{#invoke:UnitData|main|no cargo=true|no ai=true\n"
@@ -74,16 +78,18 @@ def RSUnits(data: dict):
             s += f"|Lv. {unitData['level']} ({DATA['MID_SHADOW_STAGE_DIFFICULY_'+str(iDiff)]})=[\n"
             for i in range(2):
                 unit = diffUnits[iBattle * 2 + i]
+                stats = getStats(unit['id_tag'], unitData['rarity'], unitData['level'])
                 s += "{unit=" + util.getName(unit['id_tag'])
                 s += f";rarity={unitData['rarity']};slot=-"
-                s += f";level={unitData['level']};stats=[??;;;;]"
-                s += f";weapon={'Umbra Burst ()'}"
+                s += f";level={unitData['level']}"
+                s += f";stats=[??;{';'.join([str(unitData['stats'][key] + trunc(stats[key]/5) + unit['stat_modifier'][key]) for key in ['atk','spd','def','res']])}]"
+                s += f";weapon=Umbra Burst ({nameToWeapon(unit['id_tag'])})"
                 s += f";assist={util.getName(unit['assist']) if unit['assist'] else '-'}"
                 s += f";special={util.getName(unitData['special'])}"
                 s += f";a={util.getName(unit['a']) if unit['a'] else '-'}"
                 s += f";b={util.getName(unit['b']) if unit['b'] else '-'}"
                 s += f";c={util.getName(unit['c']) if unit['c'] else '-'}"
-                s += f";seal=" + util.getName(data['_unknow10'][iDiff]['seal']) + "};\n"
+                s += f";seal=" + util.getName(unitData['seal']) + "};\n"
             s += "]\n"
         s += "}}"
     return s
