@@ -127,6 +127,8 @@ class Skills(JsonContainer, ArticleContainer):
             'SID_レーヴァテイン': 'weapon', # Laevatein
             'SID_アトラース': 'weapon', # Atlas
             'SID_セイズ': 'weapon', # Seiðr
+            'SID_ヘイズ': 'weapon', # Heiðr
+            'SID_クワシル': 'weapon', # Kvasir
             'SID_グルヴェイグ': 'weapon', # Gullveig
             'SID_ミステルトィン': 'sword', # Missiltainn
             'SID_魔書ミステルトィン': 'tome', # Missiltainn
@@ -156,13 +158,15 @@ class Skills(JsonContainer, ArticleContainer):
     def exclusive(self):
         return self.data['exclusive']
 
-    def loadArticle(self) -> Self:
+    def loadArticle(self, canCreate=True, revision=0) -> Self:
         from ..Tool.Wiki import Wiki
-        s = Wiki.getPageContent(self.articleName)
+        s =  Wiki.getPageContent(self.articleName, revision)
         if s is not None:
             self.page = s
-        else:
+        elif canCreate:
             self.createArticle()
+        else:
+            self.page = ''
         return self
 
     def update(self) -> Self:

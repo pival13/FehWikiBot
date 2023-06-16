@@ -6,10 +6,13 @@ class Weapon(Skills):
     @property
     def might(self): return self.data['might']
 
+    @property
+    def refine(self): return self.data['refine_type']
+
     def Infobox(self):
         obj = {
             'tagid': self.data['id_tag'],
-            'intID': self.data['id_num'],
+            'intID': self.data['num_id'],
             'noImg': None, 'image': None, 'userVersion1': None, 'userVersion2': None, 'userVersion3': None, 'userVersion4': None,
             'exclusive': int(self.exclusive),
             'weaponType': self.data['wep_equip'],
@@ -146,7 +149,7 @@ class Weapon(Skills):
 
     def update(self):
         import re
-        if self.data is None or self.data['@refines'] == []: return self
+        if self.data is None or self.data['@refines'] == [] or self.page == '': return self
 
         pattern = r'(Weapon Infobox(\{\{.*?\}\}|.)*?)(?=\|\s*properties|\}\})'
         for key, value in self.InfoboxRefine().items():

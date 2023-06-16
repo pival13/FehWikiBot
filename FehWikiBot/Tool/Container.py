@@ -48,6 +48,7 @@ class Container(metaclass=_ContainerMeta):
 
     @classmethod
     def get(cls, key: str, at:list=None) -> Self | None:
+        if key is None: return None
         if at is None: at = cls._key
         if isinstance(at, (int,str)):
             at = [at]
@@ -73,6 +74,7 @@ class Container(metaclass=_ContainerMeta):
 
     @classmethod
     def getAll(cls, key: str, at:list=None) -> list[Self]:
+        if key is None: return []
         if at is None: at = cls._key
         if isinstance(at, (int,str)):
             at = [at]

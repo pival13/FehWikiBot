@@ -46,13 +46,15 @@ class ArticleContainer(Article, Container):
                 o.name = name
         return o
 
-    def loadArticle(self) -> Self:
+    def loadArticle(self, canCreate=True, revision=0) -> Self:
         from ..Tool.Wiki import Wiki
-        s =  Wiki.getPageContent(self.name)
+        s =  Wiki.getPageContent(self.name, revision)
         if s is not None:
             self.page = s
-        else:
+        elif canCreate:
             self.createArticle()
+        else:
+            self.page = ''
         return self
 
     def createArticle(self) -> Self:

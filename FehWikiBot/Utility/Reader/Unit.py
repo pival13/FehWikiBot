@@ -1,11 +1,13 @@
 #! /usr/bin/env python3
 
-from ...Tool.Reader import IReader, InvalidReaderError, readStat, readTime
+from ...Tool.Reader import IReader, readStat, readTime
 
 class HeroReader(IReader):
     _basePath = 'Common/SRPG/Person/'
 
     def parse(self):
+        from ...Tool.globals import BLESSING
+        KIND = ['Legendary','Mythic','Duo','Harmonized','Ascended','Rearmed']
         nb = self.overviewLong(0x08, 0xde51ab793c3ab9e1)
         self.readArray()
         for _ in range(nb):
@@ -17,25 +19,25 @@ class HeroReader(IReader):
             if  self.readObject('extra'):
                 self.readString('duo_skill')
                 readStat(self, 'bonus_effect')
-                self.readByte("kind", 0x21) # Legendary/Mythic/Duo/Harmonic/Ascended/Rearmed
-                self.readByte("element", 0x05)
-                self.readByte("bst", 0x0F)
-                self.readBool("pair_up", 0x80)
-                self.readBool("extra_slot", 0x24)
+                self.insert('kind', KIND[self.getByte(0x21)])
+                self.insert('element', BLESSING[self.getByte(0x05)])
+                self.readByte('bst', 0x0F)
+                self.readBool('pair_up', 0x80)
+                self.readBool('extra_slot', 0x24)
                 self.end()
             count = self.readList('dragonflower_costs', 0xA0013774, True)
             for _ in range(count):
                 self.readInt(xor=0x715C6A7B)
             self.end()
             readTime(self, 'timestamp', 0xBDC1E742E9B6489B)
-            self.readInt('id_num', 0x5F6E4E18)
+            self.readInt('num_id', 0x5F6E4E18)
             self.readInt('version_num', 0x2E193A3C)
             self.readInt('sort_id', 0x2A80349B)
-            self.readMask('origins', 4, 0xe664b808)
+            self.readMask('series', 4, 0xe664b808)
             self.readByte('weapon', 0x06)
             self.readByte('magic', 0x35)
             self.readByte('move', 0x2A)
-            self.readByte('series', 0x43)
+            self.readByte('origin', 0x43)
             self.readByte('random_pool', 0xA1) # 0: None, 1: Regular, 2: Special
             self.readBool('permanent_hero', 0xC7)
             self.readByte('bvid', 0x3D)
@@ -65,7 +67,7 @@ class HeroReader(IReader):
             getSkills('extra1')
             getSkills('extra2')
             self.end()
-            self.skip(0x08 * 14*4) # Skip skills previously read
+            self.skip(0x08 * 14*4) # Skip skills previously read (1 iteration is already skipped)
             self.end()
         self.end()
 
@@ -91,7 +93,7 @@ class EnemyReader(IReader):
             self.readString('special')
             self.end()
             readTime(self, 'timestamp', 0xBDC1E742E9B6489B)
-            self.readInt('id_num', 0x422f41d4)
+            self.readInt('num_id', 0x422f41d4)
             self.skip(0x04)
             # self.readInt('is_kiran', 0x6D154FF7)
             self.readByte('weapon', 0xe4)

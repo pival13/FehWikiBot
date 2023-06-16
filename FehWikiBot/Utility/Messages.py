@@ -2,14 +2,14 @@
 
 from .Reader.Message import MessageReader
 
-# git checkout <update_tag> -- files/assets/JPJA/* files/assets/EUDE/* files/assets/EUEN/* files/assets/EUES/* files/assets/EUFR/* files/assets/EUIT/* files/assets/TWZH/* files/assets/USES/* files/assets/USPT/*
+# git fetch && git checkout <update_tag> -- files/assets/JPJA/* files/assets/EUDE/* files/assets/EUEN/* files/assets/EUES/* files/assets/EUFR/* files/assets/EUIT/* files/assets/TWZH/* files/assets/USES/* files/assets/USPT/*
 
 class _MessageMeta(type):
     def __repr__(cls) -> str:
-        return f"<class {cls.__name__} ({len(cls._loaded)} files, {len(cls._DATA.get('USEN') or [])} EN, {len(cls._DATA.get('JPJA') or [])} JP, {len(cls._DATA.get('EUDE') or [])} others)>"
+        return f"<class {cls.__name__} ({len(cls._loaded)} files, {len(cls._DATA['USEN'])} EN, {len(cls._DATA['JPJA'])} JP, {len(cls._DATA['EUDE'])} others)>"
 
 class Messages(metaclass=_MessageMeta):
-    _DATA = {}
+    _DATA = {'USEN':{},'JPJA':{},'EUDE':{},'EUEN':{},'EUES':{},'EUFR':{},'EUIT':{},'TWZH':{},'USES':{},'USPT':{}}
     _loaded = set()
 
     @classmethod
@@ -53,8 +53,7 @@ class Messages(metaclass=_MessageMeta):
 
     @classmethod
     def get(cls, key, lang):
-        if lang not in cls._DATA: cls._DATA[lang] = {}
-        if key is None or key == '': return ''
+        if key is None or key == '' or lang not in cls._DATA: return ''
         if key[0] != 'M': key = 'M'+key
         v = cls._DATA[lang].get(key)
         if v is None: v = cls._search(key, lang)
@@ -84,11 +83,9 @@ class Messages(metaclass=_MessageMeta):
         from ..PersonalData import JSON_ASSETS_DIR_PATH as jsonPath, BINLZ_ASSETS_DIR_PATH as assetsPath
         if path in cls._loaded: return False
 
+        lang = path[:4]
         jsonPath += path.replace('.bin.lz','.json')
         assetsPath += path
-
-        lang = path[:4]
-        if lang not in cls._DATA: cls._DATA[lang] = {}
 
         if exists(assetsPath) and (not exists(jsonPath) or getmtime(assetsPath) >= getmtime(jsonPath)):
             parser = MessageReader.fromAssets(path)

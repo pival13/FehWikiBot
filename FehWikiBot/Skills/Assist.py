@@ -6,7 +6,7 @@ class Assist(Skills):
     def Infobox(self):
         obj = {
             'tagid': self.data['id_tag'],
-            'intID': self.data['id_num'],
+            'intID': self.data['num_id'],
             'exclusive': int(self.data['exclusive']),
             'canUseWeapon': '{{WeaponList|' + self.data['wep_equip'] + '}}',
             'canUseMove': '{{MoveList|' + (self.data['mov_equip'] if self.data['mov_equip'].count(',') != 3 else 'All') + '}}',

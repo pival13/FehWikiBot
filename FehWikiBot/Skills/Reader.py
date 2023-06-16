@@ -57,7 +57,7 @@ class SkillReader(IReader):
             readStat(self, 'skill_param')
             readStat(self, 'skill_param2')
             readStat(self, 'refine_stats')
-            self.readInt('id_num', 0xc6a53a23)
+            self.readInt('num_id', 0xc6a53a23)
             self.readInt('sort_id', 0x8DDBF8AC)
             self.readInt('icon_id', 0xC6DF2173)
             self.readWeaponList('wep_equip', 0x35B99828)
@@ -206,7 +206,7 @@ class CaptainSkillReader(IReader):
             #'_int2': util.getSInt(data, offGr+0x38, 0x2A4BF41A),
             #0x08
             # Padding 0x04
-            self.readInt('id_num', 0x54DC7C40)
+            self.readInt('num_id', 0x54DC7C40)
             self.readInt('_unknow', 0xC3D1B4BF)
             self.readInt('icon_id', 0x7B344922)
             self.skip(0x04)

@@ -8,7 +8,7 @@ __all__ = [
     'TODO', 'ERROR', 'TIME_FORMAT', 'MIN_TIME', 'MAX_TIME',
     'DIFFICULTIES', 'ROMAN', 'COLOR',
     'MOVE_TYPE', 'WEAPON_TYPE', 'WEAPON_CATEGORY', 'WEAPON_MASK', 'REFINE_TYPE',
-    'ITEM_KIND', 'AA_ITEM', 'BLESSING_ELEMENT', 'SUPPORT_RANK'
+    'ITEM_KIND'
 ]
 
 GREEN_TEXT = '\33[1;92m'
@@ -17,6 +17,7 @@ YELLOW_BG = '\33[1;30;103m'
 RED_BG = '\33[1;37;101m'
 RESET_TEXT = '\33[0m'
 TODO = f'{YELLOW_BG}TODO{RESET_TEXT}: '
+WARNING = f'{YELLOW_BG}WARNING{RESET_TEXT}: '
 ERROR = f'{RED_BG}ERROR{RESET_TEXT}: '
 
 TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
@@ -104,19 +105,10 @@ ITEM_KIND = {
     'Lost Lore Team': 'Lost Lore Team', 'Memento Points': 'Memento Point'
 }
 
-AA_ITEM = [
-    'Elixir', 'Fortifying Horm', 'Special Blade', 'Infantry Boots', 'Naga\'s Tear',
-    'Dancer\'s Veil', 'Lightning Charm', 'Panic Charm', 'Fear Charm', 'Pressure Charm'
-]
-
 COLOR = [
     'Universal', 'Scarlet', 'Azure', 'Verdant', 'Transparent'
 ]
 
-BLESSING_ELEMENT = [
+BLESSING = [
     '', 'Fire', 'Water', 'Wind', 'Earth', 'Light', 'Dark', 'Astra', 'Anima'
-]
-
-SUPPORT_RANK = [
-    'C', 'B', 'A', 'S'
 ]

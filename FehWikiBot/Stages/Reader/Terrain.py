@@ -25,17 +25,15 @@ class MapReader(IReader):
                 self.prepareArray()
                 for _ in range(w):
                     self.readByte(None, 0xA1)
+                    # {0: 'Plain', 3: 'Forest', 4: 'Mountain', 5: 'Water', 8: 'Wall'}
                 self.end()
             self.end() 
             self.end()
         count = self.overviewInt(0x10, 0x9D63C79A)
         self.readArray('starting_pos')
         for _ in range(count):
-            self.prepareObject()
-            self.readShort('x', 0xB332)
-            self.readShort('y', 0x28B2)
+            self.insert(None, chr(self.getShort(0xB332)+97)+str(self.getShort(0x28B2)+1))
             self.skip(0x04) # TODO
-            self.end()
         self.end()
         count = self.overviewInt(0x0C, 0xAC6710EE)
         self.readArray('units')
@@ -50,10 +48,7 @@ class MapReader(IReader):
             self.readString('c')
             self.readString('seal')
             self.readString('accessory')
-            self.prepareObject('pos')
-            self.readShort('x', 0xB332)
-            self.readShort('y', 0x28B2)
-            self.end()
+            self.insert('pos', chr(self.getShort(0xB332)+97)+str(self.getShort(0x28B2)+1))
             self.readByte('rarity', 0x61)
             self.readByte('lv', 0x2A)
             self.readByte('init_cooldown', 0x1E, signed=True)

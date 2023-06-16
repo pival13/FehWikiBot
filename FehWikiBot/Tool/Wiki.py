@@ -64,7 +64,7 @@ class Wiki:
         return res
 
     @classmethod
-    def cargoQuery(cls, tables: str, fields: str="_pageName=Page", where: str="1", join: str=None, group: str=None, having: str=None, order: str="_pageID", limit: int="max"):
+    def cargoQuery(cls, tables: str, fields: str="_pageName=Page", where: str="1", join: str=None, group: str=None, having: str=None, order: str="_pageID", limit: int="max") -> list[dict | str] | dict | str | None:
         """Return the result of a cargo query.
 
         Args:
@@ -79,6 +79,9 @@ class Wiki:
         
         Returns:
             Return a list of objects, corresponding to the result of the query.
+            If `limit` is 1, the object itself is returned instead of a list.
+            If `fields` has a single element, the returned objects are the values, otherwise
+            they are a dict with the field as key.
         """
         # Several tables are joined
         if tables.find(',') != -1:

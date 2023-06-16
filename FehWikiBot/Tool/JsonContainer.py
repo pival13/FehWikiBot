@@ -32,13 +32,11 @@ class JsonContainer(Container):
         jsonPath += cls._reader._basePath + name + '.json'
 
         if exists(assetsPath) and (not exists(jsonPath) or getmtime(assetsPath) >= getmtime(jsonPath)):
-            # print('Json parsed', cls._reader._basePath+name)
             reader = cls._reader.fromAssets(name)
             if not reader.isValid(): return False
             obj = reader.object
             json.dump(obj, open(jsonPath, mode='w', encoding='utf-8'), ensure_ascii=False, indent=2)
         elif exists(jsonPath):
-            # print('Json loaded', cls._reader._basePath+name)
             obj = json.load(open(jsonPath, mode='r', encoding='utf-8'))
         else:
             return False

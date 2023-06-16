@@ -30,34 +30,39 @@ class RewardReader(IReader):
         self.end()
     
     def parseOne(self, kind):
-        from ...Tool.globals import ITEM_KIND, TODO
+        from ...Tool.globals import ITEM_KIND, COLOR, MOVE_TYPE, BLESSING, TODO
+        FB_RANK = [ 'C', 'B', 'A', 'S' ]
+        AA_ITEM = [
+            'Elixir', 'Fortifying Horm', 'Special Blade', 'Infantry Boots', 'Naga\'s Tear',
+            'Dancer\'s Veil', 'Lightning Charm', 'Panic Charm', 'Fear Charm', 'Pressure Charm'
+        ]
         REWARDS = {
             # (hasCount, hasStr, others)
             0x00: (True,  False, []), # Orb
-            0x01: (False, True,  [('rarity',self.readShort)]), #Hero
+            0x01: (False, True,  [lambda:self.readShort('rarity')]), #Hero
             0x02: (True,  False, []), # Feather
             0x03: (True,  False, []), # Stamina Potion
             0x04: (True,  False, []), # Dueling Crest
             0x05: (True,  False, []), # Light's Blessing
-            0x06: (True,  False, [('great',self.readBool),('color',self.readByte)]), # Exp
-            0x0C: (True,  False, [('great',self.readBool),('color',self.readByte)]), # Badge
+            0x06: (True,  False, [lambda:self.readBool('great'), lambda:self.insert('color', COLOR[self.getByte()])]), # Exp
+            0x0C: (True,  False, [lambda:self.readBool('great'), lambda:self.insert('color', COLOR[self.getByte()+1])]), # Badge
             0x0D: (True,  False, []), # VG Stamina
             0x0E: (False, True,  []), # Seal
-            0x0F: (True,  False, [("aa_kind",self.readByte)]),
+            0x0F: (True,  False, [lambda:self.insert('item', AA_ITEM[self.getByte()])]),
             0x10: (True,  False, []), # Sacred Coin
             0x11: (True,  False, []), # Refining Stone
             0x12: (True,  False, []), # Divine Dew
             0x13: (True,  False, []), # Arena Medal
-            0x14: (True,  False, [('element',self.readByte)]), # Blessing
+            0x14: (True,  False, [lambda:self.insert('element', BLESSING[self.getByte()])]), # Blessing
             0x15: (True,  False, []), # GC Stamina
-            0x16: (False, True, []), # Accessory
-            0x17: (False, True, []), # FB conv
+            0x16: (False, True,  []), # Accessory
+            0x17: (False, True,  []), # FB conv
             0x19: (True,  False, []), # Arena Crown
             0x1A: (True,  False, []), # Heroic Grail
             0x1B: (True,  True,  []), # Aether Stone
-            0x1C: (True,  False, [('throne_kind',self.readByte)]), 
+            0x1C: (True,  False, [lambda:self.readByte('color')]), 
             0x1D: (True,  True,  []), # Ticket
-            0x1E: (True,  False, [('move',self.readByte)]), # Dragonflower
+            0x1E: (True,  False, [lambda:self.insert('move', MOVE_TYPE[self.getByte()])]), # Dragonflower
             0x22: (True,  False, []), # RS Stamina
             0x23: (True,  True,  []), # Music
             0x24: (True,  True,  []), # HoF Stamina
@@ -71,7 +76,7 @@ class RewardReader(IReader):
         }
 
         self.prepareObject()
-    
+
         hasCount,hasString,others = REWARDS.get(kind, (kind,False,False,[]))
         if kind in ITEM_KIND or kind == 0x17:
             self.insert('kind', ITEM_KIND[kind])
@@ -80,20 +85,20 @@ class RewardReader(IReader):
             print(TODO + f'Unknow reward: {kind}')
         if hasCount:
             self.readShort('count')
-        if kind == 0x17: self.readByte('rank')
+        if kind == 0x17: self.insert('rank',FB_RANK(self.getByte()))
         if hasString:
             l = self.getByte()
             self.insert('id_tag', self.decodeString(self._buff[self._i:self._i+l]))
             self.skip(l)
-        for k,f in others: f(k)
-        
+        for f in others: f()
+
         self.end()
 
 def readReward(reader:Reader, key:str=None, xorSize=0, offSize=8):
     size = reader.overviewInt(offSize, xorSize) # 0x48 == 72, + 0x10 x K
     off = reader.getLong()
     if offSize == 8: reader.skip(4)
-    if (size-72)%16 != 0: print('Reward size:', size)
+    if size != 0 and (size-72)%16 != 0: print('Reward size:', size)
     obj = None
     if off != 0:
         rewardReader = RewardReader(reader._buff[off:off+size])

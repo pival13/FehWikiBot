@@ -130,14 +130,14 @@ class Passive(Skills):
         from ..Utility.Messages import EN
 
         prevKey = r'\{\{\s*Passive\s*'
-        reEndArg = r'(\{\{([^}]|\}(?!\}))*\}\}|[^{])*?(?=\|\s*\w+\s*=|\}\})'
+        reEndArg = r'(\{\{([^}]|\}(?!\}))*\}\}|[^{])*?(?=\||\}\})'
         for k, v in self.Infobox().items():
             key = r'\|\s*'+k+r'\s*=\s*(?<!\n)'
             if re.search(key, self.page):
                 self.page = re.sub('('+key+')'+reEndArg, f'\\g<1>{v}\n', self.page, 1)
             else:
                 self.page = re.sub('('+prevKey+reEndArg+')', f'\\g<1>|{k}={v}\n', self.page, 1)
-            prevKey = key
+            prevKey = r'\|\s*'+k+r'\s*'
 
 
         if self._datas[0]['@SealForge']:

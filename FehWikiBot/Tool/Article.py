@@ -49,35 +49,25 @@ class Article:
     def Infobox(self, name: str, params: dict):
         return '{{' + name + ' Infobox\n|' + '\n|'.join([k+'='+str(v) for k,v in params.items() if v is not None]) + '\n}}'
 
-    def BattleInfobox(self):
-        pass
-
-    def MapImage(self):
-        pass
-
-    def Availability(self, type: str, avail, notif: str="", subAvails=[], isMap=False):
-        from ..Tool.misc import timeDiff
-        s = '==Availability==\n'
-        s += f"This {type} was made available:\n"
+    def Availability(self, type: str, avail, notif: str=None, subAvails=[], isMap=False):
+        s = '==Availability==\n' if not isMap else '==Map availability==\n'
+        s += f"This {type} was made available on:\n"
         if isMap:
             s += '* {{MapDates|start=' + (avail.get('start') or '')
-            if avail.get('finish'):
-                s += '|end=' + avail['finish']
+            if avail.get('end'):
+                s += '|end=' + avail['end']
             if (avail.get('avail_sec') or -1) != -1:
                 s += '|cycle=' + avail['cycle_sec'] + '|avail=' + avail['avail_sec']
             if isinstance(notif, str):
                 s += '|notification=' + notif
             s += '}}'
         else:
-            s += '* {{HT|' + (avail.get('start') or '') + '}} – {{HT|' + avail.get('finish') + '}}'
+            s += '* {{HT|' + (avail.get('start') or '') + '}} – {{HT|' + avail.get('end') + '}}'
             if isinstance(notif, str):
                 s += ' ([[' + notif + '|Notification]])'
         for subAvail in subAvails:
-            s += '\n** {{HT|' + (subAvail.get('start') or '') + '}} – {{HT|' + subAvail.get('finish') + '}}'
+            s += '\n** {{HT|' + (subAvail.get('start') or '') + '}} – {{HT|' + subAvail.get('end') + '}}'
         return s
-
-    def UnitData(self):
-        pass
 
     def OtherLanguage(self, tag, tag2=None, swapJp=True):
         from ..Utility.Messages import Messages
