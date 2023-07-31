@@ -44,7 +44,7 @@ class Container(metaclass=_ContainerMeta):
             k = ''
         else:
             k = self._getAt(self.data, [self._key] if isinstance(self._key, (int,str)) else self._key) or ''
-        return '<' + type(self).__name__ + ' (' + k + ')>'
+        return '<' + type(self).__name__ + ' (' + str(k) + ')>'
 
     @classmethod
     def get(cls, key: str, at:list=None) -> Self | None:

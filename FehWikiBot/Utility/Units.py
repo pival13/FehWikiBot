@@ -86,13 +86,23 @@ class Enemies(ArticleContainer):
 
     @property
     def name(self):
-        if self.data['id_tag'] == 'EID_ファフニール2': return 'Fáfnir: King of Desolation (Dragon)'
-        if self.data['id_tag'] == 'EID_ヴェロニカ洗脳2': return 'Veronica: Princess Beset (Dark)'
-        if self.data['id_tag'] == 'EID_ヴェロニカ2': return 'Veronica: Princess Beset (Legendary)'
-        if self.data['id_tag'] == 'EID_レティシア洗脳': return 'Letizia: Curse Director (Dark)'
-        if self.data['id_tag'] == 'EID_ブルーノ素顔': return 'Bruno: Prince Beset (Unmasked)'
-        if self.data['generic']: return Messages.EN(self.data['id_tag'])
-        return Messages.EN(self.data['id_tag']) + ': ' + Messages.EN(self.data['id_tag'].replace('ID_','ID_HONOR_'))
+        APPEND = {
+            'EID_ファフニール2': 'Dragon', # Fáfnir
+            'EID_ヴェロニカ洗脳2': 'Dark', # Veronica
+            'EID_ヴェロニカ2': 'Legendary', # Veronica
+            'EID_レティシア洗脳': 'Dark', # Letizia
+            'EID_ブルーノ素顔': 'Unmasked', # Bruno
+            'EID_ヘイズ敵': 'Serpent', # Heiðr
+        }
+        s = super().name
+        if s or self.data is None: return s
+        if self.data['generic']:
+            s = Messages.EN(self.data['id_tag'])
+        else:
+            s = Messages.EN(self.data['id_tag']) + ': ' + Messages.EN(self.data['id_tag'].replace('ID_','ID_HONOR_'))
+        if self.data['id_tag'] in APPEND:
+            s += ' (' + APPEND[self.data['id_tag']] + ')'
+        return s
 
     @property
     def isDuo(self): return False
@@ -107,8 +117,14 @@ class Enemies(ArticleContainer):
 class Heroes(Container):
     _reader = HeroReader
 
+    def __repr__(self) -> str:
+        return '<' + type(self).__name__ + ' "' + str(self.name) + '"' + (f" ({self.data['id_tag']})" if self.data else '') + '>'
+
     @classmethod
     def fromFace(cls, name: str): return cls.get(name, 'face_dir')
+
+    @property
+    def shortName(self): return Messages.EN(self.data['id_tag'])
 
     @property
     def name(self): return Messages.EN(self.data['id_tag']) + ': ' + Messages.EN(self.data['id_tag'].replace('ID_','ID_HONOR_'))

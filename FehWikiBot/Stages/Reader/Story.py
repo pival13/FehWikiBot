@@ -21,7 +21,6 @@ class StoryMapReader(IReader):
             self.skip(0x05) # 0xFD3E451AEC
             self.readByte('book', 0x29)
             self.skip(0x01) # padding
-            # self.insert('required', [ for i in range(3)])
             count = self.overviewInt(8, 0x092DFD01)
 
             # Actually, 3 objects with the following block.

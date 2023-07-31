@@ -52,7 +52,7 @@ class Messages(metaclass=_MessageMeta):
     PT = USPT
 
     @classmethod
-    def get(cls, key, lang):
+    def get(cls, key, lang) -> str:
         if key is None or key == '' or lang not in cls._DATA: return ''
         if key[0] != 'M': key = 'M'+key
         v = cls._DATA[lang].get(key)

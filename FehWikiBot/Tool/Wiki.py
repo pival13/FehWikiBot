@@ -231,7 +231,7 @@ class Wiki:
                 print(f"{_GREEN_TEXT}* Edited{_RESET_TEXT}: {name}")
         elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'articleexists':
             print(f"{_GREY_TEXT}- Already exist{_RESET_TEXT}: {name}")
-        elif 'error' in result and 'code' in result['error'] and result['error']['info'] == 'timeout':
+        elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'timeout':
             print(f"{_YELLOW_BG}! Timeout{_RESET_TEXT}: {name}")
         elif 'error' in result and 'info' in result['error']:
             print(_ERROR + f"Failed to export \"{name}\": {result['error']['info']}")
@@ -341,9 +341,9 @@ class Wiki:
             result = cls._exportPage(pageToDelete, f"#REDIRECT [[{redirectionTarget}]]", "redirect", create=True)
             if 'edit' in result and result['edit']['result'] == 'Success':
                 print(f'{_GREEN_TEXT}+ Redirected{_RESET_TEXT}: {pageToDelete} → {redirectionTarget}')
-            if 'error' in result and 'code' in result['error'] and result['error']['info'] == 'timeout':
+            elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'timeout':
                 print(f"{_YELLOW_BG}! Timeout{_RESET_TEXT} on redirect: {pageToDelete} → {redirectionTarget}")
-            if 'error' in result:
+            elif 'error' in result:
                 print(_ERROR + f'Failed to redirect \"{pageToDelete}\" → \"{redirectionTarget}\": {result["error"]["info"]}')
             else:
                 print(f'Redirected page {pageToDelete} to {redirectionTarget}')

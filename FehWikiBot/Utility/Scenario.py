@@ -20,15 +20,52 @@ class Scenario(metaclass=_ScenarioMeta):
 
     @classmethod
     def Story(cls, tag, isStory=False):
-        return ''
+        o = cls.get(tag)
+        s = '{{#invoke:Scenario|story\n'
+        if 'MID_SCENARIO_OPENING' in o:
+            s += '|opening=' + str(o['MID_SCENARIO_OPENING']) + '\n'
+        if 'MID_SCENARIO_MAP_BEGIN' in o:
+            # 1 unit speaking not from Heroes
+            if isStory and o['MID_SCENARIO_MAP_BEGIN'].texts['USEN'].count('$Wm') == 1 and o['MID_SCENARIO_MAP_BEGIN'].texts['USEN'].find(',ch00_') == -1:
+                if 'MID_SCENARIO_OPENING' in o:
+                    s += '}}\n{{#ifeq:{{BASEPAGENAME}}|{{subst:BASEPAGENAME}}|{{#invoke:Scenario|story\n'
+                else:
+                    s = '{{#ifeq:{{BASEPAGENAME}}|{{subst:BASEPAGENAME}}|' + s
+                s += '|map begin=' + str(o['MID_SCENARIO_MAP_BEGIN']) + '}}'
+                if 'MID_SCENARIO_MAP_END' in o or 'MID_SCENARIO_ENDING' in o:
+                    s += '}}\n{{#invoke:Scenario|story\n'
+            else:
+                s += '|map begin=' + str(o['MID_SCENARIO_MAP_BEGIN']) + '\n'
+        if 'MID_SCENARIO_MAP_END' in o:
+            s += '|map end=' + str(o['MID_SCENARIO_MAP_END']) + '\n'
+        if 'MID_SCENARIO_ENDING' in o:
+            s += '|ending=' + str(o['MID_SCENARIO_ENDING']) + '\n'
+        s += '}}'
+        if len([tag for tag in o if tag[13:] not in ['OPENING','MAP_BEGIN','MAP_END','ENDING']]) > 0:
+            from ..Tool.globals import TODO
+            print(TODO + tag + ': Others scenario tag present')
+        return s
 
     @staticmethod
     def StoryNavbar(tag):
-        return ''
+        # TODO: Includes: MainStory, Paralogue, GC, TT, FB, HB
+        from ..Stages.Paralogues import Paralogue
+        from ..Stages.MainStories import MainStory
+        prev,next = None,None
+        if tag[0] == 'X' and tag[1] != 'X':
+            prev = Paralogue.get(tag[:-1] + str(int(tag[-1])-1))
+            next = Paralogue.get(tag[:-1] + str(int(tag[-1])+1))
+        elif tag[0] == 'S':
+            prev = MainStory.get(tag[:-1] + str(int(tag[-1])-1))
+            next = MainStory.get(tag[:-1] + str(int(tag[-1])+1))
+        return '{{Story Navbar|' + (prev.name if prev else '') + '|' + (next.name if next else '') + '}}'
 
     @staticmethod
-    def Navbar():
-        return ''
+    def Navbar(category, paralogueCategory=None):
+        if paralogueCategory:
+            return '{{Scenario Navbar|'+category+'|'+paralogueCategory+'}}'
+        else:
+            return '{{Scenario Navbar|'+category+'}}'
 
     @staticmethod
     def Navbox(category):
@@ -291,4 +328,4 @@ def _stringifyObjects(objs):
             obj = [o.replace('.ogg','').replace('.ckb','') for o in obj]
             stack.append('{' + ';'.join(obj) + '};')
 
-    return '[\n' + '\n  '.join(stack) + '\n]'
+    return '[\n  ' + '\n  '.join(stack) + '\n]'

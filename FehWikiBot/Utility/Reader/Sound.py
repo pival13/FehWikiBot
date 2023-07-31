@@ -67,8 +67,9 @@ class MapBGMReader(IReader):
             self.readString('bgm2_id', self.XOR)
             self.readString('unknow_id', self.XOR)
             self.readBool('genericBossMusic')
-            count = self.getInt()
-            self.skip(0x03)
+            count = self.getByte()
+            self.readBool('_unknow1')
+            self.skip(0x05)
             self.prepareArray('boss_bgms')
             for _ in range(count):
                 self.prepareObject()

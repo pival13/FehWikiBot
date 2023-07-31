@@ -2,7 +2,7 @@
 
 from typing_extensions import Self
 from ..Tool.Container import Container
-from .Reader.Terrain import MapReader, EnvironmentReader, CellEnvironmentReader
+from .Reader.Terrain import MapReader, EnvironmentReader, CellEnvironmentReader, TerrainReader
 
 class CellEnvironment(Container):
     _reader = CellEnvironmentReader
@@ -57,6 +57,8 @@ class Map(Container):
             maps += cls.fromAssets(mapId+l)
         return maps
 
+    PLACEHOLDER_UNIT = {'unit': '', 'pos': '', 'rarity': '', 'true_lv': '', 'stats': {'hp':'','atk':'','spd':'','def':'','res':''}, 'weapon': None, 'assist': None, 'special': None, 'init_cooldown': 0, 'a': None, 'b': None, 'c': None, 'seal': None, 'accessory': None, 'playable': False, 'start_turn': -1, 'start_group': -1, 'start_delay': -1, 'break_wall': False, 'return_base': False, 'nb_spawn': 0}
+
     @classmethod
     def create(cls, mapId, placeholderEnemy=1):
         Environment.load('')
@@ -64,7 +66,7 @@ class Map(Container):
         o.data = {'terrain': {'type': None, 'map_id': mapId, 'ground': [['']*6]*8}, 'units': [], 'starting_pos': [''], 'enemy_pos': ['']}
         o.data['terrain']['@Environment'] = Environment.get(mapId).data if Environment.get(mapId) else None
         for _ in range(placeholderEnemy):
-            o.data['units'].append({'unit': '', 'pos': '', 'rarity': '', 'true_lv': '', 'stats': {'hp':'','atk':'','spd':'','def':'','res':''}, 'weapon': None, 'assist': None, 'special': None, 'init_cooldown': 0, 'a': None, 'b': None, 'c': None, 'seal': None, 'accessory': None, 'playable': False, 'start_turn': -1, 'start_group': -1, 'start_delay': -1, 'break_wall': False, 'return_base': False, 'nb_spawn': 0})
+            o.data['units'].append(cls.PLACEHOLDER_UNIT)
         cls._DATA[mapId] = o.data
         return o
 
@@ -99,16 +101,20 @@ class Map(Container):
             mapType = 'SD'
 
         terrain = []
-        if not shortest or self.needWall():
+        if self.needWall():
+            for y,row in enumerate(self.data['terrain']['ground']):
+                terrain.append([])
+                for x in range(len(row)):
+                    terrain[y].append(self.mapCell(x,y,useDebris))
+        elif not shortest:
             terrain = [['']*len(row) for row in self.data['terrain']['ground']]
-            for y in range(len(terrain)):
-                for x in range(len(terrain[y])):
-                    terrain[y][x] = self.mapCell(x,y,useDebris)
 
         s =  '{{#invoke:MapLayout|initTabber\n' if not shortest else ('{{MapLayout' + ('\n' if terrain != [] else ''))
         s +=  '|baseMap=' + self.baseMap + ('\n' if not shortest else '')
-        if not shortest or self.needBackground():
+        if self.needBackground():
             s += '|backdrop=' + self.background + ('\n' if not shortest else '')
+        elif not shortest:
+            s += '|backdrop=\n'
         if mapType is not None:
             s += '|type=' + mapType + ('\n' if not shortest else '')
         if len(self.data.get('starting_pos') or []) > 0:
@@ -190,6 +196,14 @@ class Map(Container):
             s += '|hp=' + ('1' if map[y][x] in DEBRIS[1] else '2' if map[y][x] in DEBRIS[2] else 'U')
         return s + '}}'
 
+    def CombatBackgrounds(self) -> list[list[str]]:
+        ground = []
+        for row in self.data['terrain']['ground']:
+            ground.append([])
+            for cell in row:
+                ground[-1].append(self.data['terrain']['@Environment']['@Cell'][Terrain.get(cell).data['category']]['background'])
+        return ground
+
 
     @classmethod
     def UnitData(cls, maps: dict[str,Self]):
@@ -232,24 +246,35 @@ class Map(Container):
             s += f"properties={props[:-1]};" if props != '' else ''
 
             if not unit['playable']:
-                s += "ai={"
+                s += 'ai={'
                 s += f"turn={unit['start_turn']};" if unit['start_turn'] != -1 else ''
                 s += f"group={unit['start_group']};" if unit['start_group'] != -1 else ''
                 s += f"delay={unit['start_delay']};" if unit['start_delay'] != -1 else ''
-                s += "break_walls=1;" if unit['break_wall'] else ''
-                s += "tether=1;" if unit['return_base'] else ''
-                s = s[:-1] + "};"
+                s += 'break_walls=1;' if unit['break_wall'] else ''
+                s += 'tether=1;' if unit['return_base'] else ''
+                s = (s[:-1] if s[-1] == ';' else s) + '};'
             if unit['nb_spawn'] > 0:
-                s += "spawn={"
+                s += 'spawn={'
                 s += f"turn={unit['spawn_turns']+1};" if unit['spawn_turns'] != -1 else ''
                 s += f"count={unit['nb_spawn']};" if unit['nb_spawn'] > 1 else ''
                 s += f"target={Units.get(unit['spawn_target']).name};" if unit['spawn_target'] else ''
                 s += f"remain={unit['spawn_target_remain']};" if unit['spawn_target_remain'] != -1 else ''
                 s += f"kills={unit['spawn_target_kills']};" if unit['spawn_target_kills'] != -1 else ''
-                s = s[:-1] + "};"
-            s = (s[:-1] if s[-2:] != '};' else s) + "};\n"
+                s = s[:-1] + '};'
+            s = (s[:-1] if s[-2:] != '};' else s) + '};\n'
         s += ']'
         return s
 
     def hasReinforcements(self):
         return any(u['nb_spawn'] > 0 for u in self.data['units'])
+
+class Terrain(Container):
+    _reader = TerrainReader
+    _key = 'index'
+
+    @classmethod
+    def load(cls, name: str) -> bool:
+        return name == 'Terrain' and super().load(name)
+
+    @classmethod
+    def fromUnique(cls): return cls.fromAssets('Terrain')

@@ -126,18 +126,8 @@ class CellEnvironmentReader(IReader):
             i = self.getLong()
             i, self._i = self._i, i
             
-            readObject('Normal')
-            readObject('Inside')
-            readObject('Desert')
-            readObject('Forest')
-            readObject('Sea')
-            readObject('Lava')
-            readObject('Bridge')
-            readObject('NormalWall')
-            readObject('ForestWall')
-            readObject('InsideWall')
-            readObject('Fortress')
-            readObject('River')
+            for cat in TerrainReader.CATEGORY:
+                readObject(cat)
 
             self._i = i
 
@@ -145,3 +135,43 @@ class CellEnvironmentReader(IReader):
         self.end()
 
 BattleBgReader = CellEnvironmentReader
+
+class TerrainReader(IReader):
+    _basePath = 'Common/SRPG/'
+
+    TYPE = [
+        'Normal','Inside','Desert','Forest','','River','Sea','Lava',
+        'WallU','Wall1','Wall2','InsideWall1','InsideWall2','DesertWall1','DesertWall2',
+        'Bridge','Defense','ForestDefense','DesertDefense','BridgeWall1','BridgeWall2',
+        'Mountain', 'Trench','InsideTrench','DefenseTrench','InsideDefenseTrench','InsideWater',
+        'AllyFortress','EnemyFortress','AllyCamp','EnemyCamp','RelayDefenseCamp','InsideRelayDefenseCamp',
+        'AllyARStruct','EnemyARStruct','MSStruct','RBExit','InsideRBExit','DesertRBExit','ForestRBExit'
+        ]
+    CATEGORY = ['Normal','Inside','Desert','Forest','Sea','Lava','Bridge','NormalDefense','ForestDefense','InsideDefense','Sided','River']
+
+    def parse(self):
+        nb = self.overviewLong(0x08, 0x22252DA3A87C933C)
+        self.readArray()
+        for _ in range(nb):
+            self.prepareObject()
+            idx = self.getInt(0xDAE0A1AB)
+            self.insert('index', idx)
+            self.insert('_type', self.TYPE[idx])
+            self.readInt('ally_break_index', 0x6FD07DD2, signed=True)
+            self.readInt('enemy_break_index', 0x6FD07DD2, signed=True)
+            self.readByte('side', 0x21, signed=True)
+            self.insert('category', self.CATEGORY[self.getByte(0xCB)])
+            self.readBool('accessible', 0x17)
+            self.readByte('hp', 0xBA)
+            self.readBool('wall', 0xA8)
+            self.readBool('water', 0x7C)
+            self.readBool('bridge', 0x08)
+            self.readBool('trench', 0x30)
+            self.readBool('fortress', 0xDA)
+            self.readBool('sided', 0xCD)
+            self.readBool('exit', 0xE2)
+            self.readByte('damage_reduction', 0xAA)
+            self.readByte('heal', 0x7D)
+            self.skip(0x07) # padding
+            self.end()
+        self.end()

@@ -59,7 +59,7 @@ class RewardReader(IReader):
             0x17: (False, True,  []), # FB conv
             0x19: (True,  False, []), # Arena Crown
             0x1A: (True,  False, []), # Heroic Grail
-            0x1B: (True,  True,  []), # Aether Stone
+            0x1B: (True,  True,  []), # AR Item
             0x1C: (True,  False, [lambda:self.readByte('color')]), 
             0x1D: (True,  True,  []), # Ticket
             0x1E: (True,  False, [lambda:self.insert('move', MOVE_TYPE[self.getByte()])]), # Dragonflower
@@ -77,7 +77,7 @@ class RewardReader(IReader):
 
         self.prepareObject()
 
-        hasCount,hasString,others = REWARDS.get(kind, (kind,False,False,[]))
+        hasCount,hasString,others = REWARDS.get(kind, (False,False,[]))
         if kind in ITEM_KIND or kind == 0x17:
             self.insert('kind', ITEM_KIND[kind])
         else:

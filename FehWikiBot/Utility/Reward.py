@@ -6,9 +6,9 @@ class Reward:
 
     def __str__(self) -> str:
         from ..Utility.Units import Heroes
-        from ..Others.Accessory import Accessories
         from ..Skills import SacredSeals
-        from ..Utility.Messages import EN
+        from ..Others.Accessory import Accessories
+        from ..Others.AetherRaids import AetherRaidsItem
         s = []
         for r in self._obj:
             kind = r['kind']
@@ -31,8 +31,8 @@ class Reward:
                     kind = r['item']
                 elif kind == 'Blessing':
                     kind = r['element'] + ' Blessing'
-                elif kind == 'Aether Stone':
-                    kind = EN('MID_ITEM_SKYCASTLE_' + r['id_tag']).replace('tones','tone')
+                elif kind == 'AR Item':
+                    kind = AetherRaidsItem.get(r['id_tag']).name
                 elif kind == 'Summoning Ticket':
                     kind = '<!--Summoning Ticket: ' + r['id_tag'] + '-->' # TODO Get type (Special/Regular/I-VII)
                 elif kind == 'Dragonflower':

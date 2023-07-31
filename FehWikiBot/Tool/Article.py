@@ -59,12 +59,17 @@ class Article:
             if (avail.get('avail_sec') or -1) != -1:
                 s += '|cycle=' + avail['cycle_sec'] + '|avail=' + avail['avail_sec']
             if isinstance(notif, str):
-                s += '|notification=' + notif
+                if notif != '':
+                    s += '|notification=' + notif + ' (Notification)'
+                else:
+                    s += '|notification='
             s += '}}'
         else:
-            s += '* {{HT|' + (avail.get('start') or '') + '}} – {{HT|' + avail.get('end') + '}}'
+            s += '* {{HT|' + (avail.get('start') or '') + '}}'
+            if avail.get('end'):
+                s += ' – {{HT|' + avail['end'] + '}}'
             if isinstance(notif, str):
-                s += ' ([[' + notif + '|Notification]])'
+                s += ' ([[' + notif + (' (Notification)' if notif != '' else '') + '|Notification]])'
         for subAvail in subAvails:
             s += '\n** {{HT|' + (subAvail.get('start') or '') + '}} – {{HT|' + subAvail.get('end') + '}}'
         return s

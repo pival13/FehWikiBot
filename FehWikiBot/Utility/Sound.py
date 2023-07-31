@@ -3,7 +3,7 @@
 __all__ = 'Sound', 'BGM'
 
 from typing_extensions import Self
-from ..Tool import Container, classproperty
+from ..Tool import Container, JsonContainer, classproperty
 from .Reader.Sound import SoundReader, MapBGMReader, HOBGMReader
 
 class Sound(Container):
@@ -27,14 +27,15 @@ class BGM(Container):
     _reader = MapBGMReader
 
     @classproperty
-    def HO(self) -> dict:
-        if 'HO' not in self._DATA:
-            self._DATA['HO'] = {int(o['origin']): o for o in HOBGMReader.fromUnique().object}
-        return self._DATA['HO']
+    def HO(cls) -> dict:
+        if 'HO' not in cls._DATA:
+            cls._DATA['HO'] = {int(o['origin']): o for o in HOBGMReader.fromUnique().object}
+        return cls._DATA['HO']
 
-    def bgms(self, map_id) -> list[str]:
-        if map_id[0] in range(10): return self.HO[map_id]
-        o = self.get(map_id)
+    @classmethod
+    def bgms(cls, map_id) -> list[str]:
+        if map_id[0] in range(10): return cls.HO[map_id]
+        o = cls.get(map_id)
         if o is None: return []
         if o.data['unknow_id'] is not None: print(o.data)
         bgms = [o.data['bgm_id'], o.data['bgm2_id']] + [b['bgm'] for b in o.data['boss_bgms']]

@@ -124,15 +124,16 @@ class Skills(JsonContainer, ArticleContainer):
             'SID_ファルシオン': 'Mystery', # Falchion
             'SID_ファルシオン外伝': 'Gaiden', # Falchion
             'SID_ファルシオン覚醒': 'Awakening', # Falchion
+            'SID_ナーガ': 'weapon', # Naga
             'SID_レーヴァテイン': 'weapon', # Laevatein
             'SID_アトラース': 'weapon', # Atlas
+            'SID_ギンヌンガガプ': 'weapon', # Ginnungagap
             'SID_セイズ': 'weapon', # Seiðr
             'SID_ヘイズ': 'weapon', # Heiðr
             'SID_クワシル': 'weapon', # Kvasir
             'SID_グルヴェイグ': 'weapon', # Gullveig
             'SID_ミステルトィン': 'sword', # Missiltainn
             'SID_魔書ミステルトィン': 'tome', # Missiltainn
-            'SID_ナーガ': 'tome', # Naga
         }
         s = super().name
         if s or self.data is None: return s

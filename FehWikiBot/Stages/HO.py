@@ -70,8 +70,8 @@ class HeroicOrdeals(ArticleContainer):
     def Availability(self):
         from ..Tool import Wiki
         from datetime import datetime
-        start = Wiki.cargoQuery('Units', 'ReleaseDate', f"IntID={self.unit.data['num_id']}", limit=1) or datetime.now().strftime('%y-%m-%d')
-        return super().Availability('map', {'start': start+'T07:00:00Z'}, notif=None, isMap=True)
+        start = Wiki.cargoQuery('Units', 'ReleaseDate', f"IntID={self.unit.data['num_id']}", limit=1) or datetime.now().strftime('%Y-%m-%d')
+        return super().Availability('map', {'start': start+'T07:00:00Z'}, isMap=True)
 
     def UnitData(self):
         from .Terrain import Map
