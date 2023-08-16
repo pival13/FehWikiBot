@@ -2,14 +2,11 @@
 
 from FehWikiBot.Others.Accessory import Accessories
 from FehWikiBot.Others.AetherRaids import Structure
-from FehWikiBot import Skills, SacredSeals, SacredSealsForge, CaptainSkill
 from FehWikiBot.Utility.Units import Heroes
-from FehWikiBot.Stages.HO import HeroicOrdeals
-from FehWikiBot.Stages.TD import TacticsDrills
-from FehWikiBot.Stages.RD import RivalDomains
-from FehWikiBot.Stages.MainStories import MainStory
-from FehWikiBot.Stages.Paralogues import Paralogue
+from FehWikiBot.Skills import Skills, SacredSeals, SacredSealsForge, CaptainSkill
+from FehWikiBot.Stages import MainStory, Paralogue, TacticsDrills, HeroicOrdeals, HeroBattle, LimitedHeroBattle, RivalDomains, unsupportedSpecialMaps
 from FehWikiBot.Events.SS import SeersSnare
+from FehWikiBot.Tool.globals import TODO
 
 if __name__ == '__main__':
     from sys import argv
@@ -47,8 +44,16 @@ if __name__ == '__main__':
     Paralogue.exportGroups([o.createArticle() for o in Paralogue.fromAssets(argv[1])], 'Paralogue maps ('+argv[1]+')')
     for o in TacticsDrills.fromAssets(argv[1]):
         o.createArticle().export('Tactics Drills ('+argv[1]+')')
+    for o in HeroBattle.fromAssets(argv[1]): print(o)
+        o.createArticle().export(o.category + ' ('+argv[1]+')')
     for o in RivalDomains.fromAssets(argv[1]):
         o.createArticle().export('Rival Domains ('+argv[1]+')')
+    for o in LimitedHeroBattle.fromAssets(argv[1]):
+        o.loadArticle().update().export(o.category + ' ('+argv[1]+')', create=False)
+    for o in HeroBattle.upcomingRevivals():
+        o.loadArticle(False).update().export('Revival ('+argv[1]+')', create=False)
+    if unsupportedSpecialMaps(argv[1]) != []:
+        print(TODO + 'Unsupported Special maps: ' + str(unsupportedSpecialMaps(argv[1])))
 
     for o in SeersSnare.fromAssets(argv[1]):
         o.createArticle().export('Seer\'s Snare ('+argv[1]+')')

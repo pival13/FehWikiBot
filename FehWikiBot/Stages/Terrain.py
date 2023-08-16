@@ -21,6 +21,17 @@ class Environment(Container):
             data['@Cell'] = CellEnvironment.get(data['cell_env_id']).data if CellEnvironment.get(data['cell_env_id']) else None
         return True
 
+class Terrain(Container):
+    _reader = TerrainReader
+    _key = 'index'
+
+    @classmethod
+    def load(cls, name: str) -> bool:
+        return name == 'Terrain' and super().load(name)
+
+    @classmethod
+    def fromUnique(cls): return cls.fromAssets('Terrain')
+
 class Map(Container):
     _reader = MapReader
     _key = None
@@ -57,16 +68,20 @@ class Map(Container):
             maps += cls.fromAssets(mapId+l)
         return maps
 
-    PLACEHOLDER_UNIT = {'unit': '', 'pos': '', 'rarity': '', 'true_lv': '', 'stats': {'hp':'','atk':'','spd':'','def':'','res':''}, 'weapon': None, 'assist': None, 'special': None, 'init_cooldown': 0, 'a': None, 'b': None, 'c': None, 'seal': None, 'accessory': None, 'playable': False, 'start_turn': -1, 'start_group': -1, 'start_delay': -1, 'break_wall': False, 'return_base': False, 'nb_spawn': 0}
+    PLACEHOLDER_UNIT = {'unit': '', 'pos': '', 'rarity': '', 'true_lv': '', 'stats': {'hp':'','atk':'','spd':'','def':'','res':''}, 'weapon': None, 'assist': None, 'special': None, 'init_cooldown': 0, 'a': None, 'b': None, 'c': None, 'seal': None, 'accessory': None, 'playable': False, 'nb_spawn': 0}
 
     @classmethod
     def create(cls, mapId, placeholderEnemy=1):
         Environment.load('')
         o = cls()
-        o.data = {'terrain': {'type': None, 'map_id': mapId, 'ground': [['']*6]*8}, 'units': [], 'starting_pos': [''], 'enemy_pos': ['']}
-        o.data['terrain']['@Environment'] = Environment.get(mapId).data if Environment.get(mapId) else None
+        mapId2 = mapId if mapId[-1] not in 'ABCDEFG' else mapId[:-1]
+        o.data = {
+            'terrain': {'type': None, 'map_id': mapId2, 'ground': [['']*6]*8},
+            'units': [], 'starting_pos': [''], 'enemy_pos': ['']
+        }
+        o.data['terrain']['@Environment'] = Environment.get(mapId2).data if Environment.get(mapId2) else None
         for _ in range(placeholderEnemy):
-            o.data['units'].append(cls.PLACEHOLDER_UNIT)
+            o.data['units'].append(cls.PLACEHOLDER_UNIT.copy())
         cls._DATA[mapId] = o.data
         return o
 
@@ -247,34 +262,23 @@ class Map(Container):
 
             if not unit['playable']:
                 s += 'ai={'
-                s += f"turn={unit['start_turn']};" if unit['start_turn'] != -1 else ''
-                s += f"group={unit['start_group']};" if unit['start_group'] != -1 else ''
-                s += f"delay={unit['start_delay']};" if unit['start_delay'] != -1 else ''
-                s += 'break_walls=1;' if unit['break_wall'] else ''
-                s += 'tether=1;' if unit['return_base'] else ''
+                s += f"turn={unit['start_turn']};" if 'start_turn' in unit and unit['start_turn'] != -1 else ''
+                s += f"group={unit['start_group']};" if 'start_group' in unit and unit['start_group'] != -1 else ''
+                s += f"delay={unit['start_delay']};" if 'start_delay' in unit and unit['start_delay'] != -1 else ''
+                s += 'break_walls=1;' if unit.get('break_wall') else ''
+                s += 'tether=1;' if unit.get('return_base') else ''
                 s = (s[:-1] if s[-1] == ';' else s) + '};'
             if unit['nb_spawn'] > 0:
                 s += 'spawn={'
-                s += f"turn={unit['spawn_turns']+1};" if unit['spawn_turns'] != -1 else ''
+                s += f"turn={unit['spawn_turns']+1};" if 'spawn_turns' in unit and unit['spawn_turns'] != -1 else ''
                 s += f"count={unit['nb_spawn']};" if unit['nb_spawn'] > 1 else ''
-                s += f"target={Units.get(unit['spawn_target']).name};" if unit['spawn_target'] else ''
-                s += f"remain={unit['spawn_target_remain']};" if unit['spawn_target_remain'] != -1 else ''
-                s += f"kills={unit['spawn_target_kills']};" if unit['spawn_target_kills'] != -1 else ''
-                s = s[:-1] + '};'
+                s += f"target={Units.get(unit['spawn_target']).name};" if unit.get('spawn_target') else ''
+                s += f"remain={unit['spawn_target_remain']};" if 'spawn_target_remain' in unit and unit['spawn_target_remain'] != -1 else ''
+                s += f"kills={unit['spawn_target_kills']};" if 'spawn_target_kills' in unit and unit['spawn_target_kills'] != -1 else ''
+                s = (s[:-1] if s[-1] == ';' else s) + '};'
             s = (s[:-1] if s[-2:] != '};' else s) + '};\n'
         s += ']'
         return s
 
     def hasReinforcements(self):
         return any(u['nb_spawn'] > 0 for u in self.data['units'])
-
-class Terrain(Container):
-    _reader = TerrainReader
-    _key = 'index'
-
-    @classmethod
-    def load(cls, name: str) -> bool:
-        return name == 'Terrain' and super().load(name)
-
-    @classmethod
-    def fromUnique(cls): return cls.fromAssets('Terrain')

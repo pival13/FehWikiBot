@@ -41,7 +41,7 @@ class Reward:
                     if len(r['id_tag']) == 6:
                         kind = 'Divine Code: Ephemera ' + str(int(r['id_tag'][-2:]))
                     elif len(r['id_tag']) == 4:
-                        kind += 'Divine Code: Part ' + str(int(r['id_tag'])-2019)
+                        kind = 'Divine Code: Part ' + str(int(r['id_tag'])-2019)
                     else:
                         kind = f'<!--Divine Code: ' + r['id_tag'] + '-->'
                 s.append('{kind=' + kind + (r['count'] != 1 and (';count=' + str(r['count'])) or '') + '}')

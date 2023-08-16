@@ -1,16 +1,16 @@
 #! /usr/bin/env python3
 
 from typing_extensions import Self
-from .SpecialContainer import SpecialContainer
+from .SpecialMapContainer import SpecialMapContainer
 
-class RivalDomains(SpecialContainer):
+class RivalDomains(SpecialMapContainer):
     _linkArticleData = (r'baseMap=(Q\d+)', 'id_tag')
 
     @classmethod
     def fromAssets(cls, file: str) -> list[Self]:
         return [o for o in super().fromAssets(file) if o.data['rival_domain']]
 
-    @SpecialContainer.name.getter
+    @SpecialMapContainer.name.getter
     def name(self) -> str:
         from ..Utility.Messages import EN
         return super().name or \

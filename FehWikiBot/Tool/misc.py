@@ -30,6 +30,14 @@ def timeDiff(time: str, diff: int=1) -> str:
     except ValueError:
         return ''
 
+def timeFormat(time: str, format='%b %Y'):
+    from datetime import datetime
+    from .globals import TIME_FORMAT
+    try:
+        return datetime.strptime(time, TIME_FORMAT).strftime(format)
+    except ValueError:
+        return time
+
 def maskToInt(mask: list) -> int:
     v = 0
     for n in mask:
