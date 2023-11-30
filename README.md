@@ -1,4 +1,7 @@
 # Fire Emblem Heroes Wiki Bot
+
+***Note: Theses scripts are currently being rewritten as classes, in order to no longer depends on [feh-assets-json](https://github.com/HertzDevil/feh-assets-json), now archived. They are available on the `dev` branch. The dependencies are the same, minus the `feh-assets-json` repository. However a JSON folder is still required for some steps.***
+
 This repository hosts various Python3 scripts use to create and update pages on the [Fire Emblem Heroes Wiki](https://feheroes.fandom.com/wiki/).
 
 It is a clone of the same [gitlab](https://gitlab.com/pival1302/FehWikiBot) repository and may therefore be out of date or broken compared to it.
