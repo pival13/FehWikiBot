@@ -38,7 +38,7 @@ def _createChildClass(obj):
     elif obj.type == 'Weapon': o = Weapon()
     elif obj.type == 'Assist': o = Assist()
     elif obj.type == 'Special': o = Special()
-    elif obj.type in ('A','B','C','Seal'): o = Passive()
+    elif obj.type in ('A','B','C','Seal','Attuned'): o = Passive()
     else: o = Skills()
     o.data = obj.data
     o.page = obj.page
@@ -48,6 +48,9 @@ class Skills(JsonContainer, ArticleContainer):
     _DATA = {}
     _reader = SkillReader
     _linkArticleData = (r'tagid\s*=\s*(\w+)','id_tag')
+
+    def __repr__(self) -> str:
+        return '<' + type(self).__name__ + ' "' + str(self.name) + '" ('+str(self.type)+')' + (f" ({self.id_tag if hasattr(self,'id_tag') else self.data['id_tag']})" if self.data else '') + '>'
 
     def __init_subclass__(cls):
         d = cls._DATA
@@ -179,6 +182,23 @@ class Skills(JsonContainer, ArticleContainer):
         if self.page == '': return
         waitSec(10)
         Wiki.exportPage(self.articleName, self.page, summary, minor, create)
+
+    def Effects(self):
+        s =  '==Effects==\n'
+        s += '{{#invoke:SkillEffectsTable|main\n'
+        if self.type == 'Weapon' and (self.data['exclusive'] or self.data['arcane_weapon']):
+            s += '|PermanentEffect={{SkillEffectText|}}\n'
+        s += '|StatusEffect 1={{SkillEffectText|status=}}\n'
+        s += '|StatusEffect 1 Targets={{SkillTargetText|}}\n'
+        s += '|StatusEffect 1 Conditions=<!-- At start of turn / After combat -->\n'
+        s += '|MapEffect 1={{SkillEffectText|}}\n'
+        s += '|MapEffect 1 Targets={{SkillTargetText|}}\n'
+        s += '|MapEffect 1 Conditions=\n'
+        s += '|CombatEffect 1={{SkillEffectText|}}\n'
+        s += '|CombatEffect 1 Targets={{SkillTargetText|}}\n'
+        s += '|CombatEffect 1 Conditions=\n'
+        s += '}}'
+        return s
 
     def Availability(self):
         if self.type == 'Seal': return ''

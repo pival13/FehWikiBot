@@ -82,7 +82,7 @@ class HeroicOrdeals(ArticleContainer):
 
     def createArticle(self) -> Self:
         if self.data is None: return self
-        self.page =  '{{HeroPage Tabs/Heroic Ordeals}}'
+        self.page =  '{{HeroPage Tabs}}'
         self.page += self.Infobox() + '\n'
         self.page += self.Availability() + '\n'
         self.page += self.UnitData() + '\n'

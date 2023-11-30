@@ -55,7 +55,7 @@ class Scenario(metaclass=_ScenarioMeta):
         if tag[0] == 'X' and tag[1] != 'X':
             prev = Paralogue.get(tag[:-1] + str(int(tag[-1])-1))
             next = Paralogue.get(tag[:-1] + str(int(tag[-1])+1))
-        elif tag[0] == 'S':
+        elif tag[0] == 'S' and tag[1] != 'E':
             prev = MainStory.get(tag[:-1] + str(int(tag[-1])-1))
             next = MainStory.get(tag[:-1] + str(int(tag[-1])+1))
         return '{{Story Navbar|' + (prev.name if prev else '') + '|' + (next.name if next else '') + '}}'
@@ -73,6 +73,7 @@ class Scenario(metaclass=_ScenarioMeta):
 
     @classmethod
     def get(cls, tag: str, lang: list[LiteralString] | LiteralString = ('USEN','JPJA')) -> dict[str,Self]:
+        "Return a dict of message IDs and Scenario objects"
         cls.load(tag)
         if tag not in cls._DATA['USEN']: return {}
         return {k: cls(tag,k).filter(lang) for k in cls._DATA['USEN'][tag] if k[-4:] != '_BGM' and k[-6:] != '_IMAGE'}
@@ -113,10 +114,12 @@ class Scenario(metaclass=_ScenarioMeta):
 
     @property
     def langs(self) -> list[LiteralString]:
+        "The languages currently in used"
         return [l for l in self._lang if self._tag in self._DATA[l]]
 
     @property
     def texts(self) -> dict[LiteralString,str]:
+        "Returns a dict of language and raw scenario text"
         o = {}
         for l in self.langs:
             if self._tag not in self._DATA[l] or self._key not in self._DATA[l][self._tag]: continue
@@ -135,6 +138,7 @@ class Scenario(metaclass=_ScenarioMeta):
         return self
 
     def text(self, lang: LiteralString) -> str:
+        "Returns the raw scenario text for the given language"
         t = self.texts
         if lang not in t: return ''
         return t[lang].replace('\n','\\n')
@@ -157,7 +161,7 @@ def _parseObjects(objs):
 
         REs = [
             re.compile(r'\$(p)'), re.compile(r'\$(Sbs|Sbv|w).+?\|'), re.compile(r'\$(b|Ssp|n|E|Fi)(.+?)\|'),
-            re.compile(r'\$(Sbp)(\w+),(\d+)\|'), re.compile(r'\$(Wm)(\w+),(\w+),(\w+)\|'),
+            re.compile(r'\$(Sbp)(\w+),(\d+)\|'), re.compile(r'\$(Wm)([\w.]+),(\w+),(\w+)\|'),
             re.compile(r'\$(Fo)(\d+),(\d+),(\d+),(\d+),(\d+)\|'), re.compile(r'[^$]+')
         ]
         obj = []

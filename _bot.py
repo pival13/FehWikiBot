@@ -5,6 +5,7 @@ from FehWikiBot.Others.AetherRaids import Structure
 from FehWikiBot.Utility.Units import Heroes
 from FehWikiBot.Skills import Skills, SacredSeals, SacredSealsForge, CaptainSkill
 from FehWikiBot.Stages import MainStory, Paralogue, TacticsDrills, HeroicOrdeals, HeroBattle, LimitedHeroBattle, RivalDomains, unsupportedSpecialMaps
+from FehWikiBot.Events.FB import ForgingBonds
 from FehWikiBot.Events.SS import SeersSnare
 from FehWikiBot.Tool.globals import TODO
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
         Skills.get(refWep.data['pre_refine']).loadArticle(False).update().export('Refine ('+argv[1]+')', create=False)
     for o in Skills.fromAssets(argv[1], ('Weapon','Assist','Special')):
         o.createArticle().update().export('Skill ('+argv[1]+')', create=True)
-    for o in Skills.fromAssets(argv[1], ('A','B','C','Seal')):
+    for o in Skills.fromAssets(argv[1], ('A','B','C','Seal','Attuned')):
         if o.data['id_tag'] in dones: continue
         dones += [d['id_tag'] for d in o._datas]
         o.loadArticle().update().export('Skill ('+argv[1]+')', create=-1)
@@ -44,7 +45,7 @@ if __name__ == '__main__':
     Paralogue.exportGroups([o.createArticle() for o in Paralogue.fromAssets(argv[1])], 'Paralogue maps ('+argv[1]+')')
     for o in TacticsDrills.fromAssets(argv[1]):
         o.createArticle().export('Tactics Drills ('+argv[1]+')')
-    for o in HeroBattle.fromAssets(argv[1]): print(o)
+    for o in HeroBattle.fromAssets(argv[1]):
         o.createArticle().export(o.category + ' ('+argv[1]+')')
     for o in RivalDomains.fromAssets(argv[1]):
         o.createArticle().export('Rival Domains ('+argv[1]+')')
@@ -55,5 +56,7 @@ if __name__ == '__main__':
     if unsupportedSpecialMaps(argv[1]) != []:
         print(TODO + 'Unsupported Special maps: ' + str(unsupportedSpecialMaps(argv[1])))
 
+    for o in ForgingBonds.fromAssets(argv[1]):
+        o.loadArticle().update().export('Forging Bonds ('+argv[1]+')', create=-1)
     for o in SeersSnare.fromAssets(argv[1]):
         o.createArticle().export('Seer\'s Snare ('+argv[1]+')')

@@ -115,7 +115,7 @@ class MainStory(StoryContainer):
         if self.page == '': return
         waitSec(10)
         Wiki.exportPage(self.name, self.page, summary, minor=minor, create=create)
-        if self.story == '': return
+        if not hasattr(self,'story') or self.story == '': return
         waitSec(10)
         Wiki.exportPage(self.name+'/Story', self.story, summary, minor=minor, create=create)
 

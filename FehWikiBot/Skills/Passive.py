@@ -61,7 +61,7 @@ class Passive(Skills):
 
         obj = {
             'name': re.sub(r'\s*\d*$','', EN(self._datas[0]['name_id'])),
-            'type': self.type[:1],
+            'type': self.type[0] if self.type != 'Attuned' else 'X',
             'exclusive': int(self._datas[0]['exclusive']),
             'canUseWeapon': '{{WeaponList|' + self._datas[0]['wep_equip'] + '}}',
             'canUseMove': '{{MoveList|' + (self._datas[0]['mov_equip'] if self._datas[0]['mov_equip'].count(',') != 3 else 'All') + '}}',
@@ -72,7 +72,7 @@ class Passive(Skills):
             i+=1
             obj |= {
                 f'{i}name': EN(data['name_id']),
-                f'alt{i}name': cleanStr(EN(data['name_id']).replace('/',' ')),
+                f'alt{i}name': cleanStr(re.sub(r'\+$',' Plus',EN(data['name_id']).replace('/',' '))),
                 f'{i}tagid': data['id_tag'],
                 f'{i}exclusive': int(data['exclusive']),
                 f'{i}effect': Skills.description(data['desc_id']),
@@ -116,11 +116,12 @@ class Passive(Skills):
     def createArticle(self):
         if self.data is None: return self
         self.page =  super().Infobox('Passive', self.Infobox()).replace(' Infobox','',1) + '\n'
+        self.page += self.Effects() + '\n'
         self.page += '==Notes==\n\n'
         self.page += self.Availability() + '\n'
         self.page += self.OtherLanguage() + '\n'
         self.page += '==See also==\n{{See also skills|cond= False }}\n'
-        if self.type != 'Seal': self.page += '{{Passives Navbox|'+self.type+'}}'
+        if self.type != 'Seal': self.page += '{{Passives Navbox|'+(self.type if self.type != 'Attuned' else 'X')+'}}'
         else:                   self.page += '{{Seals Navbox}}'
         return self
 

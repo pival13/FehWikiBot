@@ -48,7 +48,7 @@ class AetherRaidsStructure(ArticleContainer):
 
     @classmethod
     def fromAssets(cls, file: str) -> list[Self]:
-        return [cls.get(o['id_tag']) for o in super().fromAssets(file)]
+        return [cls.get(o.data['id_tag']) for o in super().fromAssets(file)]
 
     @classmethod
     def fromWiki(cls, name: str):

@@ -34,7 +34,7 @@ class Weapon(Skills):
         # Sprites
         if obj['weaponType'] == 'Beast' or (self.data['sprite_wepL'] is None and self.data['sprite_wepR'] is None):
             obj['noImg'] = 1
-        elif (self.data['sprite_wepR'] or self.data['sprite_wepL'])[:2] == 'mg':
+        elif (self.data['sprite_wepR'] or self.data['sprite_wepL'])[:6] == 'wep_mg':
             from os.path import exists
             from ..PersonalData import WEBP_ASSETS_DIR_PATH
             from PIL import Image
@@ -140,6 +140,7 @@ class Weapon(Skills):
     def createArticle(self):
         if self.data is None: return self
         self.page =  self.Infobox() + '\n'
+        self.page += self.Effects() + '\n'
         self.page += '==Notes==\n\n'
         self.page += self.Availability() + '\n'
         self.page += self.OtherLanguage() + '\n'
@@ -156,6 +157,9 @@ class Weapon(Skills):
             if re.search(f'\\|\\s*{key}\\s*=', self.page): continue
             self.page = re.sub(pattern, f"\\1|{key}={value}\n", self.page, flags=re.DOTALL)
             pattern = f'(\\|\\s*{key}\\s*=[^|}}]*)'
+        if re.search(f'userVersion2=Open', self.page) and not re.search('userVersion3', self.page):
+            self.page = re.sub('userVersion2=Open','userVersion2=Open\n|userVersion3=Gleam Closed\n|userVersion4=Gleam Open', self.page)
+        
 
         if not re.search(r'Weapon Upgrade List', self.page):
             s =  '==Upgrades==\n'

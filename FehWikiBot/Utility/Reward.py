@@ -9,6 +9,7 @@ class Reward:
         from ..Skills import SacredSeals
         from ..Others.Accessory import Accessories
         from ..Others.AetherRaids import AetherRaidsItem
+        from ..Others.Focus import FocusTickets
         s = []
         for r in self._obj:
             kind = r['kind']
@@ -34,7 +35,7 @@ class Reward:
                 elif kind == 'AR Item':
                     kind = AetherRaidsItem.get(r['id_tag']).name
                 elif kind == 'Summoning Ticket':
-                    kind = '<!--Summoning Ticket: ' + r['id_tag'] + '-->' # TODO Get type (Special/Regular/I-VII)
+                    kind = FocusTickets.get(r['id_tag'].replace('TRIAL_','')).ticket
                 elif kind == 'Dragonflower':
                     kind = 'Dragonflower (' + r['move'][0] + ')'
                 elif kind == 'Divine Code':
@@ -51,6 +52,6 @@ class Reward:
 def Rewards(obj: dict[str,dict|list[dict]], indent=2) -> str:
     ret = []
     for k,v in obj.items():
-        ret.append(k + '=' + str(Reward(v)) + ';')
+        ret.append(str(k) + '=' + str(Reward(v)) + ';')
     indent = '\n' + (' '*indent)
     return '{' + indent + indent.join(ret) + '\n}'

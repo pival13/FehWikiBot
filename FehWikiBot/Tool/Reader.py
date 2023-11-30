@@ -213,6 +213,22 @@ class Reader:
         self.skip(nbBytes)
         return l
 
+    def assertBytes(self, nbBytes, xor, key):
+        from .globals import WARNING
+        mask = int.from_bytes(self._buff[self._i:self._i+nbBytes], 'little')
+        if (mask ^ xor) != 0:
+            print(WARNING + f'{self.__class__.__name__}: Expected 0x{xor:x}, got 0x{mask:x} ({",".join([hex(i) for _,i in self._stack if i != 0] + [hex(self._i)])})')
+            self.insert(key, f'*Expected 0x{xor:x}, got 0x{mask:x}*')
+        else:
+            self.skip(nbBytes)
+
+    def assertPadding(self, nbBytes):
+        from .globals import WARNING
+        if int.from_bytes(self._buff[self._i:self._i+nbBytes], 'little') != 0:
+            print(WARNING + f'{self.__class__.__name__}: Expected {nbBytes} padding not found ({",".join([hex(i) for _,i in self._stack if i != 0] + [hex(self._i)])})')
+        self.skip(nbBytes)
+
+
 class IReader(Reader):
     """Parent class for all Reader of FeH assets.
     
@@ -259,8 +275,10 @@ def readTime(reader: Reader, key:str=None, xor=0):
     from .globals import TIME_FORMAT
     from datetime import datetime
     timestamp = reader.getLong(xor)
-    # if timestamp
-    time = datetime.utcfromtimestamp(timestamp).strftime(TIME_FORMAT) if timestamp != 0xFFFFFFFFFFFFFFFF else None
+    try:
+        time = datetime.utcfromtimestamp(timestamp).strftime(TIME_FORMAT) if timestamp not in [0xFFFFFFFFFFFFFFFF,xor] else None
+    except:
+        time = None
     reader.insert(key, time)
 
 def readAvail(reader: Reader, key:str=None):

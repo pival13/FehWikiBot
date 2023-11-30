@@ -7,7 +7,7 @@ class HeroReader(IReader):
 
     def parse(self):
         from ...Tool.globals import BLESSING
-        KIND = ['Legendary','Mythic','Duo','Harmonized','Ascended','Rearmed']
+        KIND = ['','LegendMythic','Duo','Harmonized','Ascended','Rearmed','Attuned']
         nb = self.overviewLong(0x08, 0xde51ab793c3ab9e1)
         self.readArray()
         for _ in range(nb):
@@ -19,8 +19,10 @@ class HeroReader(IReader):
             if  self.readObject('extra'):
                 self.readString('duo_skill')
                 readStat(self, 'bonus_effect')
-                self.insert('kind', KIND[self.getByte(0x21)])
-                self.insert('element', BLESSING[self.getByte(0x05)])
+                kind = KIND[self.getByte(0x21)]
+                elem = BLESSING[self.getByte(0x05)]
+                self.insert('kind', kind if kind != 'LegendMythic' else 'Mythic' if elem in BLESSING[-4:] else 'Legend')
+                self.insert('element', elem)
                 self.readByte('bst', 0x0F)
                 self.readBool('pair_up', 0x80)
                 self.readBool('extra_slot', 0x24)
@@ -48,7 +50,7 @@ class HeroReader(IReader):
 
             def getSkills(key):
                 self.prepareArray(key)
-                for i in range(5): self.insert(None, self.overviewString(0x08 * 14*i))
+                for i in range(5): self.insert(None, self.overviewString(0x08 * 15*i))
                 self.end()
                 self.skip(0x08)
             self.prepareObject('skills')
@@ -58,6 +60,7 @@ class HeroReader(IReader):
             getSkills('summon_a')
             getSkills('summon_b')
             getSkills('summon_c')
+            getSkills('summon_attuned')
             getSkills('weapon')
             getSkills('assist')
             getSkills('special')
@@ -67,7 +70,7 @@ class HeroReader(IReader):
             getSkills('extra1')
             getSkills('extra2')
             self.end()
-            self.skip(0x08 * 14*4) # Skip skills previously read (1 iteration is already skipped)
+            self.skip(0x08 * 15*4) # Skip skills previously read (1 iteration is already skipped)
             self.end()
         self.end()
 

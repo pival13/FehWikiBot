@@ -97,7 +97,7 @@ class Paralogue(StoryContainer):
         import re
         o = Article.fromWiki('Template:Paralogue Maps Navbox')
         if o.page.find(prefix + ': ' + name) == -1:
-            count = int(re.findall(r'\|list(\d+)', o.page)[-2][1]) # -1 is for xenologue
+            count = int(re.findall(r'\|list(\d+)', o.page)[-2]) # -1 is for xenologue
             s =  f' |group{count+1}=[[Paralogue Maps#{prefix}: {name}|{prefix}: {name}]]\n'
             s += f' |list{count+1}=\n'
             for i,map in enumerate(maps):

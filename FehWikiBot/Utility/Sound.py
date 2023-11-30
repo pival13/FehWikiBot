@@ -39,5 +39,4 @@ class BGM(Container):
         if o is None: return []
         if o.data['unknow_id'] is not None: print(o.data)
         bgms = [o.data['bgm_id'], o.data['bgm2_id']] + [b['bgm'] for b in o.data['boss_bgms']]
-        bgms = list({bgm for bgm in bgms if bgm})
-        return [Sound.get(v).file for v in bgms]
+        return [Sound.get(bgms[i]).file for i in range(len(bgms)) if bgms[i] and bgms[i] not in bgms[:i]]

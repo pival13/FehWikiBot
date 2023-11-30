@@ -28,6 +28,7 @@ class CaptainSkill(ArticleContainer):
     def createArticle(self) -> Self:
         if self.data is None: return self
         self.page =  self.Infobox() + '\n'
+        self.page += self.Effects() + '\n'
         self.page += '==Notes==\n\n'
         self.page += self.OtherLanguage() + '\n'
         self.page += '==See also==\n{{See also skills|cond= False }}\n'

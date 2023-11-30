@@ -56,10 +56,10 @@ class Map(Container):
     @classmethod
     def get(cls, key: str):
         ret = cls.fromAssets(key)
-        if len(ret) > 0:
-            return ret[0]
-        ret = super().getAll(key, ('terrain','map_id'))
-        return ret[0] if len(ret) > 0 else None
+        if len(ret) > 0: return ret[0]
+        ret = cls.getAll(key)
+        if len(ret) > 0: return ret[-1]
+        return None
 
     @classmethod
     def getAll(cls, mapId):
@@ -68,7 +68,7 @@ class Map(Container):
             maps += cls.fromAssets(mapId+l)
         return maps
 
-    PLACEHOLDER_UNIT = {'unit': '', 'pos': '', 'rarity': '', 'true_lv': '', 'stats': {'hp':'','atk':'','spd':'','def':'','res':''}, 'weapon': None, 'assist': None, 'special': None, 'init_cooldown': 0, 'a': None, 'b': None, 'c': None, 'seal': None, 'accessory': None, 'playable': False, 'nb_spawn': 0}
+    PLACEHOLDER_UNIT = {'unit': '', 'pos': '', 'rarity': '', 'true_lv': '', 'stats': {'hp':'','atk':'','spd':'','def':'','res':''}, 'weapon': None, 'assist': None, 'special': None, 'init_cooldown': 0, 'a': None, 'b': None, 'c': None, 'attuned': None, 'seal': None, 'accessory': None, 'playable': False, 'nb_spawn': 0}
 
     @classmethod
     def create(cls, mapId, placeholderEnemy=1):
@@ -231,52 +231,58 @@ class Map(Container):
         s += '}}'
         return s
 
-    def Units(self):
+    @classmethod
+    def Unit(cls, unit, i=None):
         from ..Utility.Units import Units, Heroes, Enemies
         from ..Skills import Weapon, Assist, Special, Passive
         from ..Others.Accessory import Accessories
+        s =  '{'
+        s += f"unit={Units.get(unit['unit']).name if Units.get(unit['unit']) else ''};"
+        s += f"pos={unit['pos']};"
+        s += f"slot={i+1};" if unit['pos'] and i != None else "slot=;"
+        s += f"rarity={unit['rarity']};"
+        s += f"level={unit['true_lv']};"
+        s += f"stats=[{unit['stats']['hp']};{unit['stats']['atk']};{unit['stats']['spd']};{unit['stats']['def']};{unit['stats']['res']}];"
+        wep = Weapon.get(unit['weapon'])
+        if wep and wep.refine: s += f"weapon={wep.name};refine={wep.refine};"
+        else:                  s += f"weapon={wep.name if wep else '-'};"
+        s += f"assist={Assist.get(unit['assist']).name if unit['assist'] else '-'};"
+        s += f"special={Special.get(unit['special']).name if unit['special'] else '-'};"
+        s += f"cooldown={unit['init_cooldown'] or ''};" if unit['init_cooldown'] != -1 else ''
+        s += f"a={Passive.get(unit['a']).name if unit['a'] else '-'};"
+        s += f"b={Passive.get(unit['b']).name if unit['b'] else '-'};"
+        s += f"c={Passive.get(unit['c']).name if unit['c'] else '-'};"
+        s += f"seal={Passive.get(unit['seal']).name if unit['seal'] else '-'};"
+        if unit['attuned']:
+            s += f"attuned={Passive.get(unit['attuned']).name};"
+        s += f"accessory={Accessories.get(unit['accessory']).name};" if unit['accessory'] else ''
+        props = 'is_ally,' if unit['playable'] else '' + \
+                'use_ally_stats,' if unit['unit'][:4] == 'PID_' and unit['unit'][-2:] == '味方' and Enemies.get('E'+unit['unit'][1:-2]) else '' + \
+                'use_enemy_stats,' if unit['unit'][:4] == 'PID_' and Heroes.get('P'+unit['unit'][1:]+'味方') else ''
+        s += f"properties={props[:-1]};" if props != '' else ''
+
+        if not unit['playable']:
+            s += 'ai={'
+            s += f"turn={unit['start_turn']};" if 'start_turn' in unit and unit['start_turn'] != -1 else ''
+            s += f"group={unit['start_group']};" if 'start_group' in unit and unit['start_group'] != -1 else ''
+            s += f"delay={unit['start_delay']};" if 'start_delay' in unit and unit['start_delay'] != -1 else ''
+            s += 'break_walls=1;' if unit.get('break_wall') else ''
+            s += 'tether=1;' if unit.get('return_base') else ''
+            s = (s[:-1] if s[-1] == ';' else s) + '};'
+        if unit['nb_spawn'] > 0:
+            s += 'spawn={'
+            s += f"turn={unit['spawn_turns']+1};" if 'spawn_turns' in unit and unit['spawn_turns'] != -1 else ''
+            s += f"count={unit['nb_spawn']};" if unit['nb_spawn'] > 1 else ''
+            s += f"target={Units.get(unit['spawn_target']).name};" if unit.get('spawn_target') else ''
+            s += f"remain={unit['spawn_target_remain']};" if 'spawn_target_remain' in unit and unit['spawn_target_remain'] != -1 else ''
+            s += f"kills={unit['spawn_target_kills']};" if 'spawn_target_kills' in unit and unit['spawn_target_kills'] != -1 else ''
+            s = (s[:-1] if s[-1] == ';' else s) + '};'
+        return (s[:-1] if s[-2:] != '};' else s) + '};'
+
+    def Units(self):
         s = '[\n'
         for i,unit in enumerate(self.data['units']):
-            s += "{"
-            s += f"unit={Units.get(unit['unit']).name if Units.get(unit['unit']) else ''};"
-            s += f"pos={unit['pos']};"
-            s += f"slot={i+1};" if unit['pos'] else "slot=;"
-            s += f"rarity={unit['rarity']};"
-            s += f"level={unit['true_lv']};"
-            s += f"stats=[{unit['stats']['hp']};{unit['stats']['atk']};{unit['stats']['spd']};{unit['stats']['def']};{unit['stats']['res']}];"
-            wep = Weapon.get(unit['weapon'])
-            if wep and wep.refine: s += f"weapon={wep.name};refine={wep.refine};"
-            else:                  s += f"weapon={wep.name if wep else '-'};"
-            s += f"assist={Assist.get(unit['assist']).name if unit['assist'] else '-'};"
-            s += f"special={Special.get(unit['special']).name if unit['special'] else '-'};"
-            s += f"cooldown={unit['init_cooldown'] or ''};" if unit['init_cooldown'] != -1 else ''
-            s += f"a={Passive.get(unit['a']).name if unit['a'] else '-'};"
-            s += f"b={Passive.get(unit['b']).name if unit['b'] else '-'};"
-            s += f"c={Passive.get(unit['c']).name if unit['c'] else '-'};"
-            s += f"seal={Passive.get(unit['seal']).name if unit['seal'] else '-'};"
-            s += f"accessory={Accessories.get(unit['accessory']).name};" if unit['accessory'] else ''
-            props = 'is_ally,' if unit['playable'] else '' + \
-                    'use_ally_stats,' if unit['unit'][:4] == 'PID_' and unit['unit'][-2:] == '味方' and Enemies.get('E'+unit['unit'][1:-2]) else '' + \
-                    'use_enemy_stats,' if unit['unit'][:4] == 'PID_' and Heroes.get('P'+unit['unit'][1:]+'味方') else ''
-            s += f"properties={props[:-1]};" if props != '' else ''
-
-            if not unit['playable']:
-                s += 'ai={'
-                s += f"turn={unit['start_turn']};" if 'start_turn' in unit and unit['start_turn'] != -1 else ''
-                s += f"group={unit['start_group']};" if 'start_group' in unit and unit['start_group'] != -1 else ''
-                s += f"delay={unit['start_delay']};" if 'start_delay' in unit and unit['start_delay'] != -1 else ''
-                s += 'break_walls=1;' if unit.get('break_wall') else ''
-                s += 'tether=1;' if unit.get('return_base') else ''
-                s = (s[:-1] if s[-1] == ';' else s) + '};'
-            if unit['nb_spawn'] > 0:
-                s += 'spawn={'
-                s += f"turn={unit['spawn_turns']+1};" if 'spawn_turns' in unit and unit['spawn_turns'] != -1 else ''
-                s += f"count={unit['nb_spawn']};" if unit['nb_spawn'] > 1 else ''
-                s += f"target={Units.get(unit['spawn_target']).name};" if unit.get('spawn_target') else ''
-                s += f"remain={unit['spawn_target_remain']};" if 'spawn_target_remain' in unit and unit['spawn_target_remain'] != -1 else ''
-                s += f"kills={unit['spawn_target_kills']};" if 'spawn_target_kills' in unit and unit['spawn_target_kills'] != -1 else ''
-                s = (s[:-1] if s[-1] == ';' else s) + '};'
-            s = (s[:-1] if s[-2:] != '};' else s) + '};\n'
+            s += self.Unit(unit, i) + '\n'
         s += ']'
         return s
 

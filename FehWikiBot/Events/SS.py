@@ -9,7 +9,6 @@ class SeersSnare(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
         return super().name or 'Seer\'s Snare ' + str(self.number)
 
     @property

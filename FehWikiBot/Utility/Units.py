@@ -54,6 +54,7 @@ class NPC:
         'ch00_42_Ask_M_Disappear':      {'id': 'PID_アスク',        'name': 'Askr: God of Openness (Disappear)'},
         'ch00_43_Embla_F_Disappear':    {'id': 'EID_エンブラ',      'name': 'Embla: God of Closure (Disappear)'},
         'ch00_45_Ganglot_F_Shadow':     {'id': 'PID_ガングレト',    'name': 'Ganglöt: Death Anew (Shadow)'},
+        'ch00_47_Gullveig_F_Disappear': {'id': 'EID_グルヴェイグ',   'name': 'Gullveig: Golden Seer (Disappear)'},
         'ch00_49_Heith_Normal':         {'id': 'PID_ヘイズ',        'name': 'Heiðr: Innocent Goddess'},
         'ch00_51_Njord_M_Normal':       {'id': '',                  'name': 'Njörðr'}, # PID_ニョルズ
          # This is the tag used for non-face unit on scenarios
@@ -134,8 +135,10 @@ class Heroes(Container):
         from .Quotes import Quotes
         import re
         tags = re.findall(r'\$nM(PID_.+?)\|', Quotes.get('MID_'+self.data['character_file']+'_STRONGEST'))
-        tags = [tag for tag in tags if tag != self.data['id_tag']]
-        return tags[0] if len(tags) > 0 else ''
+        tags = {tag for tag in tags if tag != self.data['id_tag']}
+        if len(tags) == 2:
+            tags = {tag for tag in tags if self.data['id_tag'].find(tag[4:]) == -1}
+        return tags.pop() if len(tags) > 0 else ''
 
     @property
     def isDuo(self): return self.data['extra'] and self.data['extra']['kind'] in ('Duo','Harmonized')

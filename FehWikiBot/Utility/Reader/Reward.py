@@ -85,7 +85,7 @@ class RewardReader(IReader):
             print(TODO + f'Unknow reward: {kind}')
         if hasCount:
             self.readShort('count')
-        if kind == 0x17: self.insert('rank',FB_RANK(self.getByte()))
+        if kind == 0x17: self.insert('rank',FB_RANK[self.getByte()])
         if hasString:
             l = self.getByte()
             self.insert('id_tag', self.decodeString(self._buff[self._i:self._i+l]))

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from typing_extensions import Self, NoReturn
+from typing_extensions import Self
 from .SpecialMapContainer import SpecialMapContainer
 
 __all__ = ['HeroBattle','HB',
@@ -82,7 +82,14 @@ class HeroBattle(SpecialMapContainer):
         from ..Utility.Messages import EN
         s = super().name
         if s is None and self.data is not None:
-            s = EN('MID_STAGE_'+self.data['id_tag']) + ': ' + EN('MID_STAGE_HONOR_'+self.data['id_tag']) + ' (map)'
+            s = EN('MID_STAGE_'+self.data['id_tag']) + ': ' + EN('MID_STAGE_HONOR_'+self.data['id_tag'])
+            if s.find('Hero Battle') == -1:
+                s += ' (map)'
+            elif s[1:4] == ' & ' and s[5] == ':':
+                if s[0] == self.heroes[0].shortName[0]:
+                    s = self.heroes[0].shortName + ' & ' + self.heroes[1].shortName + s[5:]
+                else:
+                    s = self.heroes[1].shortName + ' & ' + self.heroes[0].shortName + s[5:]
         return s
 
     @property
@@ -212,7 +219,9 @@ class HeroBattle(SpecialMapContainer):
         import re
 
         if self.data is None or self.page == '': return self
-        if self.page.find(self.data['avail']['start']) != -1: return self
+        if self.page.find(self.data['avail']['start']) != -1:
+            self.page = ''
+            return self
 
         avail = super().Availability('', self.data['avail'], '', isMap=True)[50:]
         if self.data['avail']['end'] > timeDiff(self.data['avail']['start'], 86400*4-1): # Ignore Celebratory revival

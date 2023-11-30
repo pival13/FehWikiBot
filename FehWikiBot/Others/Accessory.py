@@ -25,6 +25,7 @@ class Accessories(ArticleContainer):
     @ArticleContainer.name.getter
     def name(self) -> str:
         from ..Utility.Messages import Messages
+        if self.data['id_tag'] == 'DAID_黄金の呪い': return 'Golden Curse (Accessory)'
         return super().name or Messages.EN(self.data['id_tag'])
 
     def Infobox(self):

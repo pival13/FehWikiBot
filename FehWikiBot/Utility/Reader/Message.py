@@ -16,7 +16,7 @@ class MessageReader(IReader):
 
     @classmethod
     def fromAssets(cls, path):
-        if path.find('/Message/') == -1: raise InvalidReaderError
+        if path.replace('\\','/').find('/Message/') == -1: raise InvalidReaderError
         return super(IReader,cls).fromAssets(path)
 
     def parse(self):

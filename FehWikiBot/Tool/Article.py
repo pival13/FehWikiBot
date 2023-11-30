@@ -75,19 +75,26 @@ class Article:
         return s
 
     def OtherLanguage(self, tag, tag2=None, swapJp=True):
-        from ..Utility.Messages import Messages
-        lang = lambda lang, sep, swap=False: ((Messages.get(tag2,lang).replace('\n',' ')+sep) if tag2 and swap else '') + Messages.get(tag,lang).replace('\n',' ') + ((sep+Messages.get(tag2,lang).replace('\n',' ')) if tag2 and not swap else '')
+        def lang(l,sep,swap):
+            from ..Utility.Messages import Messages
+            s = Messages.get(tag,l).replace('\n',' ')
+            if s == '' or tag2 is None: return s
+            if swap:
+                return Messages.get(tag2,l).replace('\n',' ') + sep + s
+            else:
+                return s + sep + Messages.get(tag2,l).replace('\n',' ')
+
         s = '==In other languages==\n'
         s += '{{OtherLanguages\n'
-        if lang('USEN', ': ') != self.name:
-            s += '|english=' + lang('USEN', ': ') + '\n'
+        if lang('USEN', ': ', False) != self.name:
+            s += '|english=' + lang('USEN', ': ', False) + '\n'
         s += '|japanese=' +    lang('JPJA', '　', swapJp) + '\n'
-        s += '|german=' +      lang('EUDE', ': ') + '\n'
-        s += '|spanishEU=' +   lang('EUES', ': ') + '\n'
-        s += '|spanishLA=' +   lang('USES', ': ') + '\n'
-        s += '|french=' +      lang('EUFR', ' : ') + '\n'
+        s += '|german=' +      lang('EUDE', ': ', False) + '\n'
+        s += '|spanishEU=' +   lang('EUES', ': ', False) + '\n'
+        s += '|spanishLA=' +   lang('USES', ': ', False) + '\n'
+        s += '|french=' +      lang('EUFR', ' : ', False) + '\n'
         s += '|italian=' +    (lang('EUIT', ': ', True) if swapJp else lang('EUIT', ', ', False)) + '\n'
         s += '|chineseTW=' +   lang('TWZH', '　', swapJp) + '\n'
-        s += '|portuguese=' +  lang('USPT', ': ') + '\n'
+        s += '|portuguese=' +  lang('USPT', ': ', False) + '\n'
         s += '}}'
         return s

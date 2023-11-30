@@ -46,6 +46,7 @@ class MapReader(IReader):
             self.readString('a')
             self.readString('b')
             self.readString('c')
+            self.readString('attuned')
             self.readString('seal')
             self.readString('accessory')
             self.insert('pos', chr(self.getShort(0xB332)+97)+str(self.getShort(0x28B2)+1))

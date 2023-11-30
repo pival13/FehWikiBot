@@ -3,7 +3,7 @@
 from ...Tool.Reader import IReader
 from ...Tool.globals import DIFFICULTIES
 
-class HOReader(IReader):
+class HeroicOrdealsReader(IReader):
     _basePath = 'Common/HeroTrial/'
 
     @classmethod
@@ -23,5 +23,5 @@ class HOReader(IReader):
             self.end()
         self.end()
 
-HeroicOrdealsReader = HOReader
-HeroTrialReader = HOReader
+HOReader = HeroicOrdealsReader
+HeroTrialReader = HeroicOrdealsReader

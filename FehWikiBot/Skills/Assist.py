@@ -33,6 +33,7 @@ class Assist(Skills):
     def createArticle(self):
         if self.data is None: return self
         self.page =  self.Infobox() + '\n'
+        self.page += self.Effects() + '\n'
         self.page += '==Notes==\n\n'
         self.page += self.Availability() + '\n'
         self.page += self.OtherLanguage() + '\n'
