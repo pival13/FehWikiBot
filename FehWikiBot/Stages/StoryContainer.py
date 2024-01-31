@@ -39,6 +39,11 @@ class StoryContainer(ArticleContainer):
     def id_tag(self):
         return self.map['Normal']['id_tag'][:-1]
 
+    @property
+    def groupName(self) -> str:
+        from ..Utility.Messages import EN
+        return (EN('MID_CHAPTER_TITLE_'+self.data['id_tag']) + ': ' + EN('MID_CHAPTER_'+self.data['id_tag'])) if self.data is not None else None
+
     def Infobox(self):
         from ..Tool.globals import ROMAN
         from ..Utility.Messages import EN

@@ -39,7 +39,8 @@ class Units(metaclass=_UnitMeta):
 class NPC:
     UNITS = {
         # 'ch00_00_Eclat_X_Normal':       {'name': 'Kiran'}, # Mini unit only
-        'ch00_00_Eclat_X_Avatar00':     {'id': 'EID_アバター',      'name': 'Kiran: Hero Summoner',},
+        'ch00_00_Eclat_X_Avatar00':     {'id': 'EID_アバター',      'name': 'Kiran: Hero Summoner'},
+        'ch00_01_Alfons_M_Stain':       {'id': 'PID_アルフォンス',  'name': 'Alfonse: Prince of Askr (Injured)'},
         'ch00_04_Veronica_F_Stain':     {'id': 'EID_ヴェロニカ',    'name': 'Veronica: Emblian Princess (Injured)'},
         'ch00_04_Veronica2_F_Enemy':    {'id': 'EID_ヴェロニカ2',   'name': 'Veronica: Princess Beset (Legendary Dark)'},
         'ch00_05_Bruno_M_Plain':        {'id': 'PID_ブルーノ皇子',  'name': 'Bruno (Unmasked)'},
@@ -57,6 +58,7 @@ class NPC:
         'ch00_47_Gullveig_F_Disappear': {'id': 'EID_グルヴェイグ',   'name': 'Gullveig: Golden Seer (Disappear)'},
         'ch00_49_Heith_Normal':         {'id': 'PID_ヘイズ',        'name': 'Heiðr: Innocent Goddess'},
         'ch00_51_Njord_M_Normal':       {'id': '',                  'name': 'Njörðr'}, # PID_ニョルズ
+        'ch00_56_Nidhogg_F_Normal':     {'id': '',                  'name': 'Níðhöggr'},
          # This is the tag used for non-face unit on scenarios
         'ch90_02_FighterAX_M_Normal':   {'id': '', 'name': ''}
     }
@@ -149,3 +151,52 @@ class Heroes(Container):
         return {
             k: int((growth(v) + self.data['base_stats'][k]-1 + (rarity if k in (statsOrder[1],statsOrder[2]) else rarity-1) // 2) * (hpmodifier if k == 'hp' else 1))
         for k,v in self.data['growth_rates'].items() }
+
+    def Skills(self, rarity=5, latest=False):
+        o = {
+            'weapon': self.Skill('weapon', rarity, latest),
+            'assist': self.Skill('assist', rarity, latest),
+            'special': self.Skill('special', rarity, latest),
+            'a': self.Skill('a', rarity, latest),
+            'b': self.Skill('b', rarity, latest),
+            'c': self.Skill('c', rarity, latest),
+            'attuned': self.Skill('attuned', rarity, latest),
+        }
+        return {k: v.data['id_tag'] if v else None for k,v in o.items()}
+
+    def Skill(self, type: str, rarity=5, latest=False):
+        from ..Skills import Skills
+        def getter(a, b=None):
+            s1 = [v for v in a[:rarity] if v is not None]
+            if b:
+                s2 = [v for v in b[:rarity] if v is not None]
+                if len(s2) > 0 and s2[-1] not in s1:
+                    return Skills.get(s2[-1])
+            return Skills.get(s1[-1] if len(s1) > 0 else None)
+
+        if latest:
+            s = getter(self.data['skills']['extra1'])
+            if s and s.type.lower() == type: return s
+            s = getter(self.data['skills']['extra2'])
+            if s and s.type.lower() == type: return s
+        match type.lower():
+            case 'weapon':
+                s = getter(self.data['skills']['summon_weapon'], self.data['skills']['weapon'])
+                if not latest or not s or len(s.data['@refines']) == 0: return s
+                if len(s.data['@refines']) in (1,5):
+                    return Skills.get(s.data['@refines'][-1])
+                else:
+                    return Skills.get(s.data['@refines'][0])
+            case 'assist':
+                return getter(self.data['skills']['summon_assist'], self.data['skills']['assist'])
+            case 'special':
+                return getter(self.data['skills']['summon_special'], self.data['skills']['special'])
+            case 'a':
+                return getter(self.data['skills']['summon_a'], self.data['skills']['a'])
+            case 'b':
+                return getter(self.data['skills']['summon_b'], self.data['skills']['b'])
+            case 'c':
+                return getter(self.data['skills']['summon_c'], self.data['skills']['c'])
+            case 'attuned':
+                return getter(self.data['skills']['summon_attuned'])
+            case 'seal': return None

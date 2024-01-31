@@ -59,7 +59,7 @@ class RivalDomains(SpecialMapContainer):
             self.page += ' This map layout is the same as Area '+str(self._dup[1])+' of [[Grand Conquests '+str(self._dup[0])+'|the '+num2words(self._dup[0], to='ordinal')+' Grand Conquests event]].'
         self.page += '\n{{Special Maps Navbox}}'
         return self
-    
+
     def RDTerrain(self):
         from ..Tool.Wiki import Wiki
         from ..Tool.globals import TODO

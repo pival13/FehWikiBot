@@ -47,6 +47,13 @@ class SeersSnare(ArticleContainer):
     def UnitData(self):
         from ..Stages.Terrain import Map
         from ..Utility.Units import Units
+        def weaponToSeal(unit: Units):
+            from ..Tool.globals import WEAPON_MASK
+            if (1 << unit.data['weapon']) & WEAPON_MASK['Red']: return 'SID_時を彷徨う者・赤'
+            if (1 << unit.data['weapon']) & WEAPON_MASK['Blue']: return 'SID_時を彷徨う者・青'
+            if (1 << unit.data['weapon']) & WEAPON_MASK['Green']: return 'SID_時を彷徨う者・緑'
+            return 'SID_時を彷徨う者・無'
+
         s =  '==Timeless Rift==\n'
         prev = 0
         for o in sorted(self.data['boss_battle'],key=lambda o:o['stage'])[:-1]:
@@ -54,14 +61,16 @@ class SeersSnare(ArticleContainer):
             map1 = Map.create(o['intermediate'][:-1])
             map2 = Map.create(o['advanced'][:-1])
             for map,idx,count in ((map1,1,3), (map2,2,4)):
-                map.data['units'] = [Map.PLACEHOLDER_UNIT | {
+                unit = Units.get(o['unit'])
+                map.data['units']  = [Map.PLACEHOLDER_UNIT | unit.Skills(latest=True) | {
                     'unit': o['unit'],
-                    'init_cooldown': None,
+                    'init_cooldown': -1,
                     'rarity': 5,
                     'true_lv': data['boss_level'][idx],
-                    'stats': Units.get(o['unit']).Stats(data['boss_level'][idx], 5, data['hp_factor'][idx] / 100)
+                    'stats': unit.Stats(data['boss_level'][idx], 5),#, data['hp_factor'][idx] / 100)
+                    'seal': weaponToSeal(unit)
                 }] + [Map.PLACEHOLDER_UNIT | {
-                    'init_cooldown': None,
+                    'init_cooldown': -1,
                     'rarity': 5,
                     'true_lv': data['level'][idx],
                 } for _ in range(count)]
@@ -84,17 +93,19 @@ class SeersSnare(ArticleContainer):
         map1 = Map.create(o['intermediate'][:-1])
         map2 = Map.create(o['advanced'][:-1])
         for map,idx,count in ((map1,1,4), (map2,2,5)):
+            print(self.data['final_boss'])
             map.data['units'] = [Map.PLACEHOLDER_UNIT | self.data['final_boss'] | {
-                'init_cooldown': None,
+                'init_cooldown': -1,
                 'rarity': 5,
                 'true_lv': data['boss_level'][idx],
-                'stats': Units.get(o['unit']).Stats(data['boss_level'][idx], 5, data['hp_factor'][idx] / 100)
-            }] + [Map.PLACEHOLDER_UNIT | {
+                'stats': Units.get(o['unit']).Stats(data['boss_level'][idx], 5)#, data['hp_factor'][idx] / 100)
+            }] + [Map.PLACEHOLDER_UNIT | Units.get(self.data['final_boss']['enemies'][i]).Skills(latest=True) | {
                 'unit': self.data['final_boss']['enemies'][i],
-                'init_cooldown': None,
+                'init_cooldown': -1,
                 'rarity': 5,
                 'true_lv': data['level'][idx],
-                'stats': Units.get(self.data['final_boss']['enemies'][i]).Stats(data['level'][idx])
+                'stats': Units.get(self.data['final_boss']['enemies'][i]).Stats(data['level'][idx]),
+                'seal': weaponToSeal(unit)
             } for i in range(count)]
 
         s += f"===Rifts {prev+1}-{o['stage']+1}===\n"
@@ -107,7 +118,7 @@ class SeersSnare(ArticleContainer):
         s += '! ' + rift + '\n|-\n'
         map2.data.pop('enemy_pos')
         s += '|' + map2.Image(shortest=True).replace('#invoke:MapImage|initTabber','MapImage')[:-2] + f'|init={self.name}|initTab={rift} - Advanced' + '}}\n|}\n'
-        s += Map.UnitData({rift + ' - Intermediate': map1, rift + ' - Advanced': map2}).replace('==Unit data==\n','').replace('=-;','=;') + '\n'
+        s += Map.UnitData({rift + ' - Intermediate': map1, rift + ' - Advanced': map2}).replace('==Unit data==\n','') + '\n'
 
         return s[:-1]
 

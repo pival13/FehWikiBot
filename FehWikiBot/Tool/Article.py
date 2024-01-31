@@ -50,6 +50,7 @@ class Article:
         return '{{' + name + ' Infobox\n|' + '\n|'.join([k+'='+str(v) for k,v in params.items() if v is not None]) + '\n}}'
 
     def Availability(self, type: str, avail, notif: str=None, subAvails=[], isMap=False):
+        """The default header has a size of 46"""
         s = '==Availability==\n' if not isMap else '==Map availability==\n'
         s += f"This {type} was made available on:\n"
         if isMap:
@@ -57,7 +58,7 @@ class Article:
             if avail.get('end'):
                 s += '|end=' + avail['end']
             if (avail.get('avail_sec') or -1) != -1:
-                s += '|cycle=' + avail['cycle_sec'] + '|avail=' + avail['avail_sec']
+                s += '|cycle=' + str(avail['cycle_sec']) + '|avail=' + str(avail['avail_sec'])
             if isinstance(notif, str):
                 if notif != '':
                     s += '|notification=' + notif + ' (Notification)'
@@ -70,8 +71,8 @@ class Article:
                 s += ' – {{HT|' + avail['end'] + '}}'
             if isinstance(notif, str):
                 s += ' ([[' + notif + (' (Notification)' if notif != '' else '') + '|Notification]])'
-        for subAvail in subAvails:
-            s += '\n** {{HT|' + (subAvail.get('start') or '') + '}} – {{HT|' + subAvail.get('end') + '}}'
+        for prefix,subAvail in subAvails:
+            s += '\n** ' + prefix + ': {{HT|' + (subAvail.get('start') or '') + '}} – {{HT|' + subAvail.get('end') + '}}'
         return s
 
     def OtherLanguage(self, tag, tag2=None, swapJp=True):

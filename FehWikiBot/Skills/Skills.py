@@ -116,7 +116,7 @@ class Skills(JsonContainer, ArticleContainer):
         from ..Utility.Messages import EN
         import re
         s = EN(key).replace('$a','').replace('\n\n','<br><br>')
-        s = re.sub(r'(?:\n|<br>)((?:Effect:\s*)?【[^】]+】)\n', '<br>\\1<br>', s)
+        s = re.sub(r'(?:\n|<br>)((?:Effect:\s*)?【[^】]+】)(?:\n|<br>)', '<br>\\1<br>', s)
         return s.replace('\n',' ')
 
 
@@ -135,6 +135,7 @@ class Skills(JsonContainer, ArticleContainer):
             'SID_ヘイズ': 'weapon', # Heiðr
             'SID_クワシル': 'weapon', # Kvasir
             'SID_グルヴェイグ': 'weapon', # Gullveig
+            'SID_シーフ': 'weapon', # Thief
             'SID_ミステルトィン': 'sword', # Missiltainn
             'SID_魔書ミステルトィン': 'tome', # Missiltainn
         }
@@ -155,11 +156,11 @@ class Skills(JsonContainer, ArticleContainer):
         return s
 
     @property
-    def type(self):
+    def type(self) -> str:
         return self.data['type']
 
     @property
-    def exclusive(self):
+    def exclusive(self) -> bool:
         return self.data['exclusive']
 
     def loadArticle(self, canCreate=True, revision=0) -> Self:

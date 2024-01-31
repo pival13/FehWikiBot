@@ -1,8 +1,7 @@
 #! /usr/bin/env python3
 
-from ...Tool.Reader import IReader, readAvail
+from ...Tool.Reader import IReader, readAvail, readTime
 from ...Utility.Reader.Reward import readReward
-# from ...Tool.globals import WEAPON_TYPE
 
 class SeersSnareReader(IReader):
     _basePath = 'Common/SRPG/Explorer/'
@@ -30,7 +29,7 @@ class SeersSnareReader(IReader):
             self.end()
 
             readAvail(self, 'avail')
-            self.skip(0x08)
+            readTime(self, 'start2', 0x843E97F6BDC9CCB3)
 
             if self.readObject('stages'):
                 self.readArray('stages')
@@ -41,19 +40,20 @@ class SeersSnareReader(IReader):
                     self.insert('level', [self.overviewByte(0x08*i+0x01, 0x2C) for i in range(3)])
                     self.insert('boss_level', [self.overviewByte(0x08*i+0x02, 0xAD) for i in range(3)])
                     # padding
-                    self.insert('_unknow', [self.overviewShort(0x08*i+0x04, 0xDC86) for i in range(3)])
-                    self.insert('hp_factor', [self.overviewShort(0x08*i+0x06, 0xAD36) for i in range(3)])
+                    self.insert('factor1', [self.overviewShort(0x08*i+0x04, 0xDCDC) for i in range(3)])
+                    self.insert('factor2', [self.overviewShort(0x08*i+0x06, 0xAD36) for i in range(3)])
+                    # print(self._stack[-1][0]['factor1'], self._stack[-1][0]['factor2'])
                     self.skip(0x18) # previously read
-                    self.readArray('_unknow2')
+                    self.readArray('_unknow2') # ['0xf7e43524', '0xf4f33524', '0xf7e4351c', '0xf7e43524', '0xf7e4351c', '0xf7e4351c']
                     for _ in range(6):
                         self.insert(None, hex(self.getInt()))
                     self.end()
                     # 3 x 0x04 bytes, as follow
-                    self.insert('min_rift_vessels', [self.overviewShort(0x04*i+0x00, 0x34C0) for i in range(3)])
-                    self.insert('max_rift_vessels', [self.overviewShort(0x04*i+0x02, 0xF787) for i in range(3)])
+                    self.insert('min_rift_vessels', [self.overviewShort(0x04*i+0x00, 0x35EC) for i in range(3)])
+                    self.insert('max_rift_vessels', [self.overviewShort(0x04*i+0x02, 0xF403) for i in range(3)])
                     self.skip(0x0C) # previously read
-                    self.insert('_unknow3', [hex(self.getShort(0x00)) for _ in range(3)])
-                    self.skip(0x06) # padding
+                    self.insert('_unknow3', [hex(self.getShort(0x40BA)) for _ in range(3)])
+                    self.assertPadding(6)
                     self.skip(0x08)
                     # self.readShort('_5', 13806)
                     # self.readShort('_6', 0xF403)
@@ -66,47 +66,41 @@ class SeersSnareReader(IReader):
                     # self.readByte('_2', 0xE3, signed=True)
                     # self.readByte('_3', 0x7E, signed=True)
                     # self.readByte('_4', 0xC2)
-                    self.skip(0x07) # padding
-                    readReward(self, 'reward', 0XACF0DE36)
-                    self.skip(0x04) # padding
+                    self.assertPadding(7)
+                    readReward(self, 'reward', 0xACF0DE36)
+                    self.assertPadding(4)
                     self.prepareArray('reward_ids')
                     for _ in range(3):
                         self.readString()
                     self.end()
                     readReward(self, 'advanced_reward', 0X875BB721)
-                    self.skip(0x04) # padding
+                    self.assertPadding(4)
                     self.prepareArray('reward_ids2')
                     for _ in range(3):
                         self.readString()
                     self.end()
                     self.end()
                 self.end()
-                self.skip(0x08)
-                # self.readArray('_unknow1')
-                # for _ in range(7):
-                #     self.readArray()
-                #     for _ in range(3):
-                #         self.readShort(None, 0x84BA)
-                #     self.end()
-                #     self.skip(0x02)
-                # self.end()
-                self.skip(0x08)
-                # self.readArray("_unknow2")
-                # for _ in range(6):
-                #     self.readInt(None, 0xF7E43524)
-                # self.end()
-                self.skip(0x03)
-                self.skip(0x01) # padding
-                self.skip(0x06)
-                self.skip(0x06) # padding
-                self.skip(0x05)
-                self.skip(0x03) # padding
+                self.readArray('_unknow1')
+                for _ in range(7):
+                    self.prepareArray()
+                    for _ in range(3):
+                        self.readShort(None, 0x8488) # [[50, 50, 0], [50, 50, 0], [40, 40, 20], [30, 40, 30], [30, 40, 30], [20, 40, 40], [20, 40, 40]]
+                        # 0x8748 => [[1010, 1010, 960], [1010, 1010, 960], [1000, 1000, 980], [990, 1000, 990], [990, 1000, 990], [980, 1000, 1000], [980, 1000, 1000]]
+                    self.end()
+                    self.assertPadding(0x02)
+                self.end()
+                self.readArray("_skillCost")
+                for _ in range(6):
+                    self.readInt(None, 0xF7E435EC)
+                self.end()
+                self.assertBytes(0x18, 0x00000088FE0773510000000000007FB67ADDF78400D80C8C, '_stages')
             self.end()
             
             for _ in range(self.readList('daily_rewards', 0x35F7601A)):
                 self.prepareObject()
                 readReward(self, 'reward', 0x33287F60)
-                self.skip(0x04) # Padding
+                self.assertPadding(0x04)
                 self.prepareArray('reward_ids')
                 for _ in range(3):
                     self.readString()
@@ -126,7 +120,12 @@ class SeersSnareReader(IReader):
                 self.skip(0x03)
                 self.end()
             self.end()
-            self.skip(0x28)
+            self.assertBytes(8, 0x2E410F8A7D443EB7, '_12')
+            self.assertBytes(8, 0x6625D9ED5DAA0403, '_34')
+            self.assertBytes(12, 0xAFEB1B0B11BA38763CA19888, '_567')
+            self.assertBytes(4, 0xF0219FF7, '_8')
+            self.assertBytes(4, 0xAFCE324D, '_9')
+            self.assertBytes(4, 0x6CDBCD5D, '_A')
             self.end()
         self.end()
 

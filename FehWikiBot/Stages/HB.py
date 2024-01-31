@@ -8,7 +8,9 @@ __all__ = ['HeroBattle','HB',
            'BoundHeroBattle','BHB',
            'LegendaryHeroBattle','DoubleLegendaryHeroBattle','LHB',
            'MythicHeroBattle','DoubleMythicHeroBattle','MHB',
-           'LegendaryMythicHeroBattle','LimitedHeroBattle']
+           'EmblemHeroBattle','EHB',
+           'LegendaryMythicHeroBattle','EmblemMythicHeroBattle',
+           'LimitedHeroBattle']
 
 class HeroBattle(SpecialMapContainer):
     _linkArticleData = (r'baseMap=([TL]\d+)', 'id_tag')
@@ -27,12 +29,16 @@ class HeroBattle(SpecialMapContainer):
                 o = LegendaryHeroBattle()
             case 'Mythic Hero Battle':
                 o = MythicHeroBattle()
+            case 'Emblem Hero Battle':
+                o = EmblemHeroBattle()
             case 'Double Legendary Hero Battle':
                 o = DoubleLegendaryHeroBattle()
             case 'Double Mythic Hero Battle':
                 o = DoubleMythicHeroBattle()
             case 'Legendary & Mythic Hero Battle':
                 o = LegendaryMythicHeroBattle()
+            case 'Emblem & Mythic Hero Battle':
+                o = EmblemMythicHeroBattle()
             case _:
                 return self
         o.data = self.data
@@ -116,17 +122,21 @@ class HeroBattle(SpecialMapContainer):
         heroes = self.heroes
         if len(heroes) == 1:
             if self.data['id_tag'][0] == 'T': return 'Grand Hero Battle'
-            elif (heroes[0].data['extra'] or {}).get('kind') == 'Legendary': return 'Legendary Hero Battle'
+            elif (heroes[0].data['extra'] or {}).get('kind') == 'Legend': return 'Legendary Hero Battle'
             elif (heroes[0].data['extra'] or {}).get('kind') == 'Mythic': return 'Mythic Hero Battle'
+            elif (heroes[0].data['extra'] or {}).get('kind') == 'Emblem': return 'Emblem Hero Battle'
         elif len(heroes) == 2:
             if self.data['id_tag'][0] == 'T': return 'Bound Hero Battle'
-            elif (heroes[0].data['extra'] or {}).get('kind') == 'Legendary' and (heroes[1].data['extra'] or {}).get('kind') == 'Legendary':
+            elif (heroes[0].data['extra'] or {}).get('kind') == 'Legend' and (heroes[1].data['extra'] or {}).get('kind') == 'Legend':
                 return 'Double Legendary Hero Battle'
             elif (heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[1].data['extra'] or {}).get('kind') == 'Mythic':
                 return 'Double Mythic Hero Battle'
-            elif ((heroes[0].data['extra'] or {}).get('kind') == 'Legendary' and (heroes[1].data['extra'] or {}).get('kind') == 'Mythic') or \
-                 ((heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[1].data['extra'] or {}).get('kind') == 'Legendary'):
+            elif ((heroes[0].data['extra'] or {}).get('kind') == 'Legend' and (heroes[1].data['extra'] or {}).get('kind') == 'Mythic') or \
+                 ((heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[1].data['extra'] or {}).get('kind') == 'Legend'):
                 return 'Legendary & Mythic Hero Battle'
+            elif ((heroes[0].data['extra'] or {}).get('kind') == 'Emblem' and (heroes[1].data['extra'] or {}).get('kind') == 'Mythic') or \
+                 ((heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[1].data['extra'] or {}).get('kind') == 'Emblem'):
+                return 'Mythic & Emblem Hero Battle'
         from ..Tool.globals import TODO
         print(TODO + '')
         return 'Unknown Hero Battle'
@@ -224,7 +234,7 @@ class HeroBattle(SpecialMapContainer):
             return self
 
         avail = super().Availability('', self.data['avail'], '', isMap=True)[50:]
-        if self.data['avail']['end'] > timeDiff(self.data['avail']['start'], 86400*4-1): # Ignore Celebratory revival
+        if self.data['avail']['end'] and self.data['avail']['end'] > timeDiff(self.data['avail']['start'], 86400*4-1): # Ignore Celebratory revival
             time = datetime(year=int(self.data['avail']['start'][:4]), month=int(self.data['avail']['start'][5:7]), day=1).strftime('%b %Y')
             if   type(self) is GrandHeroBattle:
                 avail = avail.replace('notification=', f'notification=Grand Hero Battle Revival - {self.heroes[0].name} (Notification)')
@@ -263,19 +273,31 @@ class LegendaryHeroBattle(HeroBattle):
     def Availability(self):
         from datetime import datetime
         from FehWikiBot.Tool.globals import TIME_FORMAT
-        return super().Availability('Legendary Hero Batle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
+        return super().Availability('Legendary Hero Battle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
 
 class MythicHeroBattle(HeroBattle):
     def Availability(self):
         from datetime import datetime
         from FehWikiBot.Tool.globals import TIME_FORMAT
-        return super().Availability('Mythic Hero Batle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
+        return super().Availability('Mythic Hero Battle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
+
+class EmblemHeroBattle(HeroBattle):
+    def Availability(self):
+        from datetime import datetime
+        from FehWikiBot.Tool.globals import TIME_FORMAT
+        return super().Availability('Emblem Hero Battle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
 
 class LegendaryMythicHeroBattle(BoundHeroBattle):
     def Availability(self):
         from datetime import datetime
         from FehWikiBot.Tool.globals import TIME_FORMAT
-        return super().Availability('Legendary & Mythic Hero Battle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
+        return super(BoundHeroBattle,self).Availability('Legendary & Mythic Hero Battle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
+
+class EmblemMythicHeroBattle(BoundHeroBattle):
+    def Availability(self):
+        from datetime import datetime
+        from FehWikiBot.Tool.globals import TIME_FORMAT
+        return super(BoundHeroBattle,self).Availability('Emblem & Mythic Hero Battle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
 
 class DoubleLegendaryHeroBattle(LegendaryHeroBattle): pass
 class DoubleMythicHeroBattle(MythicHeroBattle): pass
@@ -285,6 +307,7 @@ GHB = GrandHeroBattle
 BHB = BoundHeroBattle
 LHB = LegendaryHeroBattle
 MHB = MythicHeroBattle
+EHB = EmblemHeroBattle
 
 
 class LimitedHeroBattle(HeroBattle):

@@ -22,6 +22,21 @@ class CaptainSkill(ArticleContainer):
             'properties': ''
         }).replace(' Infobox','',1)
 
+    def Effects(self):
+        s =  '==Effects==\n'
+        s += '{{#invoke:SkillEffectsTable|main\n'
+        s += '|StatusEffect 1={{SkillEffectText|status=}}\n'
+        s += '|StatusEffect 1 Targets={{SkillTargetText|}}\n'
+        s += '|StatusEffect 1 Conditions=<!-- At start of turn / After combat -->\n'
+        s += '|MapEffect 1={{SkillEffectText|}}\n'
+        s += '|MapEffect 1 Targets={{SkillTargetText|}}\n'
+        s += '|MapEffect 1 Conditions=\n'
+        s += '|CombatEffect 1={{SkillEffectText|}}\n'
+        s += '|CombatEffect 1 Targets={{SkillTargetText|}}\n'
+        s += '|CombatEffect 1 Conditions=\n'
+        s += '}}'
+        return s
+
     def OtherLanguage(self):
         return super().OtherLanguage('MID_REALTIME_PVP_SKILL_' + self.data['id_tag'])
 

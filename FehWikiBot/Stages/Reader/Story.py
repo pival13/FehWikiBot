@@ -38,6 +38,7 @@ class StoryMapReader(IReader):
                 self.prepareObject()
                 for j in range(3):
                     arrPtr = self.overviewLong(self._stack[-2][1]-0x08 + j*0x28 - self._i)
+                    if arrPtr == 0: continue
                     stage = StageReader(self._buff, arrPtr + i*0x78).object
                     self.insert(stage['diff'], stage)
                 self.end()

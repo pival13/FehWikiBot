@@ -4,10 +4,10 @@ from .Skills import Skills
 
 class Weapon(Skills):
     @property
-    def might(self): return self.data['might']
+    def might(self) -> int: return self.data['might']
 
     @property
-    def refine(self): return self.data['refine_type']
+    def refine(self) -> str | None: return self.data['refine_type']
 
     def Infobox(self):
         obj = {

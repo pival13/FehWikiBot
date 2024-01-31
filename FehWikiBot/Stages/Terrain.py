@@ -243,16 +243,20 @@ class Map(Container):
         s += f"rarity={unit['rarity']};"
         s += f"level={unit['true_lv']};"
         s += f"stats=[{unit['stats']['hp']};{unit['stats']['atk']};{unit['stats']['spd']};{unit['stats']['def']};{unit['stats']['res']}];"
-        wep = Weapon.get(unit['weapon'])
-        if wep and wep.refine: s += f"weapon={wep.name};refine={wep.refine};"
-        else:                  s += f"weapon={wep.name if wep else '-'};"
-        s += f"assist={Assist.get(unit['assist']).name if unit['assist'] else '-'};"
-        s += f"special={Special.get(unit['special']).name if unit['special'] else '-'};"
+        if isinstance(unit['weapon'],Weapon):
+            s += f"weapon={unit['weapon'].name};"
+            if unit['weapon'].refine: s += f"refine={unit['weapon'].refine};"
+        else:
+            wep = Weapon.get(unit['weapon'])
+            if wep and wep.refine: s += f"weapon={wep.name};refine={wep.refine};"
+            else:                  s += f"weapon={wep.name if wep else '-'};"
+        s += f"assist={unit['assist'].name if isinstance(unit['assist'],Assist) else Assist.get(unit['assist']).name if unit['assist'] else '-'};"
+        s += f"special={unit['special'].name if isinstance(unit['special'],Special) else Special.get(unit['special']).name if unit['special'] else '-'};"
         s += f"cooldown={unit['init_cooldown'] or ''};" if unit['init_cooldown'] != -1 else ''
-        s += f"a={Passive.get(unit['a']).name if unit['a'] else '-'};"
-        s += f"b={Passive.get(unit['b']).name if unit['b'] else '-'};"
-        s += f"c={Passive.get(unit['c']).name if unit['c'] else '-'};"
-        s += f"seal={Passive.get(unit['seal']).name if unit['seal'] else '-'};"
+        s += f"a={unit['a'].name if isinstance(unit['a'],Passive) else Passive.get(unit['a']).name if unit['a'] else '-'};"
+        s += f"b={unit['b'].name if isinstance(unit['b'],Passive) else Passive.get(unit['b']).name if unit['b'] else '-'};"
+        s += f"c={unit['c'].name if isinstance(unit['c'],Passive) else Passive.get(unit['c']).name if unit['c'] else '-'};"
+        s += f"seal={unit['seal'].name if isinstance(unit['seal'],Passive) else Passive.get(unit['seal']).name if unit['seal'] else '-'};"
         if unit['attuned']:
             s += f"attuned={Passive.get(unit['attuned']).name};"
         s += f"accessory={Accessories.get(unit['accessory']).name};" if unit['accessory'] else ''

@@ -44,8 +44,6 @@ class Reader:
     - `read*`: Insert the element at the head, and move the head forward
     """
 
-    __slots__ = '_header', '_buff', '_i', '_obj', '_stack'
-
     def __init__(self, buff):
         buff = bytes(Decompresser(buff).data)
         self._header = buff[0x00:0x20]
@@ -213,14 +211,12 @@ class Reader:
         self.skip(nbBytes)
         return l
 
-    def assertBytes(self, nbBytes, xor, key):
+    def assertBytes(self, nbBytes, xor, key='_'):
         from .globals import WARNING
         mask = int.from_bytes(self._buff[self._i:self._i+nbBytes], 'little')
         if (mask ^ xor) != 0:
-            print(WARNING + f'{self.__class__.__name__}: Expected 0x{xor:x}, got 0x{mask:x} ({",".join([hex(i) for _,i in self._stack if i != 0] + [hex(self._i)])})')
-            self.insert(key, f'*Expected 0x{xor:x}, got 0x{mask:x}*')
-        else:
-            self.skip(nbBytes)
+            print(WARNING + f'{self.__class__.__name__}: Expected 0x{xor:x}, got 0x{mask:x} (XOR 0x{xor^mask:x}) ({key})')
+        self.skip(nbBytes)
 
     def assertPadding(self, nbBytes):
         from .globals import WARNING
@@ -250,7 +246,7 @@ class IReader(Reader):
     @property
     def object(self):
         if not self.isValid(): return
-        if super()._obj == None:
+        if self._obj == None:
             self.parse()
         return super().object
 
@@ -297,3 +293,28 @@ def readAvail(reader: Reader, key:str=None):
         reader.readLong('cycle_sec', 0x6B227EC9D51B5721, True)
         if reader.getLong() not in (0xB5,0xB7): print('Unexpected number on `readAvail`')
         reader.end()
+
+def readReward(reader: Reader, key: str=None, xorSize=0, offSize=8):
+    from ..Utility.Reader.Reward import readReward
+    return readReward(reader, key, xorSize, offSize)
+
+
+def getAllStrings(reader: Reader, key=DEFAULT_XOR) -> dict[str,str]:
+    t = {}
+    for i in range(len(reader._buff) // 0x08):
+        t[hex(i*0x08)] = Reader.decodeString(reader._buff[i*0x08:i*0x08+0x40], key)
+    return t
+
+def getAllRewards(reader: Reader, payload=0x48):
+    from ..Utility.Reader.Reward import RewardReader
+    r = Reader([])
+    r._header = reader._header
+    r._buff = reader._buff
+    t = {}
+    while r._i < len(r._buff):
+        off = r.getLong()
+        if off == 0: continue
+        rewardReader = RewardReader(reader._buff[off:off+payload])
+        if not rewardReader.isValid(): continue
+        t[hex(r._i-0x08)] = rewardReader.object
+    return t

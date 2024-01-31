@@ -5,7 +5,7 @@ from ..Tool.Reader import IReader
 class SkillReader(IReader):
     _basePath = 'Common/SRPG/Skill/'
 
-    SKILL_TYPE = ['Weapon', 'Assist', 'Special', 'A', 'B', 'C', 'Attuned', 'Seal', 'Refine', 'Duo']
+    SKILL_TYPE = ['Weapon', 'Assist', 'Special', 'A', 'B', 'C', 'Attuned', 'Seal', 'Refine', 'Duo', 'Engage']
     REFINE_TYPE = {0: None, 1: 'Skill1', 2: 'Skill2', 101: 'Atk', 102: 'Spd', 103: 'Def', 104: 'Res'}
 
     def readWeaponList(self, key, xor):

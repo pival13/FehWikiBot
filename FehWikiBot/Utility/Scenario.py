@@ -161,7 +161,7 @@ def _parseObjects(objs):
 
         REs = [
             re.compile(r'\$(p)'), re.compile(r'\$(Sbs|Sbv|w).+?\|'), re.compile(r'\$(b|Ssp|n|E|Fi)(.+?)\|'),
-            re.compile(r'\$(Sbp)(\w+),(\d+)\|'), re.compile(r'\$(Wm)([\w.]+),(\w+),(\w+)\|'),
+            re.compile(r'\$(Sbp)(\w+),(\d+)\|'), re.compile(r'\$(Wm)([\w.―]+),(\w+),(\w+)\|'),
             re.compile(r'\$(Fo)(\d+),(\d+),(\d+),(\d+),(\d+)\|'), re.compile(r'[^$]+')
         ]
         obj = []

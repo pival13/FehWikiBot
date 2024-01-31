@@ -5,8 +5,7 @@ from FehWikiBot.Others.AetherRaids import Structure
 from FehWikiBot.Utility.Units import Heroes
 from FehWikiBot.Skills import Skills, SacredSeals, SacredSealsForge, CaptainSkill
 from FehWikiBot.Stages import MainStory, Paralogue, TacticsDrills, HeroicOrdeals, HeroBattle, LimitedHeroBattle, RivalDomains, unsupportedSpecialMaps
-from FehWikiBot.Events.FB import ForgingBonds
-from FehWikiBot.Events.SS import SeersSnare
+from FehWikiBot.Events import TempestTrials, ForgingBonds, HallOfForms, MjolnirsStrike, SeersSnare, AffinityAutoBattles
 from FehWikiBot.Tool.globals import TODO
 
 if __name__ == '__main__':
@@ -56,7 +55,15 @@ if __name__ == '__main__':
     if unsupportedSpecialMaps(argv[1]) != []:
         print(TODO + 'Unsupported Special maps: ' + str(unsupportedSpecialMaps(argv[1])))
 
+    for o in TempestTrials.fromAssets(argv[1]):
+        o.createArticle().export('Tempest Trials ('+argv[1]+')')
     for o in ForgingBonds.fromAssets(argv[1]):
         o.loadArticle().update().export('Forging Bonds ('+argv[1]+')', create=-1)
+    for o in HallOfForms.fromAssets(argv[1]):
+        o.loadArticle().update().export('Hall of Forms ('+argv[1]+')', create=-1)
+    for o in MjolnirsStrike.fromAssets(argv[1]):
+        o.createArticle().export('Mjölnir\'s Strike ('+argv[1]+')')
     for o in SeersSnare.fromAssets(argv[1]):
         o.createArticle().export('Seer\'s Snare ('+argv[1]+')')
+    for o in AffinityAutoBattles.fromAssets(argv[1]):
+        o.createArticle().export('Affinity Auto Battle ('+argv[1]+')')
