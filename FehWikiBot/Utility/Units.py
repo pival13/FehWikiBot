@@ -43,6 +43,7 @@ class NPC:
         'ch00_01_Alfons_M_Stain':       {'id': 'PID_アルフォンス',  'name': 'Alfonse: Prince of Askr (Injured)'},
         'ch00_04_Veronica_F_Stain':     {'id': 'EID_ヴェロニカ',    'name': 'Veronica: Emblian Princess (Injured)'},
         'ch00_04_Veronica2_F_Enemy':    {'id': 'EID_ヴェロニカ2',   'name': 'Veronica: Princess Beset (Legendary Dark)'},
+        'ch00_04_Veronica2_F_Stain':    {'id': 'EID_ヴェロニカ2',   'name': 'Veronica: Princess Rising (Injured)'},
         'ch00_05_Bruno_M_Plain':        {'id': 'PID_ブルーノ皇子',  'name': 'Bruno (Unmasked)'},
         'ch00_05_Bruno_M_PlainStain':   {'id': 'PID_ブルーノ皇子',  'name': 'Bruno (Unmasked Injured)'},
         'ch00_13_Gustaf_M_Normal':      {'id': '',                  'name': 'Gustav'},# PID_グスタフ

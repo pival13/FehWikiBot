@@ -3,9 +3,9 @@
 from FehWikiBot.Others.Accessory import Accessories
 from FehWikiBot.Others.AetherRaids import Structure
 from FehWikiBot.Utility.Units import Heroes
-from FehWikiBot.Skills import Skills, SacredSeals, SacredSealsForge, CaptainSkill
-from FehWikiBot.Stages import MainStory, Paralogue, TacticsDrills, HeroicOrdeals, HeroBattle, LimitedHeroBattle, RivalDomains, unsupportedSpecialMaps
-from FehWikiBot.Events import TempestTrials, ForgingBonds, HallOfForms, MjolnirsStrike, SeersSnare, AffinityAutoBattles
+from FehWikiBot.Skills import *
+from FehWikiBot.Stages import *
+from FehWikiBot.Events import *
 from FehWikiBot.Tool.globals import TODO
 
 if __name__ == '__main__':
@@ -38,8 +38,10 @@ if __name__ == '__main__':
     for o in CaptainSkill.fromAssets(argv[1]):
         o.createArticle().export('Captain Skill ('+argv[1]+')', create=True)
 
-    for o in Heroes.fromAssets(argv[1]):
-        HeroicOrdeals.get(str(o.data['num_id'])).createArticle().export('Heroic Ordeals ('+argv[1]+')')
+    for o in HeroicOrdeals.fromAssets(argv[1]):
+        o.createArticle().export('Heroic Ordeals ('+argv[1]+')')
+    for o in MergedOrdeals.fromAssets(argv[1]):
+        o.createArticle().export('Merged Ordeals ('+argv[1]+')')
     MainStory.exportGroups([o.createArticle() for o in MainStory.fromAssets(argv[1])], 'Story maps ('+argv[1]+')')
     Paralogue.exportGroups([o.createArticle() for o in Paralogue.fromAssets(argv[1])], 'Paralogue maps ('+argv[1]+')')
     for o in TacticsDrills.fromAssets(argv[1]):
@@ -63,7 +65,19 @@ if __name__ == '__main__':
         o.loadArticle().update().export('Hall of Forms ('+argv[1]+')', create=-1)
     for o in MjolnirsStrike.fromAssets(argv[1]):
         o.createArticle().export('Mjölnir\'s Strike ('+argv[1]+')')
+    for o in PawnsOfLoki.fromAssets(argv[1]):
+        o.createArticle().export('Pawns of Loki ('+argv[1]+')')
+    for o in HeroesJourney.fromAssets(argv[1]):
+        o.createArticle().export('Heroes Journey ('+argv[1]+')')
+    for o in BindingWorlds.fromAssets(argv[1]):
+        o.createArticle().export('Binding Worlds ('+argv[1]+')')
+    for o in SummonerDuelsR.fromAssets(argv[1]):
+        o.createArticle().export('Summoner Duels R ('+argv[1]+')')
+    for o in SummonerDuelsS.fromAssets(argv[1]):
+        o.createArticle().export('Summoner Duels S ('+argv[1]+')')
     for o in SeersSnare.fromAssets(argv[1]):
         o.createArticle().export('Seer\'s Snare ('+argv[1]+')')
     for o in AffinityAutoBattles.fromAssets(argv[1]):
         o.createArticle().export('Affinity Auto Battle ('+argv[1]+')')
+    for o in UnitedWarfront.fromAssets(argv[1]):
+        o.createArticle().export('United Warfront ('+argv[1]+')')

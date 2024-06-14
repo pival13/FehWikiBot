@@ -55,10 +55,10 @@ class SeersSnareReader(IReader):
                     self.insert('_unknow3', [hex(self.getShort(0x40BA)) for _ in range(3)])
                     self.assertPadding(6)
                     self.skip(0x08)
-                    # self.readShort('_5', 13806)
-                    # self.readShort('_6', 0xF403)
-                    # self.readShort('_7', 13804)
-                    # self.readShort('_8', 62760)
+                    # self.assertBytes(2, 0x35ef, f'stages[{len(self._stack[-2][0])-1}][_1]')
+                    # self.assertBytes(2, 0xF403, f'stages[{len(self._stack[-2][0])-1}][_2]')
+                    # self.assertBytes(2, 0x35ec, f'stages[{len(self._stack[-2][0])-1}][_3]')
+                    # self.assertBytes(2, 0xf528, f'stages[{len(self._stack[-2][0])-1}][_4]')
                     self.readByte('id', 0x51)
                     self.skip(0x08)
                     # self.insert('_9', hex(self.getInt()))
@@ -131,3 +131,17 @@ class SeersSnareReader(IReader):
 
 SSReader = SeersSnareReader
 ExplorerReader = SeersSnareReader
+
+# SS5:
+# 4,14(E) == 0x4010
+# ! WARNING: SeersSnareReader: Expected 0x6625d9ed5daa0403, got 0x66259dff2cd597f9 (XOR 0x44'12717f93fa) (_34)
+# ! WARNING: SeersSnareReader: Expected 0xf0219ff7, got 0xf0219873 (XOR 0x784) (_8)
+# ! WARNING: SeersSnareReader: Expected 0xafce324d, got 0xafce3004 (XOR 0x249) (_9)
+# ! WARNING: SeersSnareReader: Expected 0x6cdbcd5d, got 0x6cdbcd5a (XOR 0x7) (_A)
+
+# SS6:
+# 2,7 == 0x00F2
+# ! WARNING: SeersSnareReader: Expected 0x6625d9ed5daa0403, got 0x6625dd6bdbe282a1 (XOR 0x48'6864886a2) (_34)
+# ! WARNING: SeersSnareReader: Expected 0xf0219ff7, got 0xf0219869 (XOR 0x79e) (_8)
+# ! WARNING: SeersSnareReader: Expected 0xafce324d, got 0xafce306a (XOR 0x227) (_9)
+# ! WARNING: SeersSnareReader: Expected 0x6cdbcd5d, got 0x6cdbcd5a (XOR 0x7) (_A)

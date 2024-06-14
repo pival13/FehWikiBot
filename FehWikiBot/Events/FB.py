@@ -56,6 +56,18 @@ class ForgingBonds(ArticleContainer):
         s += '}}'
         return s
     
+    def Schedule(self):
+        FB_COLORS = ['R','O','G','B']
+        days = len(self.data['color_bonus']) // 24
+        s =  '==Bonus schedule==\n'
+        s += '{{#invoke:ForgingBondsMultiplier|makeTable'
+        s += '|start='+self.data['avail']['start']
+        s += '|days='+str(days)
+        s += '|colors='
+        for i in range(days):
+            s += '\n  ' + ','.join(map(lambda c:FB_COLORS[c], self.data['color_bonus'][24*i:24*(i+1)])) + ','
+        return s + '\n}}'
+
     def Story(self):
         from ..Utility.Units import Units
         from ..Utility.Scenario import Scenario
@@ -95,6 +107,7 @@ class ForgingBonds(ArticleContainer):
         self.page  = self.Infobox() + '\n'
         self.page += self.Availability() + '\n'
         self.page += self.Rewards() + '\n'
+        self.page += self.Schedule() + '\n'
         self.page += self.Story() + '\n'
         self.page += self.OtherLanguage() + '\n'
         self.page += '{{Main Events Navbox}}'

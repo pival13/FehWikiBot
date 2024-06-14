@@ -5,7 +5,7 @@ from .Reader.SS import SeersSnareReader
 
 class SeersSnare(ArticleContainer):
     _reader = SeersSnareReader
-    _linkArticleData = (r'StartTime', ('avail','start'))
+    _linkArticleData = (r'startTime\s*=\s*([0-9TZ\-:]{20})', ['avail','start'])
 
     @ArticleContainer.name.getter
     def name(self) -> str:

@@ -70,10 +70,10 @@ class HeroBattle(SpecialMapContainer):
 
     @classmethod
     def upcomingRevivals(cls) -> list[Self]:
-        from datetime import datetime
+        from datetime import datetime, timedelta
         from ..Tool.globals import TIME_FORMAT
         super().get('')
-        now = datetime.now().strftime(TIME_FORMAT)
+        now = (datetime.now() - timedelta(days=1)).strftime(TIME_FORMAT)
         os = []
         for tag,datas in cls._DATA.items():
             for k in datas:

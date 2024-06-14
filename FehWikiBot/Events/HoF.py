@@ -10,7 +10,7 @@ class HallOfForms(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        return super().name or 'Hall of Forms ' + str(self.number)
+        return super().name or ('Hall of Forms ' + str(self.number))
 
     @property
     def number(self) -> int:

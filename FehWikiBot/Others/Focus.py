@@ -108,6 +108,8 @@ class Focus(Article):
             self.page += '{{Summoning Event Navbox}}'
 
         else:
+            if 'shsr' in kwargs and kwargs['shsr'] and kwargs['name'].find('SHSR') == -1:
+                kwargs['name'] += ' (4★SHSR)'
             format = '%Y' if type in ('Special','ω Special Heroes') else '%b %Y'
             if 'notif' not in kwargs or kwargs['notif'] == '':
                 if kwargs['type'] == 'Special':
@@ -153,7 +155,7 @@ class Focus(Article):
             s += '|youtubeEN=https://www.youtube.com/watch?v=' + params['youtube'][0] + '\n'
             s += '|youtubeJP=https://www.youtube.com/watch?v=' + params['youtube'][1] + '\n'
 
-        rarities = [f'|rarity{r}{s}Percent={float(params[str(r)+s]):.02}%' for r in range(5,0,-1) for s in ('Focus','SHSpecial','Special','') if (str(r)+s) in params]
+        rarities = [f'|rarity{r}{s}Percent={float(params[str(r)+s]):.02f}%' for r in range(5,0,-1) for s in ('Focus','SHSpecial','Special','') if (str(r)+s) in params]
         if rarities != []: pass
         elif params['type'] in ('Special') and params['name'][-9:] == ' (4★SHSR)':
             if 'focus4' in params:

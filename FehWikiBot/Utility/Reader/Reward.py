@@ -96,6 +96,7 @@ class RewardReader(IReader):
 
 def readReward(reader:Reader, key:str=None, xorSize=0, offSize=8):
     size = reader.overviewInt(offSize, xorSize) # 0x48 == 72, + 0x10 x K
+    if offSize == 0: reader.skip(4)
     off = reader.getLong()
     if offSize == 8: reader.skip(4)
     if size != 0 and (size-72)%16 != 0: print('Reward size:', size)

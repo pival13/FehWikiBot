@@ -108,7 +108,7 @@ class Map(Container):
         mapType = None
         if self.baseMap[:2] in ('PA','PB','PC'):
             mapType = 'TD'
-        elif self.baseMap[0] in ('H'):
+        elif self.baseMap[0] in ('H','J'):
             mapType = 'HO'
         elif self.baseMap[0] in ('Q','O','Y'):
             mapType = 'RD'
@@ -232,7 +232,7 @@ class Map(Container):
         return s
 
     @classmethod
-    def Unit(cls, unit, i=None):
+    def Unit(cls, unit, i=None) -> str:
         from ..Utility.Units import Units, Heroes, Enemies
         from ..Skills import Weapon, Assist, Special, Passive
         from ..Others.Accessory import Accessories

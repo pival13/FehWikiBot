@@ -19,9 +19,9 @@ class ForgingBondsReader(IReader):
 
     def parse(self):
         nb = self.getLong()
-        self.readArray()
+        self.prepareArray()
         for _ in range(nb):
-            self.prepareObject()
+            self.readObject()
             self.readString('id_tag', xor=self.XOR)
             self.readString('id_tag2', xor=self.XOR)
             self.readString('title_id', xor=self.XOR)
@@ -50,16 +50,23 @@ class ForgingBondsReader(IReader):
                 self.end()
             self.end()
             count = self.overviewInt(0x84, 0x6F889C0D)
-            self.readArray('_unknow2')
+            self.readArray('bonus_mult')
             for _ in range(count):
                 self.prepareObject()
-                # TODO
+                self.assertBytes(0x10, 0x00000000377815dce649fb65d07c8fb9, 'bonus_mult[0x00-0x10]')
+                self.readArray('mults')
+                for _ in range(3):
+                    self.prepareObject()
+                    self.readInt('proba', 0x2E83318E)
+                    self.readInt('mult', 0x5122027C)
+                    self.end()
+                self.end()
                 self.end()
             self.end()
             count = self.overviewInt(0x80, 0x52974491)
             self.readArray('color_bonus')
             for _ in range(count):
-                self.readLong(xor=0x5B08CD8C)
+                self.readLong(xor=0x5B08CD8E)
             self.end()
             count = self.overviewInt(0x7C, 0x07C5C47C)
             self.readArray('score_mult')

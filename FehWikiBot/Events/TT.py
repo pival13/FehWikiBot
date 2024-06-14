@@ -13,7 +13,7 @@ class TempestTrials(ArticleContainer):
         super().__init__()
         self.story = ''
 
-    @property
+    @ArticleContainer.name.getter
     def name(self) -> str:
         from ..Utility.Messages import Messages
         return super().name or Messages.EN('MID_SEQUENTIAL_MAP_TERM_'+self.data['id_tag'])

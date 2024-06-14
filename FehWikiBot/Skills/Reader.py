@@ -6,7 +6,12 @@ class SkillReader(IReader):
     _basePath = 'Common/SRPG/Skill/'
 
     SKILL_TYPE = ['Weapon', 'Assist', 'Special', 'A', 'B', 'C', 'Attuned', 'Seal', 'Refine', 'Duo', 'Engage']
-    REFINE_TYPE = {0: None, 1: 'Skill1', 2: 'Skill2', 101: 'Atk', 102: 'Spd', 103: 'Def', 104: 'Res'}
+    REFINE_TYPE = {
+        0: None, 1: 'Skill1', 2: 'Skill2',
+        11: 'Skill1Atk', 12: 'Skill1Spd', 13: 'Skill1Def', 14: 'Skill1Res',
+        21: 'Skill2Atk', 22: 'Skill2Spd', 23: 'Skill2Def', 24: 'Skill2Res',
+        101: 'Atk', 102: 'Spd', 103: 'Def', 104: 'Res'
+    }
 
     def readWeaponList(self, key, xor):
         from ..Tool.globals import WEAPON_CATEGORY, WEAPON_MASK
@@ -57,6 +62,7 @@ class SkillReader(IReader):
             readStat(self, 'skill_param')
             readStat(self, 'skill_param2')
             readStat(self, 'refine_stats')
+            readStat(self, '_stats')
             self.readInt('num_id', 0xc6a53a23)
             self.readInt('sort_id', 0x8DDBF8AC)
             self.readInt('icon_id', 0xC6DF2173)
@@ -84,7 +90,14 @@ class SkillReader(IReader):
             self.readMoveList('mov_shield', 0x0EBEF25B)
             self.readWeaponList('wep_weakness', 0x005A02AF)
             self.readMoveList('mov_weakness', 0xB269B819)
-            self.skip(0x10)
+            self.skip(0x08)
+            # self.assertBytes(4, 0x494E2629, 'wep_adaptive') # Calculate damage using lower Def/Res
+            # self.assertBytes(4, 0xEE6CEF2E, 'mov_adaptive')
+            self.skip(0x08)
+            # self.assertBytes(8, 0xc49e0d1e68f6029c)
+            self.skip(0x08)
+            # self.assertBytes(8, 0x00)
+            self.skip(0x08)
             self.readInt('timing_id', 0x9C776648)
             self.readInt('ability_id', 0x72B07325)
             self.prepareArray('limits')

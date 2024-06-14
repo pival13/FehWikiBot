@@ -10,9 +10,10 @@ from .FB import ForgingBonds
 from .HoF import HallOfForms
 from .MS import MjolnirsStrike, Mechanism
 # from .FP import FrontlinePhalanx
-# from .PoL import PawnsOfLoki
-# from .HJ import HeroesJourney
-from .SD import SummonerDuelsR, SummonerDuelsS
-# from .BW import BindingWorlds
+from .PoL import PawnsOfLoki
+from .HJ import HeroesJourney
+from .SD import SummonerDuels, SummonerDuelsSeason, SummonerDuelsR, SummonerDuelsS
+from .BW import BindingWorlds
 from .SS import SeersSnare
 from .AAB import AffinityAutoBattles
+from .UW import UnitedWarfront

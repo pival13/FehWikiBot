@@ -3,7 +3,7 @@
 from .MainStories import MainStory
 from .Paralogues import Paralogue
 from .TD import TacticsDrills
-from .HO import HeroicOrdeals
+from .HO import HeroicOrdeals, MergedOrdeals
 # from .CC import
 # from .SA import
 
