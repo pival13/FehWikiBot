@@ -20,7 +20,7 @@ class AffinityAutoBattles(ArticleContainer):
     def Infobox(self):
         return super().Infobox('Affinity Auto-Battles', {
             'mapImage': self.MapImage(),
-            'bonusTitles': ';'.join(map(str,[0,9])),
+            'bonusTitles': ';'.join(map(str,self.data['entries'])),
             'start': self.data['avail']['start'],
             'end': self.data['avail']['end']
         })

@@ -2,7 +2,6 @@
 
 from FehWikiBot.Others.Accessory import Accessories
 from FehWikiBot.Others.AetherRaids import Structure
-from FehWikiBot.Utility.Units import Heroes
 from FehWikiBot.Skills import *
 from FehWikiBot.Stages import *
 from FehWikiBot.Events import *
@@ -57,6 +56,8 @@ if __name__ == '__main__':
     if unsupportedSpecialMaps(argv[1]) != []:
         print(TODO + 'Unsupported Special maps: ' + str(unsupportedSpecialMaps(argv[1])))
 
+    for o in VotingGauntlet.upcomingEvents():
+        o.createArticle().export('Voting Gauntlet ('+argv[1]+')')
     for o in TempestTrials.fromAssets(argv[1]):
         o.createArticle().export('Tempest Trials ('+argv[1]+')')
     for o in ForgingBonds.fromAssets(argv[1]):

@@ -5,9 +5,9 @@
 from datetime import datetime as _datetime
 
 __all__ = [
-    'TODO', 'ERROR', 'TIME_FORMAT', 'MIN_TIME', 'MAX_TIME',
+    'TODO', 'WARNING', 'ERROR', 'TIME_FORMAT', 'MIN_TIME', 'MAX_TIME',
     'DIFFICULTIES', 'ROMAN', 'COLOR',
-    'MOVE_TYPE', 'WEAPON_TYPE', 'WEAPON_CATEGORY', 'WEAPON_MASK', 'REFINE_TYPE',
+    'MOVE_TYPE', 'WEAPON_TYPE', 'WEAPON_CATEGORY', 'WEAPON_MASK',
     'ITEM_KIND'
 ]
 
@@ -88,8 +88,6 @@ WEAPON_CATEGORY = {
     0b100000000000000000000000: 'Colorless Beast',
 }
 WEAPON_MASK = {weapon: mask for mask, weapon in WEAPON_CATEGORY.items()}
-
-REFINE_TYPE = {1: 'Skill1', 2: 'Skill2', 101: 'Atk', 102: 'Spd', 103: 'Def', 104: 'Res'}
 
 ITEM_KIND = {
     0: 'Orb', 1: 'Hero', 2: 'Hero Feather', 3: 'Stamina Potion',

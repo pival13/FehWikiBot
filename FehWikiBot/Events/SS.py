@@ -19,6 +19,7 @@ class SeersSnare(ArticleContainer):
     def Infobox(self):
         from ..Utility.Units import Units
         return super().Infobox('Seers Snare', {
+            'bonusTitles': ';'.join(map(str, self.data['entries'])),
             'bosses': ';'.join([Units.get(o['unit']).name for o in self.data['boss_battle'][1:]] + [Units.get(self.data['boss_battle'][0]['unit']).name]),
             'startTime': self.data['avail']['start'],
             'endTime': self.data['avail']['end']
@@ -67,7 +68,7 @@ class SeersSnare(ArticleContainer):
                     'init_cooldown': -1,
                     'rarity': 5,
                     'true_lv': data['boss_level'][idx],
-                    'stats': unit.Stats(data['boss_level'][idx], 5),#, data['hp_factor'][idx] / 100)
+                    # 'stats': unit.Stats(data['boss_level'][idx], 5),#, data['hp_factor'][idx] / 100)
                     'seal': weaponToSeal(unit)
                 }] + [Map.PLACEHOLDER_UNIT | {
                     'init_cooldown': -1,
@@ -93,19 +94,18 @@ class SeersSnare(ArticleContainer):
         map1 = Map.create(o['intermediate'][:-1])
         map2 = Map.create(o['advanced'][:-1])
         for map,idx,count in ((map1,1,4), (map2,2,5)):
-            print(self.data['final_boss'])
             map.data['units'] = [Map.PLACEHOLDER_UNIT | self.data['final_boss'] | {
                 'init_cooldown': -1,
                 'rarity': 5,
                 'true_lv': data['boss_level'][idx],
-                'stats': Units.get(o['unit']).Stats(data['boss_level'][idx], 5)#, data['hp_factor'][idx] / 100)
+                # 'stats': Units.get(o['unit']).Stats(data['boss_level'][idx], 5)#, data['hp_factor'][idx] / 100)
             }] + [Map.PLACEHOLDER_UNIT | Units.get(self.data['final_boss']['enemies'][i]).Skills(latest=True) | {
                 'unit': self.data['final_boss']['enemies'][i],
                 'init_cooldown': -1,
                 'rarity': 5,
                 'true_lv': data['level'][idx],
-                'stats': Units.get(self.data['final_boss']['enemies'][i]).Stats(data['level'][idx]),
-                'seal': weaponToSeal(unit)
+                # 'stats': Units.get(self.data['final_boss']['enemies'][i]).Stats(data['level'][idx]),
+                'seal': weaponToSeal(Units.get(self.data['final_boss']['enemies'][i]))
             } for i in range(count)]
 
         s += f"===Rifts {prev+1}-{o['stage']+1}===\n"

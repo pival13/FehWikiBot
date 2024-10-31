@@ -7,10 +7,10 @@ from ...Tool.globals import ITEM_KIND
 class AccessoryReader(IReader):
     _basePath = 'Common/DressAccessory/Data/'
 
-    TYPES = {1: 'hat', 0: 'mask', 2: 'hair', 3: 'tiara'}
+    TYPES = {1: 'hat', 0: 'mask', 2: 'hair', 3: 'tiara', 4: 'aide'}
 
     def parse(self):
-        nb = self.overviewLong(0x08, 0x0de4c6f0ab07e0e13)
+        nb = self.overviewLong(0x08, 0xde4c6f0ab07e0e13)
         self.readArray()
         for _ in range(nb):
             self.prepareObject()
@@ -18,12 +18,26 @@ class AccessoryReader(IReader):
             self.readString('sprite')
             self.readInt('num_id', 0xf765ad9c)
             self.readInt('sort_id', 0x0159b21d)
-            self.insert('type', self.TYPES.get(self.getByte(0xf6)) or f"Unknow ({self.getByte(0xf6)})")
+            self.insert('type', self.TYPES.get(self.getByte(0xf6)) or f"Unknow ({self.overviewByte(-1,0xf6)})")
+            self.assertBytes(2, 0xA526, '_unknow1')
             self.readBool('summoner', 0xf6)
-            self.skip(0x06) # 0x981B01B78027
+            self.assertBytes(4, 0x981B01B7, '_filler')
             self.end()
         self.end()
     
+class AccessoryAideData(IReader):
+    _basePath = 'Common/DressAccessory/TamerData/'
+
+    def parse(self):
+        nb = self.overviewLong(0x08, 0x4D456A353BA30E65)
+        self.readArray()
+        for _ in range(nb):
+            self.prepareObject()
+            self.readString('unit_id')
+            self.readString('accessory_id')
+            self.end()
+        self.end()
+
 class AccessoryPurchaseData(IReader):
     _basePath = 'Common/DressAccessory/ShopData/'
 

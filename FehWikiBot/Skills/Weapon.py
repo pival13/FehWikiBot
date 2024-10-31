@@ -72,8 +72,8 @@ class Weapon(Skills):
     def InfoboxRefine(self):
         from ..Tool.globals import WEAPON_CATEGORY, ITEM_KIND, YELLOW_BG, RESET_TEXT
         refines = [self.get(r).data for r in self.data['@refines']]
-        listAdd = lambda a,b:list(map(lambda c,d:c+d,a,b))
-        listSub = lambda a,b:list(map(lambda c,d:c-d,a,b))
+        listAdd = lambda a,b: list(map(lambda c,d: c+d,  a,b))
+        listSub = lambda a,b: list(map(lambda c,d: c-d,  a,b))
 
         ret = {}
         if  (    self.exclusive and self.data['wep_equip'] == WEAPON_CATEGORY[0x8000] and sorted([r['refine_type'] for r in refines]) == sorted(['Skill1'])) or \
@@ -90,7 +90,7 @@ class Weapon(Skills):
         if ITEM_KIND[17] in costs: ret['refineStones'] = costs[ITEM_KIND[17]]
         if ITEM_KIND[18] in costs: ret['refineDews'] = costs[ITEM_KIND[18]]
 
-        # Changs common to all refines
+        # Changes common to all refines
         ref = Weapon(); ref.data = refines[-1] # Skill1 for exclusive, Res for inheritable
         stats = listAdd(listSub(ref.data['stats'].values(), ref.data['refine_stats'].values()), [0,ref.might,0,0,0])
         if ref.data['desc_id'] != self.data['desc_id']:
@@ -115,11 +115,11 @@ class Weapon(Skills):
                 'Skill': ([3,0,0,0,0], [0,0,0,0,0])
             }
             # TODO: icon for staffs
-            if r['id_tag'][r['id_tag'].rindex('_')+1:] != TAGS[r['refine_type']] and not (self.exclusive and r['refine_type'] == 'Skill1' and r['id_tag'][:-2] != '_一'):
+            if r['refine_type'] not in TAGS or r['id_tag'][r['id_tag'].rindex('_')+1:] != TAGS[r['refine_type']] and not (self.exclusive and r['refine_type'] == 'Skill1' and r['id_tag'][:-2] != '_一'):
                 print(f'{YELLOW_BG}Unusual refine{RESET_TEXT}: ' + self.name)
                 ret['tagidExtra'+r['refine_type']] = r['id_tag'][r['id_tag'].rindex('_')+1:]
             deltaMight = ref.might - self.data['might']
-            if listSub(r['refine_stats'].values(), [0,deltaMight,0,0,0]) != STATS[r['refine_type'][:5]][r['range']-1]:
+            if r['refine_type'] not in STATS or listSub(r['refine_stats'].values(), [0,deltaMight,0,0,0]) != STATS[r['refine_type'][:5]][r['range']-1]:
                 ret['refineStats'+r['refine_type']] = ','.join(map(str,listSub(r['refine_stats'].values(), [0,deltaMight,0,0,0])))
 
         # Changs of Skill1

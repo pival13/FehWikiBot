@@ -120,28 +120,15 @@ class SeersSnareReader(IReader):
                 self.skip(0x03)
                 self.end()
             self.end()
-            self.assertBytes(8, 0x2E410F8A7D443EB7, '_12')
-            self.assertBytes(8, 0x6625D9ED5DAA0403, '_34')
-            self.assertBytes(12, 0xAFEB1B0B11BA38763CA19888, '_567')
-            self.assertBytes(4, 0xF0219FF7, '_8')
-            self.assertBytes(4, 0xAFCE324D, '_9')
-            self.assertBytes(4, 0x6CDBCD5D, '_A')
+            self.assertBytes(8, 0x2E410F8A_7D443EB7, '&boss_battle[8,16]')
+            self.skip(4)#, 0x5DAA0403, '_3')
+            self.readMask('entries', 2, 0xDDEF)
+            self.assertBytes(14, 0xAFEB1B0B_11BA3876_3CA19888_6625, '&entries[2,16]')
+            self.readInt('max_hero', 0xF0219C5D) # NOTE: Still inaccurate
+            self.readInt('max_skill', 0xAFCE3F9A) # NOTE: Still inaccurate
+            self.assertBytes(4, 0x6CDBCD44, '25 - 35')
             self.end()
         self.end()
 
 SSReader = SeersSnareReader
 ExplorerReader = SeersSnareReader
-
-# SS5:
-# 4,14(E) == 0x4010
-# ! WARNING: SeersSnareReader: Expected 0x6625d9ed5daa0403, got 0x66259dff2cd597f9 (XOR 0x44'12717f93fa) (_34)
-# ! WARNING: SeersSnareReader: Expected 0xf0219ff7, got 0xf0219873 (XOR 0x784) (_8)
-# ! WARNING: SeersSnareReader: Expected 0xafce324d, got 0xafce3004 (XOR 0x249) (_9)
-# ! WARNING: SeersSnareReader: Expected 0x6cdbcd5d, got 0x6cdbcd5a (XOR 0x7) (_A)
-
-# SS6:
-# 2,7 == 0x00F2
-# ! WARNING: SeersSnareReader: Expected 0x6625d9ed5daa0403, got 0x6625dd6bdbe282a1 (XOR 0x48'6864886a2) (_34)
-# ! WARNING: SeersSnareReader: Expected 0xf0219ff7, got 0xf0219869 (XOR 0x79e) (_8)
-# ! WARNING: SeersSnareReader: Expected 0xafce324d, got 0xafce306a (XOR 0x227) (_9)
-# ! WARNING: SeersSnareReader: Expected 0x6cdbcd5d, got 0x6cdbcd5a (XOR 0x7) (_A)

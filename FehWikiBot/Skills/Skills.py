@@ -47,7 +47,7 @@ def _createChildClass(obj):
 class Skills(JsonContainer, ArticleContainer):
     _DATA = {}
     _reader = SkillReader
-    _linkArticleData = (r'tagid\s*=\s*(\w+)','id_tag')
+    _linkArticleData = (r'tagid\s*=\s*([^\s\|\}]+)','id_tag')
 
     def __repr__(self) -> str:
         return '<' + type(self).__name__ + ' "' + str(self.name) + '" ('+str(self.type)+')' + (f" ({self.id_tag if hasattr(self,'id_tag') else self.data['id_tag']})" if self.data else '') + '>'
@@ -138,6 +138,7 @@ class Skills(JsonContainer, ArticleContainer):
             'SID_シーフ': 'weapon', # Thief
             'SID_ミステルトィン': 'sword', # Missiltainn
             'SID_魔書ミステルトィン': 'tome', # Missiltainn
+            'SID_絶対化身': 'Sacred Seal', # Beast
         }
         s = super().name
         if s or self.data is None: return s

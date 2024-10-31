@@ -2,10 +2,15 @@
 
 from ..Tool.ArticleContainer import ArticleContainer, Container
 from .Reader.Accessory import AccessoryReader as Reader,\
-                              AccessoryPurchaseData as ShopReader
+                              AccessoryPurchaseData as ShopReader,\
+                              AccessoryAideData as AideReader
 
 class AccessoriesPurchasable(Container):
     _reader = ShopReader
+
+class AideAccessories(Container):
+    _reader = AideReader
+    _key = None
 
 class Accessories(ArticleContainer):
     _reader = Reader
@@ -18,7 +23,10 @@ class Accessories(ArticleContainer):
 
         datas = cls._DATA.get(name)
         for data in (datas.values() if isinstance(datas, dict) else datas or []):
-            data['@Shop'] = AccessoriesPurchasable.get(data['id_tag']).data if AccessoriesPurchasable.get(data['id_tag']) else None
+            data['@Shop'] = AccessoriesPurchasable.get(data['id_tag'])
+            data['@Aide'] = AideAccessories.get(data['id_tag'], 'accessory_id')
+            if data['@Shop']: data['@Shop'] = data['@Shop'].data
+            if data['@Aide']: data['@Aide'] = data['@Aide'].data['unit_id']
 
         return True
 
@@ -44,8 +52,11 @@ class Accessories(ArticleContainer):
             s += '{{Gold accessory}}\n'
         elif self.data['id_tag'][-2:] == '・極' or Accessories.get(self.data['id_tag']+'・極') is not None:
             s += '{{Forging Bonds accessory}}\n'
-        elif self.data['id_tag'][:8] == 'DAID_旅先の':
+        elif self.data['id_tag'][:8] == 'DAID_旅先の' or self.data['id_tag'][:7] == 'DAID_旅の':
             s += '{{Heroes Journey accessory}}\n'
+        elif self.data['@Aide']:
+            from ..Utility.Units import Heroes
+            s += '* Obtained by summoning {{Ut|' + Heroes.get(self.data['@Aide']).name + '}} for the first time.\n'
         #{{Rokkr Sieges accessory}}
         #{{Tap Battle accessory}}
         if self.data['@Shop'] is not None:

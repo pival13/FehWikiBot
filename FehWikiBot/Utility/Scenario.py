@@ -266,14 +266,14 @@ def _mergeObjects(langs):
 
 def _stringifyObjects(objs):
     from .Messages import Messages
-    from .Units import Units
+    from .Units import Units, NPC
 
     stack = []
     for i,obj in enumerate(objs):
         # Unit object
         if 'unit' in obj:
             prev = objs[i-1] if i > 0 and 'unit' in objs[i-1] else objs[i-2] if i > 1 and 'unit' in objs[i-2] else {'unit':'','name':'','expression':''}
-            unit = Units.fromFace(obj['unit'])
+            unit = Units.fromFace(obj['unit']) if obj['unit'] != 'ch90_02_FighterAX_M_Normal' else NPC.fromFace(obj['unit'])
             o = {}
 
             # New unit

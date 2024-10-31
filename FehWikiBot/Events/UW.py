@@ -57,17 +57,23 @@ class UnitedWarfront(ArticleContainer):
             ally = ally[1] if ally else ''
             image = re.search(r'UnitData.*mapImage\s*=\s*(\{\{.+?\}\})\s*\|\s*(?:Normal|Hard|Lunatic|Infernal|Abyssal)', o.page, re.DOTALL)
             image = image[1] if image else Map.get(stage['map_id']).Image(shortest=True)
-            diff = list(stage['maps'].keys())[-1]
-            units = re.search(r'UnitData.*\|\s*'+diff+r'\s*=\s*(\[.*?\])\s*(?:\||\}\})', o.page, re.DOTALL)
-            units = units[1] if units else ('[\n'+Map.Unit(Map.PLACEHOLDER_UNIT)+'\n]')
+            derivedTabs = []
+            units = {}
+            for j,diff in enumerate(stage['maps'].keys()):
+                if not self.data['_obj2'][j]['altered_data']:
+                    derivedTabs.append(diff)
+                else:
+                    units[diff] = re.search(r'UnitData.*\|\s*'+diff+r'\s*=\s*(\[.*?\])\s*(?:\||\}\})', o.page, re.DOTALL)
+                    units[diff] = units[diff][1] if units[diff] else ('[\n'+Map.Unit(Map.PLACEHOLDER_UNIT)+'\n]')
             s += f'===Battle {i+1}===\n'
-            s += '{{#invoke:UnitData|main\n'
+            s +=  '{{#invoke:UnitData|main\n'
             s += f'|battle={i+1}|derived=united_warfront\n'
             s += f'|derivedMap={o.name}'
-            s += '|derivedTabs={' + ';'.join([k+'='+k for k in list(stage['maps'].keys())[:-1]]) + '}\n'
+            s +=  '|derivedTabs={' + ';'.join([k+'='+k for k in derivedTabs]) + '}\n'
             s += f'|mapImage={image}|allyPos={ally}\n'
-            s += f'|{diff}={units}\n'
-            s += '}}\n'
+            for diff,units in units.items():
+                s += f'|{diff}={units}\n'
+            s +=  '}}\n'
         return s[:-1]
 
     def createArticle(self) -> Self:

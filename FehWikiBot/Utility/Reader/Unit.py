@@ -7,7 +7,7 @@ class HeroReader(IReader):
 
     def parse(self):
         from ...Tool.globals import BLESSING
-        KIND = ['','LegendMythic','Duo','Harmonized','Ascended','Rearmed','Attuned','Emblem']
+        KIND = ['','LegendMythic','Duo','Harmonized','Ascended','Rearmed','Attuned','Emblem','Aided']
         nb = self.overviewLong(0x08, 0xde51ab793c3ab9e1)
         self.readArray()
         for _ in range(nb):

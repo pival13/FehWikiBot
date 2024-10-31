@@ -164,7 +164,7 @@ class Reader:
         return bytes(s).decode('utf8', 'replace')
 
 
-    def readLong(self, key:str=None, xor=0, signed=False): self.insert(key, self.getLong(xor, signed))
+    def readLong(self, key:str=None, xor=0, signed=False, hexa=False): self.insert(key, (hex if hexa else int)(self.getLong(xor, signed)))
     def getLong(self, xor=0, signed=False): self.skip(8); return self.overviewLong(-8, xor, signed)
     def overviewLong(self, off=0, xor=0, signed=False):
         v = int.from_bytes(self._buff[self._i+off:self._i+off+8], 'little')
@@ -172,7 +172,7 @@ class Reader:
         if signed and v > 0x7FFFFFFFFFFFFFFF: v = -(v ^ 0xFFFFFFFFFFFFFFFF) - 1
         return v
 
-    def readInt(self, key:str=None, xor=0, signed=False): self.insert(key, self.getInt(xor, signed))
+    def readInt(self, key:str=None, xor=0, signed=False, hexa=False): self.insert(key, (hex if hexa else int)(self.getInt(xor, signed)))
     def getInt(self, xor=0, signed=False): self.skip(4); return self.overviewInt(-4, xor, signed)
     def overviewInt(self, off=0, xor=0, signed=False):
         v = int.from_bytes(self._buff[self._i+off:self._i+off+4], 'little')
@@ -180,7 +180,7 @@ class Reader:
         if signed and v > 0x7FFFFFFF: v = -(v ^ 0xFFFFFFFF) - 1
         return v
 
-    def readShort(self, key:str=None, xor=0, signed=False): self.insert(key, self.getShort(xor, signed))
+    def readShort(self, key:str=None, xor=0, signed=False, hexa=False): self.insert(key, (hex if hexa else int)(self.getShort(xor, signed)))
     def getShort(self, xor=0, signed=False): self.skip(2); return self.overviewShort(-2, xor, signed)
     def overviewShort(self, off=0, xor=0, signed=False):
         v = int.from_bytes(self._buff[self._i+off:self._i+off+2], 'little')
@@ -188,7 +188,7 @@ class Reader:
         if signed and v > 0x7FFF: v = -(v ^ 0xFFFF) - 1
         return v
 
-    def readByte(self, key:str=None, xor=0, signed=False): self.insert(key, self.getByte(xor, signed))
+    def readByte(self, key:str=None, xor=0, signed=False, hexa=False): self.insert(key, (hex if hexa else int)(self.getByte(xor, signed)))
     def getByte(self, xor=0, signed=False): self.skip(1); return self.overviewByte(-1, xor, signed)
     def overviewByte(self, off=0, xor=0, signed=False):
         v = int.from_bytes(self._buff[self._i+off:self._i+off+1], 'little')
@@ -221,7 +221,7 @@ class Reader:
     def assertPadding(self, nbBytes):
         from .globals import WARNING
         if int.from_bytes(self._buff[self._i:self._i+nbBytes], 'little') != 0:
-            print(WARNING + f'{self.__class__.__name__}: Expected {nbBytes} padding not found ({",".join([hex(i) for _,i in self._stack if i != 0] + [hex(self._i)])})')
+            print(WARNING + f'{self.__class__.__name__}: Expected {nbBytes} padding not found ({",".join([hex(i-8) for _,i in self._stack if i != 0] + [hex(self._i)])})')
         self.skip(nbBytes)
 
 

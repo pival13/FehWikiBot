@@ -6,7 +6,7 @@ from .Reader.FB import ForgingBondsReader
 
 class ForgingBonds(ArticleContainer):
     _reader = ForgingBondsReader
-    _linkArticleData = (r'', 'id_tag')
+    _linkArticleData = (r'startTime\s*=\s*([0-9TZ\-:]{20})', ['avail','start'])
 
     def __init__(self):
         self.pages = {}

@@ -92,11 +92,11 @@ class Focus(Article):
                 match kwargs['type']:
                     case 'New Heroes': kwargs['notif'] = 'New Heroes Summoning Event: '+kwargs['name']+' (Notification)'
                     case 'Special': kwargs['notif'] = 'Special Heroes Summoning Event: '+kwargs['name']+' (Notification)'
-                    case 'Legendary': kwargs['notif'] = 'Legendary Hero Summoning Event - '+kwargs['heroes'][0]+' (Notification)'
-                    case 'Mythic': kwargs['notif'] = 'Mythic Hero Summoning Event - '+kwargs['heroes'][0]+' (Notification)'
+                    case 'Legendary' | 'Mythic' | 'Emblem': kwargs['notif'] = kwargs['type']+' Hero Summoning Event - '+kwargs['heroes'][0]+' (Notification)'
                     case 'Double Special Heroes': kwargs['notif'] = f"Double Special Heroes Summoning Event ({kwargs['start'].strftime('%b %Y')}) (Notification)"
                     case 'ω Special Heroes': kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].year}) (Notification)"
-                    case 'Returning' | 'Legendary & Mythic Hero Remix': kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].strftime('%b %Y')}) (Notification)"
+                    case 'Legendary & Mythic Hero Remix': kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].strftime('%b %Y')}) (Notification)"
+                    case 'Returning': kwargs['notif'] = f"New Heroes Return: {kwargs['name']} ({kwargs['start'].strftime('%b %Y')}) (Notification)"
                     case 'Bound Hero Battle': kwargs['notif'] = 'Summoning Focus: Bound Hero Battle ('+kwargs['name'][7:-9]+') (Notification)'
                     case 'Tempest Trials': kwargs['notif'] = 'Summoning Focus: Tempest Trials+ ('+kwargs['page'][23:-1]+') (Notification)'
                     case 'Other': kwargs['notif'] = ''
@@ -173,7 +173,10 @@ class Focus(Article):
             else:
                 rarities = ['|rarity5FocusPercent=6.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=57.00%','|rarity3Percent=34.00%']
         elif params['type'] in ('ω Special Heroes'):
-            rarities = ['|rarity5FocusPercent=6.00%','|rarity5Percent=2.00%','|rarity4FocusPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=50.00%','|rarity3Percent=36.00%']
+            if 'focus4' in params:
+                rarities = ['|rarity5FocusPercent=6.00%','|rarity5Percent=2.00%','|rarity4FocusPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=50.00%','|rarity3Percent=36.00%']
+            else:
+                rarities = ['|rarity5FocusPercent=6.00%','|rarity5Percent=2.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=53.00%','|rarity3Percent=36.00%']
         elif params['type'] in ('Legendary', 'Mythic', 'Emblem', 'Legendary & Mythic', 'Emblem & Mythic'):
             rarities = ['|rarity5FocusPercent=8.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=34.00%']
         elif params['type'] in ('Legendary & Mythic Hero Remix'):

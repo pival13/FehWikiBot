@@ -87,7 +87,10 @@ class Article:
 
         s = '==In other languages==\n'
         s += '{{OtherLanguages\n'
-        if lang('USEN', ': ', False) != self.name:
+        try:
+            if lang('USEN', ': ', False) != self.name:
+                s += '|english=' + lang('USEN', ': ', False) + '\n'
+        except:
             s += '|english=' + lang('USEN', ': ', False) + '\n'
         s += '|japanese=' +    lang('JPJA', '　', swapJp) + '\n'
         s += '|german=' +      lang('EUDE', ': ', False) + '\n'
