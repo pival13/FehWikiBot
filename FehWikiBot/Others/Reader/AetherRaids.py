@@ -26,7 +26,7 @@ class StructureReader(IReader):
     _basePath = 'Common/SkyCastle/FacilityData/'
 
     def parse(self):
-        KIND = {0: 'Structure (D)', 1: 'Traps', 2: 'Resources', 3: 'Ornaments', 4: 'Structure (O)', 5: 'R&R Structures', 6: 'Structure (Resort)', 7: 'Decoy Traps'}
+        KIND = {0: 'Structures (D)', 1: 'Traps', 2: 'Resources', 3: 'Ornaments', 4: 'Structures (O)', 5: 'R&R Structures', 6: 'Structure (Resort)', 7: 'Decoy Traps'}
 
         nb = self.overviewLong(0x08, 0x69670863)
         self.readArray()

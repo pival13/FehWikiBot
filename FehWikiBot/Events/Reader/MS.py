@@ -8,10 +8,11 @@ class MjolnirsStrikeReader(IReader):
 
     def parse(self):
         SEASONS = ['LightDark','DarkLight','HeavenLogic','LogicHeaven']
-        nb = self.overviewLong(0x08, 0x00)
-        self.readArray()
+        self.skip(0x08)
+        nb = self.getLong()
+        self.prepareArray()
         for _ in range(nb):
-            self.prepareObject()
+            self.readObject()
             self.readString('id_tag')
             self.readString('bonus_structure')
             self.readString('bonus_structure_next')
@@ -68,13 +69,17 @@ class MjolnirsStrikeReader(IReader):
             readAvail(self, 'avail')
             readAvail(self, 'shield_avail')
             readAvail(self, 'counter_avail')
-            self.skip(0x10)
+            self.skip(0x04) # self.assertBytes(0x04, 0x8D49B397, 'data[0xC0:]')
+            self.assertBytes(0x04, 0x27E3B493, 'data[0xC8:]')
+            self.skip(0x04) # self.assertBytes(0x04, 0x4036619A, 'data[0xD0:]')
+            self.assertBytes(0x04, 0x99012F7D, 'data[0xD8:]')
             self.readMask('origins', 4, 0xc8f81eca)
-            self.skip(0x04)
-            self.skip(0x10) # reward,tiers,_unknows count
-            self.skip(0x0D)
+            self.assertBytes(0x04, 0xB7AAB352)
+            self.skip(0x10) # nb rewards,tiers,unknows
+            self.assertBytes(0x0D, 0xE4EEFBFAFA5DCBBB682F6388C2, 'data[0xF4:]')
             self.insert('season', SEASONS[self.getByte(0x1c)])
-            self.skip(0x0A)
+            self.assertBytes(0x0C, 0xF5F46D42F50F6E8AF4026FD2, 'data[...:]')
+            self.assertPadding(6)
             self.end()
         self.end()
 

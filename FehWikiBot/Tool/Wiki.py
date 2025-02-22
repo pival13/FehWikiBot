@@ -136,7 +136,9 @@ class Wiki:
             "rvprop": "content",
             "rvlimit": revision+1,
             "rvslots": "*",
-        })['query']['pages']
+        })
+        if 'query' not in result: return None
+        result = result['query']['pages']
         if len(result) == 0 or 'revisions' not in list(result.values())[0]: return None
         result = list(result.values())[0]['revisions']
         if len(result) > revision:

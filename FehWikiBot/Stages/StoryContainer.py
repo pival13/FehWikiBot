@@ -72,14 +72,14 @@ class StoryContainer(ArticleContainer):
         reqs = []
         if self.map['Normal']['survive']: reqs.append('All allies must survive.')
         if self.map['Normal']['lights_blessing'] == 0: reqs.append('Cannot use {{It|Light\'s Blessing}}.')
+        if self.map['Normal']['reinforcements']:
+            o['mapMode'] = 'Reinforcement Map'
         if self.map['Normal']['max_turn']:
             o['mapMode'] = 'Turn Limit Map'
             reqs.append(f"Turns to win: {self.map['Normal']['max_turn']}")
-        if self.map['Normal']['max_turn']:
+        if self.map['Normal']['min_turn']:
             o['mapMode'] = 'Defensive Battle Map'
             reqs.append(f"Turns to defend: {self.map['Normal']['min_turn']}")
-        if self.map['Normal']['reinforcements']:
-            o['mapMode'] = 'Reinforcement Map'
         o['winReq'] = '<br>'.join(reqs)
 
         return super().Infobox('Battle', o)

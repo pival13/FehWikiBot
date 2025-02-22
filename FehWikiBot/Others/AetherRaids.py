@@ -64,8 +64,10 @@ class AetherRaidsStructure(ArticleContainer):
         if not hasattr(self, 'levels'):
             return EN('MID_SCF_' + self.data['id_tag'])
         else:
-            return EN('MID_SCF_' + self.levels[0]['id_tag'][:-1])
-
+            s = EN('MID_SCF_' + self.levels[0]['id_tag'][:-1])
+            if s == '':
+                s = EN('MID_SCF_' + self.levels[0]['id_tag'])
+            return s
 
     def Infobox(self):
         from ..Utility.Messages import EN

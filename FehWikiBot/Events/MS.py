@@ -22,11 +22,13 @@ class MjolnirsStrike(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        return super().name or 'Mjölnir\'s Strike ' + str(self.number)
+        return 'Mjölnir\'s Strike ' + str(self.number)
 
     @property
     def number(self) -> int:
         from ..Tool.Wiki import Wiki
+        s = super().name
+        if s: return int(s[17:])
         return int(Wiki.cargoQuery('MjolnirsStrike', 'COUNT(DISTINCT _pageName)=Nb', where='StartTime < "'+self.data['avail']['start']+'"', limit=1))+1
 
 
@@ -91,6 +93,8 @@ class MjolnirsStrike(ArticleContainer):
         if self.page.find('askrScore=\n') == -1: return self
 
         content = requests.get(url=f'https://support.fire-emblem-heroes.com/mjolnir/terms/m_{self.number:04}').content.decode()
+        if not content: return self
+
         lvs = re.findall(r'レベル (\d+)', content)
         timeStronger = re.search(r'\d+時間中、(\d+)時間', content)[1]
         situations = json.loads(re.search(r'data-situations="([^"]*)"', content)[1].replace('&quot;','"'))

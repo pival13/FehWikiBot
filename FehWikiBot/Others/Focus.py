@@ -53,7 +53,7 @@ class Focus(Article):
         'Voting Gauntlet', 'Tempest Trials', 'Hall of Forms', 'Hall of Forms Revival'
         'Bound Hero Battle',
         'Skill', 'New Power',
-        'Weekly Revival',
+        'Weekly Revival', 'Legendary Revival',
         'Hero Fest',
         'A Hero Rises',
         'Other',
@@ -96,7 +96,7 @@ class Focus(Article):
                     case 'Double Special Heroes': kwargs['notif'] = f"Double Special Heroes Summoning Event ({kwargs['start'].strftime('%b %Y')}) (Notification)"
                     case 'ω Special Heroes': kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].year}) (Notification)"
                     case 'Legendary & Mythic Hero Remix': kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].strftime('%b %Y')}) (Notification)"
-                    case 'Returning': kwargs['notif'] = f"New Heroes Return: {kwargs['name']} ({kwargs['start'].strftime('%b %Y')}) (Notification)"
+                    case 'Returning': kwargs['notif'] = f"New Heroes Return ({kwargs['start'].strftime('%b %Y')}) (Notification)"
                     case 'Bound Hero Battle': kwargs['notif'] = 'Summoning Focus: Bound Hero Battle ('+kwargs['name'][7:-9]+') (Notification)'
                     case 'Tempest Trials': kwargs['notif'] = 'Summoning Focus: Tempest Trials+ ('+kwargs['page'][23:-1]+') (Notification)'
                     case 'Other': kwargs['notif'] = ''
@@ -110,6 +110,8 @@ class Focus(Article):
         else:
             if 'shsr' in kwargs and kwargs['shsr'] and kwargs['name'].find('SHSR') == -1:
                 kwargs['name'] += ' (4★SHSR)'
+            if kwargs['type'] == 'Hall of Forms Revival':
+                kwargs['name'] += ' Revival'
             format = '%Y' if type in ('Special','ω Special Heroes') else '%b %Y'
             if 'notif' not in kwargs or kwargs['notif'] == '':
                 if kwargs['type'] == 'Special':
@@ -118,7 +120,7 @@ class Focus(Article):
                     kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].year}) (Notification)"
                 elif kwargs['type'] == 'New Heroes Revival':
                     kwargs['notif'] = f"New Heroes Revival: {kwargs['name'][9:]} (Notification)"
-                elif kwargs['type'] == 'Weekly Revival':
+                elif kwargs['type'] in ('Weekly Revival','Hall of Forms Revival'):
                     kwargs['notif'] = f"Summoning {kwargs['name']} ({kwargs['start'].strftime(format)}) (Notification)"
                 else:
                     kwargs['notif'] = ''
@@ -173,15 +175,17 @@ class Focus(Article):
             else:
                 rarities = ['|rarity5FocusPercent=6.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=57.00%','|rarity3Percent=34.00%']
         elif params['type'] in ('ω Special Heroes'):
-            if 'focus4' in params:
-                rarities = ['|rarity5FocusPercent=6.00%','|rarity5Percent=2.00%','|rarity4FocusPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=50.00%','|rarity3Percent=36.00%']
-            else:
-                rarities = ['|rarity5FocusPercent=6.00%','|rarity5Percent=2.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=53.00%','|rarity3Percent=36.00%']
+            rarities = ['|rarity5FocusPercent=6.00%','|rarity5Percent=2.00%']
+            if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
+            if params.get('shsr'): rarities.append('|rarity4SHSpecialPercent=3.00%')
+            rarities.append('|rarity4SpecialPercent=3.00%')
+            rarities.append(f"|rarity4Percent={50 if len(rarities) > 3 else 53}.00%")
+            rarities.append(f"|rarity3Percent={33 if len(rarities) > 5 else 36}.00%")
         elif params['type'] in ('Legendary', 'Mythic', 'Emblem', 'Legendary & Mythic', 'Emblem & Mythic'):
             rarities = ['|rarity5FocusPercent=8.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=34.00%']
         elif params['type'] in ('Legendary & Mythic Hero Remix'):
             rarities = ['|rarity5FocusPercent=6.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=57.00%','|rarity3Percent=34.00%']
-        elif params['type'] in ('Weekly Revival'):
+        elif params['type'] in ('Weekly Revival','Legendary Revival'):
             rarities = ['|rarity5FocusPercent=4.00%','|rarity5Percent=2.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=36.00%']
         elif params['type'] in ('Hero Fest'):
             rarities = ['|rarity5FocusPercent=5.00%','|rarity5Percent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=34.00%']
@@ -191,7 +195,7 @@ class Focus(Article):
             rarities = ['|rarity5FocusPercent=3.00%','|rarity5Percent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=36.00%']
         s += '\n'.join(rarities) + '\n'
 
-        for i,h in enumerate(params['heroes']):
+        for i,h in enumerate(params.get('heroes') or []):
             s += f'|hero{i+1}={h}\n'
             if 'focus4' in params and (i+1) not in params['focus4']:
                 s += f'|rarity{i+1}=5\n'

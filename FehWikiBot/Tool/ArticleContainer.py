@@ -23,7 +23,7 @@ class ArticleContainer(Article, Container):
     "Article pattern with a single match and path to the variable on data"
 
     def __repr__(self) -> str:
-        return '<' + type(self).__name__ + ' "' + str(self.name) + '"' + (f" ({self.id_tag if hasattr(self,'id_tag') else self.data['id_tag']})" if self.data else '') + '>'
+        return '<' + type(self).__name__ + ' "' + str(self.name if hasattr(self,'name') else None) + '"' + (f" ({self.id_tag if hasattr(self,'id_tag') else self.data['id_tag']})" if hasattr(self,'data') and self.data else '') + '>'
 
     @Article.name.getter
     def name(self) -> str | None:
@@ -38,6 +38,7 @@ class ArticleContainer(Article, Container):
         from re import search
         o = super().fromWiki(name)
         if o is None: return None
+        o.data = None
         m = search(cls._linkArticleData[0], o.page)
         if m:
             o2 = super().get(m[1], cls._linkArticleData[1])

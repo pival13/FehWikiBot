@@ -150,6 +150,7 @@ class Paralogue(StoryContainer):
         elif start.month == 5: return 'Bridal Festival'
         elif start.month in (6,7): return 'Summer Vacation'
         elif start.month == 10: return 'Harvest Festival'
+        elif start.month == 11: return 'Ninja Festival'
         elif start.month == 12 and start.day <= 25: return 'Winter Festival'
         else:
             print(TODO + 'Story category for '+self.name) # TODO

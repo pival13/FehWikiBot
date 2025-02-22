@@ -59,7 +59,7 @@ class NPC:
         'ch00_47_Gullveig_F_Disappear': {'id': 'EID_グルヴェイグ',   'name': 'Gullveig: Golden Seer (Disappear)'},
         'ch00_49_Heith_Normal':         {'id': 'PID_ヘイズ',        'name': 'Heiðr: Innocent Goddess'},
         'ch00_51_Njord_M_Normal':       {'id': '',                  'name': 'Njörðr'}, # PID_ニョルズ
-        'ch00_61_Thjazi_F_Normal':      {'id': '',                  'name': 'Þjazi '},
+        'ch00_59_Lerazr_M_Disappear':   {'id': 'EID_レーラズ',      'name': 'Læraðr: Quieting Heart (Disappear)'},
          # This is the tag used for non-face unit on scenarios
         'ch90_02_FighterAX_M_Normal':   {'id': '', 'name': ''}
     }

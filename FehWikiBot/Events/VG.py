@@ -7,7 +7,7 @@ from .Reader.VG import VotingGauntletReader
 class VotingGauntlet(ArticleContainer):
     @classmethod
     def fromWiki(cls, name: str):
-        o = super(ArticleContainer).fromWiki(name)
+        o = super(ArticleContainer,cls).fromWiki(name)
         o.data = None
         return o
 
@@ -35,13 +35,14 @@ class VotingGauntlet(ArticleContainer):
     @classmethod
     def incompleteArticles(cls) -> list[Self]:
         from ..Tool.Wiki import Wiki
-        os = Wiki.cargoQuery('VotingGauntlets', where='Scores3 IS NULL')
+        os = Wiki.cargoQuery('VotingGauntlets', where='Scores3__full IS NULL')
         pages = Wiki.getPagesContent(os)
         os = []
-        for page,content in pages.values():
+        for page,content in pages.items():
             o = cls()
             o.name = page
             o.page = content
+            o.data = None
             os.append(o)
         return os
 
@@ -57,7 +58,7 @@ class VotingGauntlet(ArticleContainer):
     @ArticleContainer.name.getter
     def name(self) -> str:
         from ..Utility.Messages import EN
-        return super().name or EN('MID_VOTE_TERM_' + self.data['id_tag']) if self.data is not None else None
+        return super().name or EN('MID_VOTE_TERM_' + self.data['id_tag']) if hasattr(self,'data') and self.data is not None else None
 
 
     def Infobox(self):

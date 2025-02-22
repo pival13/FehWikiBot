@@ -112,7 +112,7 @@ class Weapon(Skills):
                 'Spd':   ([5,0,3,0,0], [2,0,2,0,0]),
                 'Def':   ([5,0,0,4,0], [2,0,0,3,0]),
                 'Res':   ([5,0,0,0,4], [2,0,0,0,3]),
-                'Skill': ([3,0,0,0,0], [0,0,0,0,0])
+                'Skill1':([3,0,0,0,0], [0,0,0,0,0])
             }
             # TODO: icon for staffs
             if r['refine_type'] not in TAGS or r['id_tag'][r['id_tag'].rindex('_')+1:] != TAGS[r['refine_type']] and not (self.exclusive and r['refine_type'] == 'Skill1' and r['id_tag'][:-2] != '_一'):
