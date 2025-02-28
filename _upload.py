@@ -94,7 +94,7 @@ def upload(filepath: str, comment: str):
             from FehWikiBot.Others.Accessory import Accessories
             if exists(filepath[:-len(name)] + '/Thumbnail.png') and name[:-5] != 'Thumbnail': return
             o = Accessories.get(filepath[filepath.rfind('/', 0, -len(name))+1:-len(name)],'sprite')
-            name = o.data['sprite']
+            name = o.data['sprite'] + '.webp'
             name2 = ('Accessory ' + o.name + '.png') if o else None
         elif filepath.find('/Field/') != -1 and filepath.find('/Field/Common/') == -1:
             name = 'Map_' + name
