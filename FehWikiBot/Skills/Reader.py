@@ -84,13 +84,18 @@ class SkillReader(IReader):
             self.readByte('promotion_rarity', 0x75)
             self.readBool('refined', 0x02)
             self.insert('refine_type', self.REFINE_TYPE[self.getByte(0xFC)])
+            # Effective against this type
             self.readWeaponList('wep_effective', 0x23BE3D43)
             self.readMoveList('mov_effective', 0x823FDAEB)
+            # Remove this weakness
             self.readWeaponList('wep_shield', 0xAABAB743)
             self.readMoveList('mov_shield', 0x0EBEF25B)
-            self.readWeaponList('wep_weakness', 0x005A02AF)
-            self.readMoveList('mov_weakness', 0xB269B819)
-            self.assertBytes(0x08, 0xB7064176647F9ECD, f"[{self._stack[-1][0]['id_tag']}][...]")
+            # Weak against skills effective against this type
+            self.readWeaponList('wep_phantom_weakness', 0x005A02AF)
+            self.readWeaponList('mov_phantom_weakness', 0xB269B819)
+            # Weak against this type
+            self.readWeaponList('wep_weakness', 0x647F9ECD)
+            self.readWeaponList('mov_weakness', 0xB7064176)
             self.readWeaponList('wep_adaptive', 0x494E2629) # Calculate damage using lower Def/Res
             self.readMoveList('mov_adaptive', 0xEE6CEF2E)
             self.skip(0x04)# self.assertBytes(4, 0x68F6029C, f"[{self._stack[-1][0]['id_tag']}]._1")

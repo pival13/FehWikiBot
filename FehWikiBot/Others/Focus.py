@@ -152,7 +152,7 @@ class Focus(Article):
         s = '{{#invoke:SummoningFocus|focusPage\n'
         s += '|name=' + params['name'] + '\n'
         s += '|bannerType=' + params['type'] + '\n'
-        s += '|description={{SummoningEventDescription|notif=' + params['notif'] + '}}\n'
+        s += '|description=\n'
         if 'youtube' in params and len(params['youtube']) == 2:
             s += '|youtubeEN=https://www.youtube.com/watch?v=' + params['youtube'][0] + '\n'
             s += '|youtubeJP=https://www.youtube.com/watch?v=' + params['youtube'][1] + '\n'

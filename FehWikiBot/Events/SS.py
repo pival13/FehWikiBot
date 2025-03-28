@@ -13,8 +13,8 @@ class SeersSnare(ArticleContainer):
 
     @property
     def number(self) -> int:
-        self.get('')
-        return sorted(o['avail']['start'] for os in self._DATA.values() for o in os.values()).index(self.data['avail']['start']) + 1
+        from ..Tool.Wiki import Wiki
+        return int(Wiki.cargoQuery('SeersSnare', 'COUNT(DISTINCT _pageName)=Nb', where='StartTime < "'+self.data['avail']['start']+'"', limit=1))+1
 
     def Infobox(self):
         from ..Utility.Units import Units

@@ -97,7 +97,7 @@ ITEM_KIND = {
     20: 'Blessing', 21: 'Conquest Lance', 22: 'Accessory',
     23: 'FB Conversation', 25: 'Arena Crown', 26: 'Heroic Grail',
     27: 'AR Item', 28: 'Throne', 29: 'Summoning Ticket',
-    30: 'Dragonflower', 33: 'R&R Affinity', 34: 'Havoc Axe', 35: 'Music', 36: 'Forma Torch',
+    30: 'Dragonflower', 32: 'Combat Manual', 33: 'R&R Affinity', 34: 'Havoc Axe', 35: 'Music', 36: 'Forma Torch',
     37: 'Midgard Gem', 39: 'Divine Code', 43: 'Forma Soul', 
     44: 'Guardian Shield', 45: 'Trait Fruit', 50: 'Binding Torch',
     'Lost Lore Team': 'Lost Lore Team', 'Memento Points': 'Memento Point'

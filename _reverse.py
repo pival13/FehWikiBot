@@ -4,6 +4,7 @@ from FehWikiBot.Tool.Reader import IReader
 from FehWikiBot.Others.Reader.Accessory import AccessoryReader, AccessoryAideData, AccessoryPurchaseData
 from FehWikiBot.Others.Reader.AetherRaids import StructureReader, ConsumableReader
 from FehWikiBot.Others.Reader.Summon import FocusReader
+from FehWikiBot.Others.Reader.CompileManual import CompileCombatManualReader
 from FehWikiBot.Utility.Reader.Message import MessageReader
 from FehWikiBot.Utility.Reader.Sound import SoundReader, MapBGMReader, HOBGMReader
 from FehWikiBot.Utility.Reader.Unit import HeroReader, EnemyReader
@@ -33,7 +34,7 @@ from FehWikiBot.Events.Reader.SS import SeersSnareReader
 from FehWikiBot.Events.Reader.AAB import AffinityAutoBattlesReader
 from FehWikiBot.Events.Reader.UW import UnitedWarfrontReader
 
-READERS : list[IReader] = [ AccessoryReader, AccessoryAideData, AccessoryPurchaseData, StructureReader, MechanismReader, ConsumableReader, FocusReader, SoundReader, MapBGMReader, HOBGMReader, HeroReader, EnemyReader,
+READERS : list[IReader] = [ AccessoryReader, AccessoryAideData, AccessoryPurchaseData, StructureReader, MechanismReader, ConsumableReader, FocusReader, CompileCombatManualReader, SoundReader, MapBGMReader, HOBGMReader, HeroReader, EnemyReader,
                             SkillReader, RefineryReader, SealReader, SealForgeReader, CaptainSkillReader,
                             MapReader, EnvironmentReader, CellEnvironmentReader, StoryMapReader, SpecialMapReader, HeroicOrdealsReader, TacticsDrillsReader,
                             VotingGauntletReader, TempestTrialsReader, TapBattleReader, GrandConquestReader, GrandConquestWorldReader, ForgingBondsReader, RokkrSiegesReader, LostLoreReader, HallOfFormsReader, MjolnirsStrikeReader, FrontlinePhalanxReader, PawnsOfLokiReader, HeroesJourneyReader, SummonerDuelsReader, SummonerDuelsRankedReader, SummonerDuelsSurvivalReader, SummonerDuelsSeasonReader, BindingWorldsReader, SeersSnareReader, AffinityAutoBattlesReader, UnitedWarfrontReader ]

@@ -128,7 +128,7 @@ class ForgingBonds(ArticleContainer):
 
         if not re.search(r'===\s*Original [rR]un\s*===', self.page):
             self.page = re.sub(r'(==\s*Rewards\s*==\n)', '\\1===Original run===\n', self.page)
-        self.page = re.sub(r'\}\}\n(\n*==\s*Special [cC]onversations\s*==)', '}}\n===Rerun===\n'+self.Rewards()[12:]+'\n\\1', self.page)
+        self.page = re.sub(r'\}\}\n(\n*==\s*\w)', '}}\n===Rerun===\n'+self.Rewards()[12:]+'\n\\1', self.page)
 
         return self
 

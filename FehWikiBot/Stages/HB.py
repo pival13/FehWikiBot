@@ -334,7 +334,7 @@ class LimitedHeroBattle(HeroBattle):
             s += '|refresher=' + str(self.data['maps'][0]['max_refreshers']) + '\n'
             s += '|reward=' + Rewards({o['diff']: o['reward'] for o in self.data['maps']}) + '\n'
             s += '|start=' + self.data['avail']['start'] + '|end=' + self.data['avail']['end'] + '\n'
-            s += '|notification=Limited Hero Battles! (' + timeFormat(self.data['avail']['start']) + ') (Notification)\n'
+            # s += '|notification=Limited Hero Battles! (' + timeFormat(self.data['avail']['start']) + ') (Notification)\n'
             s += '}}'
             self.page = re.sub(r'(==\s*Limited Hero Battle\s*==(\n.*)*?)\n\|\}', '\\1\n'+s+'\n|}', self.page)
 

@@ -63,6 +63,7 @@ class RewardReader(IReader):
             0x1C: (True,  False, [lambda:self.readByte('color')]), 
             0x1D: (True,  True,  []), # Ticket
             0x1E: (True,  False, [lambda:self.insert('move', MOVE_TYPE[self.getByte()])]), # Dragonflower
+            0x20: (False, True,  [lambda:self.readByte('rarity')]), # Combat Manual
             0x22: (True,  False, []), # RS Stamina
             0x23: (True,  True,  []), # Music
             0x24: (True,  True,  []), # HoF Stamina
