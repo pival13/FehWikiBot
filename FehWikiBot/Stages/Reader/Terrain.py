@@ -19,7 +19,7 @@ class MapReader(IReader):
             self.insert('width', w)
             self.insert('height', h)
             self.insert('type', self.TERRAIN_TYPE[self.getByte(0x41,signed=True)])
-            self.skip(0x07) # padding
+            self.assertPadding(7)
             self.prepareArray('ground')
             for _ in range(h):
                 self.prepareArray()

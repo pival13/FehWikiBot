@@ -58,7 +58,7 @@ class VotingGauntlet(ArticleContainer):
     @ArticleContainer.name.getter
     def name(self) -> str:
         from ..Utility.Messages import EN
-        return super().name or EN('MID_VOTE_TERM_' + self.data['id_tag']) if hasattr(self,'data') and self.data is not None else None
+        return super().name or (EN('MID_VOTE_TERM_' + self.data['id_tag']) if hasattr(self,'data') and self.data is not None else None)
 
 
     def Infobox(self):

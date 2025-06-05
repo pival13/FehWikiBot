@@ -6,7 +6,7 @@ class HeroReader(IReader):
     _basePath = 'Common/SRPG/Person/'
 
     def parse(self):
-        from ...Tool.globals import BLESSING
+        from ...Tool.globals import BLESSING,WARNING
         KIND = ['','LegendMythic','Duo','Harmonized','Ascended','Rearmed','Attuned','Emblem','Aided']
         nb = self.overviewLong(0x08, 0xde51ab793c3ab9e1)
         self.readArray()
@@ -25,7 +25,11 @@ class HeroReader(IReader):
                 self.insert('element', elem)
                 self.readByte('bst', 0x0F)
                 self.readBool('pair_up', 0x80)
-                self.readBool('extra_slot', 0x24)
+                mask = self.getByte(0x24)
+                self.insert('extra_slot', ((mask>>0)&1)==1)
+                self.insert('reinforcement_slot', ((mask>>1)&1)==1)
+                if (mask>>2)!=0:
+                    print(WARNING + f"{self.__class__.__name__}: data['extra']['extras'] unsupported values")
                 self.end()
             count = self.readList('dragonflower_costs', 0xA0013774, True)
             for _ in range(count):

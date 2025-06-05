@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from FehWikiBot.Tool.Reader import IReader
+from FehWikiBot.Tool.Reader import IReader,Decompresser
 from FehWikiBot.Others.Reader.Accessory import AccessoryReader, AccessoryAideData, AccessoryPurchaseData
 from FehWikiBot.Others.Reader.AetherRaids import StructureReader, ConsumableReader
 from FehWikiBot.Others.Reader.Summon import FocusReader
@@ -14,8 +14,7 @@ from FehWikiBot.Stages.Reader.Story import StoryMapReader
 from FehWikiBot.Stages.Reader.Special import SpecialMapReader
 from FehWikiBot.Stages.Reader.HO import HeroicOrdealsReader
 from FehWikiBot.Stages.Reader.TD import TacticsDrillsReader
-# from FehWikiBot.Stages.Reader.CC
-# from FehWikiBot.Stages.Reader.SA
+from FehWikiBot.Stages.Reader.MultiMap import StoryChainChallengeReader, ParalogueChainChallengeReader, SquadAssaultReader
 from FehWikiBot.Events.Reader.VG import VotingGauntletReader
 from FehWikiBot.Events.Reader.TT import TempestTrialsReader
 from FehWikiBot.Events.Reader.TB import TapBattleReader
@@ -33,11 +32,12 @@ from FehWikiBot.Events.Reader.BW import BindingWorldsReader
 from FehWikiBot.Events.Reader.SS import SeersSnareReader
 from FehWikiBot.Events.Reader.AAB import AffinityAutoBattlesReader
 from FehWikiBot.Events.Reader.UW import UnitedWarfrontReader
+from FehWikiBot.Events.Reader.YTS import YourTimeToShineReader
 
 READERS : list[IReader] = [ AccessoryReader, AccessoryAideData, AccessoryPurchaseData, StructureReader, MechanismReader, ConsumableReader, FocusReader, CompileCombatManualReader, SoundReader, MapBGMReader, HOBGMReader, HeroReader, EnemyReader,
                             SkillReader, RefineryReader, SealReader, SealForgeReader, CaptainSkillReader,
-                            MapReader, EnvironmentReader, CellEnvironmentReader, StoryMapReader, SpecialMapReader, HeroicOrdealsReader, TacticsDrillsReader,
-                            VotingGauntletReader, TempestTrialsReader, TapBattleReader, GrandConquestReader, GrandConquestWorldReader, ForgingBondsReader, RokkrSiegesReader, LostLoreReader, HallOfFormsReader, MjolnirsStrikeReader, FrontlinePhalanxReader, PawnsOfLokiReader, HeroesJourneyReader, SummonerDuelsReader, SummonerDuelsRankedReader, SummonerDuelsSurvivalReader, SummonerDuelsSeasonReader, BindingWorldsReader, SeersSnareReader, AffinityAutoBattlesReader, UnitedWarfrontReader ]
+                            MapReader, EnvironmentReader, CellEnvironmentReader, StoryMapReader, SpecialMapReader, HeroicOrdealsReader, TacticsDrillsReader, StoryChainChallengeReader, ParalogueChainChallengeReader, SquadAssaultReader,
+                            VotingGauntletReader, TempestTrialsReader, TapBattleReader, GrandConquestReader, GrandConquestWorldReader, ForgingBondsReader, RokkrSiegesReader, LostLoreReader, HallOfFormsReader, MjolnirsStrikeReader, FrontlinePhalanxReader, PawnsOfLokiReader, HeroesJourneyReader, SummonerDuelsReader, SummonerDuelsRankedReader, SummonerDuelsSurvivalReader, SummonerDuelsSeasonReader, BindingWorldsReader, SeersSnareReader, AffinityAutoBattlesReader, UnitedWarfrontReader, YourTimeToShineReader ]
 
 
 from FehWikiBot.PersonalData import BINLZ_ASSETS_DIR_PATH
@@ -80,5 +80,5 @@ if __name__ == '__main__':
         exit(0)
 
     print(WARNING + 'Reversal method not found')
-    IReader(open(realpath(argv[1]),'rb').read())
+    Decompresser(open(realpath(argv[1]),'rb').read()).decompress()
     exit(1)

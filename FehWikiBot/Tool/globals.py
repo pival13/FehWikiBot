@@ -100,6 +100,7 @@ ITEM_KIND = {
     30: 'Dragonflower', 32: 'Combat Manual', 33: 'R&R Affinity', 34: 'Havoc Axe', 35: 'Music', 36: 'Forma Torch',
     37: 'Midgard Gem', 39: 'Divine Code', 43: 'Forma Soul', 
     44: 'Guardian Shield', 45: 'Trait Fruit', 50: 'Binding Torch',
+    53: 'Hero Stamina',
     'Lost Lore Team': 'Lost Lore Team', 'Memento Points': 'Memento Point'
 }
 

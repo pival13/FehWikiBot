@@ -120,7 +120,6 @@ class Container(metaclass=_ContainerMeta):
         # if isinstance(cls._key, (int,str)): cls._key = [cls._key]
         if name in cls._DATA: return False
 
-        # print('Container parsed', cls._reader._basePath+name)
         reader = cls._reader.fromAssets(name)
         if not reader.isValid() or reader.object is None: return False
 
@@ -139,6 +138,14 @@ class Container(metaclass=_ContainerMeta):
         #         cls._DATA[name] = {o[cls._key]: o for o in objs}
         return True
     
+    @classmethod
+    def loadAll(cls):
+        from ..PersonalData import BINLZ_ASSETS_DIR_PATH
+        from os import listdir
+        for f in listdir(BINLZ_ASSETS_DIR_PATH + cls._reader._basePath)[::-1]:
+            if f[-7:] == '.bin.lz':
+                cls.load(f[:-7])
+
     @staticmethod
     def _getAt(object: list|dict, keys: list[str|int]) -> Any | None:
         for k in keys:

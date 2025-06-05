@@ -64,3 +64,6 @@ class UnitedWarfrontReader(IReader):
             self.assertBytes(0x04, 0x45CBD9F0, '&nDiffs[16:20]')
             self.end()
         self.end()
+
+UWReader = UnitedWarfrontReader
+CoopTrialReader = UnitedWarfrontReader

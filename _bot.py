@@ -39,21 +39,24 @@ if __name__ == '__main__':
     for o in CaptainSkill.fromAssets(argv[1]):
         o.createArticle().export('Captain Skill ('+argv[1]+')', create=True)
 
-    for o in HeroicOrdeals.fromAssets(argv[1]):
-        o.createArticle().export('Heroic Ordeals ('+argv[1]+')')
-    for o in MergedOrdeals.fromAssets(argv[1]):
-        o.createArticle().export('Merged Ordeals ('+argv[1]+')')
     MainStory.exportGroups([o.createArticle() for o in MainStory.fromAssets(argv[1])], 'Story maps ('+argv[1]+')')
     Paralogue.exportGroups([o.createArticle() for o in Paralogue.fromAssets(argv[1])], 'Paralogue maps ('+argv[1]+')')
     for o in TacticsDrills.fromAssets(argv[1]):
         o.createArticle().export('Tactics Drills ('+argv[1]+')')
-    for o in HeroBattle.fromAssets(argv[1]):
-        o.createArticle().export(o.category + ' ('+argv[1]+')')
+    for o in HeroicOrdeals.fromAssets(argv[1]):
+        o.createArticle().export('Heroic Ordeals ('+argv[1]+')')
+    for o in MergedOrdeals.fromAssets(argv[1]):
+        o.createArticle().export('Merged Ordeals ('+argv[1]+')')
+    # Chain Challenge
+    for o in SquadAssault.fromAssets(argv[1]):
+        o.createArticle().export('Squad Assault ('+argv[1]+')')
     for o in RivalDomains.fromAssets(argv[1]):
         o.createArticle().export('Rival Domains ('+argv[1]+')')
+    for o in HeroBattle.fromAssets(argv[1]):
+        o.createArticle().export(o.category + ' ('+argv[1]+')')
     for o in LimitedHeroBattle.fromAssets(argv[1]):
         o.loadArticle().update().export(o.category + ' ('+argv[1]+')', create=False)
-    for o in HeroBattle.upcomingRevivals():
+    for o in HeroBattle.upcomingRevivals(argv[1]):
         o.loadArticle(False).update().export('Revival ('+argv[1]+')', create=False)
     if unsupportedSpecialMaps(argv[1]) != []:
         print(TODO + 'Unsupported Special maps: ' + str(unsupportedSpecialMaps(argv[1])))

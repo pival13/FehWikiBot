@@ -8,8 +8,9 @@ class MjolnirsStrikeReader(IReader):
 
     def parse(self):
         SEASONS = ['LightDark','DarkLight','HeavenLogic','LogicHeaven']
-        self.skip(0x08)
-        nb = self.getLong()
+        self.skip(0x10)
+        # nb = self.getLong() # Because they lied once
+        nb = len(self._strTbl)
         self.prepareArray()
         for _ in range(nb):
             self.readObject()

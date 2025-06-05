@@ -60,7 +60,7 @@ class Accessories(ArticleContainer):
         #{{Rokkr Sieges accessory}}
         #{{Tap Battle accessory}}
         if self.data['@Shop'] is not None:
-            s += '{{Shop accessory|' + str(self.data['@Shop']['cost']) + '}}\n'
+            s += '{{Shop accessory|' + str(self.data['@Shop']['required']['count']) + '}}\n'
         return s[:-1]
 
     def OtherLanguage(self):

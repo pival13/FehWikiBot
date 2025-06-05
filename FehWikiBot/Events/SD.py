@@ -15,8 +15,8 @@ class SummonerDuelsSeason(Container):
         ret = super().load(name)
         if not ret: return False
         SummonerDuels.load(name)
-        SummonerDuelsR.get('')
-        SummonerDuelsS.get('')
+        SummonerDuelsR.loadAll()
+        SummonerDuelsS.loadAll()
 
         datas = cls._DATA.get(name)
         for data in (datas.values() if isinstance(datas, dict) else datas or []):
@@ -45,7 +45,7 @@ class SummonerDuelsEvent(ArticleContainer):
 
     @property
     def season(self) -> SummonerDuelsSeason:
-        SummonerDuelsSeason.get('')
+        SummonerDuelsSeason.loadAll()
         o = SummonerDuelsSeason()
         o.data = [data for datas in SummonerDuelsSeason._DATA.values() for data in datas.values() if data['avail']['start'] <= self.data['avail']['start'] < data['avail']['end']][0]
         return o

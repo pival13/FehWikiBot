@@ -104,6 +104,11 @@ class Reader:
             self._i = self._stack[-1][1]
         self._stack.pop()
 
+    def readPointer(self) -> bool:
+        idx = self.getLong()
+        self._stack.append((self._stack[-1][0], self._i))
+        self._i = idx
+        return idx != 0x00
 
     def readObject(self, key:str=None):
         obj = {}
@@ -196,7 +201,12 @@ class Reader:
         if signed and v > 0x7F: v = -(v ^ 0xFF) - 1
         return v
     
-    def readBool(self, key:str=None, xor=0): self.insert(key, self.getBool(xor))
+    def readBool(self, key:str=None, xor=0):
+        from .globals import WARNING
+        v = self.getByte(xor)
+        if v not in (0,1):
+            print(WARNING + f'{self.__class__.__name__}: Expected boolean, got 0x{v:x} ({key})')
+        self.insert(key, v != 0)
     def getBool(self, xor=0): return self.getByte(xor) != 0
     def overviewBool(self, off=0, xor=0): return self.overviewByte(off, xor) != 0
 

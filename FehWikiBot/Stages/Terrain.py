@@ -59,7 +59,7 @@ class Map(Container):
         if len(ret) > 0: return ret[0]
         ret = cls.getAll(key)
         if len(ret) > 0: return ret[-1]
-        return None
+        return cls.getFromWiki(key)
 
     @classmethod
     def getAll(cls, mapId):
@@ -72,17 +72,52 @@ class Map(Container):
 
     @classmethod
     def create(cls, mapId, placeholderEnemy=1):
-        Environment.load('')
         o = cls()
         mapId2 = mapId if mapId[-1] not in 'ABCDEFG' else mapId[:-1]
         o.data = {
-            'terrain': {'type': None, 'map_id': mapId2, 'ground': [['']*6]*8},
+            'terrain': {'map_id': mapId2, 'type': None, 'ground': [['']*6]*8},
             'units': [], 'starting_pos': [''], 'enemy_pos': ['']
         }
         o.data['terrain']['@Environment'] = Environment.get(mapId2).data if Environment.get(mapId2) else None
         for _ in range(placeholderEnemy):
             o.data['units'].append(cls.PLACEHOLDER_UNIT.copy())
-        cls._DATA[mapId] = o.data
+        cls._DATA[mapId] = [o.data]
+        return o
+
+    @classmethod
+    def getFromWiki(cls, mapId, placeholderEnemy=1):
+        from ..Tool.Wiki import Wiki
+        from ..Tool.globals import TODO
+        import re
+        mapId = mapId if mapId[-1] not in 'ABCDEFG' else mapId[:-1]
+        name = Wiki.cargoQuery('Maps',where='Map="'+mapId+'"',limit=1)
+        if not name: return None
+        o = cls.create(mapId,placeholderEnemy)
+        try:
+            page = Wiki.getPageContent(name)
+            layout = re.search(r'MapLayout.*\n(?:(?!\}\}\n).*\n)+\}\}', page)[0]
+
+            allyPos = re.search(r'allyPos\s*=\s*([a-h0-9, ]*)', layout)
+            o.data['starting_pos'] = allyPos[1].split(',') if allyPos else ['','','','']
+            o.data['enemy_pos'] = []
+
+            if layout.find('h10') != -1:
+                objects1 = [ re.findall('[a-h]'+str(i+1)+r'=\s*(\{\{.+?\}\}|)\s*(?:\n|\|\s*(?=[a-h]\d))', layout) for i in range(10) ]
+            else:
+                objects1 = [ re.findall('[a-f]'+str(i+1)+r'=\s*(\{\{.+?\}\}|)\s*(?:\n|\|\s*(?=[a-f]\d))', layout) for i in range(8) ]
+            o.data['terrain']['ground'] = [[0 for _ in row] for row in objects1]
+            for y,row in enumerate(objects1):
+                for x,cell in enumerate(row):
+                    ally = re.search(r'\{\{Ally\|(\d+)\}\}',cell)
+                    if cell.find('Wall') != -1 or cell.find('Box') != -1:
+                        o.data['terrain']['ground'][y][x] = 9 if cell.find('1') != -1 else 10 if cell.find('2') != -1 else 8
+                    if ally:
+                        o.data['starting_pos'][int(ally[1])-1] = chr(x+97)+str(y+1)
+            if all(c == '' for c in o.data['starting_pos']):
+                o.data['starting_pos'] = []
+
+        except Exception as e:
+            print(TODO + str(e))
         return o
 
     @property
@@ -124,18 +159,19 @@ class Map(Container):
         elif not shortest:
             terrain = [['']*len(row) for row in self.data['terrain']['ground']]
 
+        endLine = '\n' if not shortest else ''
         s =  '{{#invoke:MapLayout|initTabber\n' if not shortest else ('{{MapLayout' + ('\n' if terrain != [] else ''))
-        s +=  '|baseMap=' + self.baseMap + ('\n' if not shortest else '')
+        s +=  '|baseMap=' + self.baseMap + endLine
         if self.needBackground():
-            s += '|backdrop=' + self.background + ('\n' if not shortest else '')
+            s += '|backdrop=' + self.background + endLine
         elif not shortest:
             s += '|backdrop=\n'
         if mapType is not None:
-            s += '|type=' + mapType + ('\n' if not shortest else '')
+            s += '|type=' + mapType + endLine
         if len(self.data.get('starting_pos') or []) > 0:
-            s += '|allyPos=' + ','.join(self.data['starting_pos']) + ('\n' if not shortest else '')
+            s += '|allyPos=' + ','.join(self.data['starting_pos']) + endLine
         if len(self.data.get('enemy_pos') or []) > 0:
-            s += '|enemyPos=' + ','.join(self.data['enemy_pos']) + ('\n' if not shortest else '')
+            s += '|enemyPos=' + ','.join(self.data['enemy_pos']) + endLine
         if shortest and terrain != []: s += '\n'
         for y,row in list(enumerate(terrain))[::-1]:
             for x,cell in enumerate(row):
@@ -178,6 +214,7 @@ class Map(Container):
         }
 
         map = self.data['terrain']['ground']
+        if isinstance(map[y][x],str): return map[y][x]
         if map[y][x] in OTHERS: return OTHERS[map[y][x]]
         if map[y][x] not in WALLS: return ''
 

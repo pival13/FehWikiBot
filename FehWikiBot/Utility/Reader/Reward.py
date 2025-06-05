@@ -74,6 +74,7 @@ class RewardReader(IReader):
             0x2D: (True,  False, []), # Trait Fruit
             0x2E: (True,  False, []), # Celestial Stone
             0x32: (True,  True,  []), # BW Stamina
+            0x35: (True,  True,  []), # YTS Stamina
         }
 
         self.prepareObject()
@@ -82,7 +83,7 @@ class RewardReader(IReader):
         if kind in ITEM_KIND or kind == 0x17:
             self.insert('kind', ITEM_KIND[kind])
         else:
-            self.insert('kind', f'Unknow ({kind}])')
+            self.insert('kind', f'Unknow ({kind})')
             print(TODO + f'Unknow reward: {kind}')
         if hasCount:
             self.readShort('count')

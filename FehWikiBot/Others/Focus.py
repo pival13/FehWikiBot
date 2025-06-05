@@ -132,7 +132,7 @@ class Focus(Article):
                 rarities = {o[0]: o[1] for o in rarities}
                 if len(rarities) != 0:
                     kwargs['focus4'] = [i+1 for i in range(len(heroes)) if str(i+1) not in rarities or rarities[str(i+1)] != '5']
-            if self.page.count('#invoke:SummoningFocus|focusPage') == 1:
+            if self.page.find('{{tab/end}}') == -1:
                 if type in ('Special','ω Special Heroes'):
                     time = re.search(r'start=(?:.+?, )?(\d{4})', self.page)[1]
                 else:
