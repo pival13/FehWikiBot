@@ -20,6 +20,15 @@ class Special(Skills):
             'properties': []
         }
 
+        # Activates: when attacking, when defending, before combat, after combat, after/during assist
+        if   self.data['timing_id'] == 3: obj['properties'] += ['offensive_special']
+        elif self.data['timing_id'] == 4: obj['properties'] += ['defensive_special']
+        elif self.data['timing_id'] == 5: obj['properties'] += ['aoe_special']
+        elif self.data['timing_id'] == 6: obj['properties'] += ['after_combat_special']
+        elif self.data['timing_id'] == 7: obj['properties'] += ['heal_special']
+        else:
+            from ..Tool.globals import TODO
+            print(TODO + f"Unknwon special category ({self.data['timing_id']})")
         if self.data['enemy_only']: obj['properties'] += ['enemy_only']
         if self.data['tt_inherit_base']: obj['properties'] += ['random_inherit_base']
         if self.data['random_allowed'] > 0:

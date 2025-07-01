@@ -7,9 +7,9 @@ class Passive(Skills):
         if self._i == -1:
             return '<Passive "None">'
         elif len(self._datas) == 1:
-            return '<Passive "' + str(self.name) + '" (' + self.data['id_tag'] + ')>'
+            return '<Passive (' + self.type + ') "' + str(self.name) + '" (' + self.data['id_tag'] + ')>'
         else:
-            return '<Passive "' + str(self.name) + '" (' + self.data['id_tag'] + ') (' + ', '.join([o['id_tag'] for o in self._datas]) + ')>'
+            return '<Passive (' + self.type + ') "' + str(self.name) + '" (' + self.data['id_tag'] + f', +{len(self._datas)-1} more)>'
 
     def __init__(self):
         super().__init__()

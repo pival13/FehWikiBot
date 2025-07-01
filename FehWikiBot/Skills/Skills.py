@@ -2,7 +2,7 @@
 
 from typing_extensions import Self
 from .Reader import SkillReader, SealReader, RefineryReader, SealForgeReader
-from ..Tool.ArticleContainer import Container, JsonContainer, ArticleContainer
+from ..Tool import Container, JsonContainer, ArticleContainer, _Metaclass
 
 class SacredSealsForge(Container):
     _reader = SealForgeReader
@@ -44,13 +44,26 @@ def _createChildClass(obj):
     o.page = obj.page
     return o
 
-class Skills(JsonContainer, ArticleContainer):
+class _SkillMeta(_Metaclass):
+    def __repr__(cls) -> str:
+        if cls.__name__ == 'Skills':
+            return super().__repr__()
+        count = 0
+        for os in cls._DATA.values():
+            for o in os.values():
+                if o['type'] == cls.__name__: count += 1
+                elif o['type'] in ('A','B','C','Seal','Attuned') and cls.__name__ == 'Passive': count += 1
+        return f"<class {cls.__name__} ({len(cls._DATA)} files, {count} objects)>"
+
+class Skills(JsonContainer, ArticleContainer, metaclass=_SkillMeta):
     _DATA = {}
     _reader = SkillReader
     _linkArticleData = (r'tagid\s*=\s*([^\s\|\}]+)','id_tag')
 
     def __repr__(self) -> str:
-        return '<' + type(self).__name__ + ' "' + str(self.name) + '" ('+str(self.type)+')' + (f" ({self.id_tag if hasattr(self,'id_tag') else self.data['id_tag']})" if self.data else '') + '>'
+        return '<' + type(self).__name__ + (f" ({self.type})" if type(self) == Skills else '') + \
+            (f' "{self.name}"' if str(self.name) != '' else '') + \
+            (f" ({self.id_tag if hasattr(self,'id_tag') else self.data['id_tag']})" if self.data else '') + '>'
 
     def __init_subclass__(cls):
         d = cls._DATA
@@ -97,6 +110,7 @@ class Skills(JsonContainer, ArticleContainer):
     def fromAssets(cls, file: str, type: list = None) -> list[Self]:
         tmp = super().fromAssets(file)
         os = []
+        if cls != Skills and type is None: type = cls.__name__
         if isinstance(type, str): type = [type]
         for i in range(len(tmp)):
             if type is not None and tmp[i].type not in type: continue

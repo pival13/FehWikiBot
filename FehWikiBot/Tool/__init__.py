@@ -6,7 +6,7 @@ from .Wiki import *
 
 from . import Reader
 
-from .Container import Container
+from .Container import Container, _ContainerMeta as _Metaclass
 from .JsonContainer import JsonContainer
 from .Article import Article
 from .ArticleContainer import ArticleContainer
