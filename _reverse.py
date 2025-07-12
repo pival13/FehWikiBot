@@ -8,7 +8,7 @@ from FehWikiBot.Others.Reader.CompileManual import CompileCombatManualReader
 from FehWikiBot.Utility.Reader.Message import MessageReader
 from FehWikiBot.Utility.Reader.Sound import SoundReader, MapBGMReader, HOBGMReader
 from FehWikiBot.Utility.Reader.Unit import HeroReader, EnemyReader
-from FehWikiBot.Skills.Reader import SkillReader, RefineryReader, SealReader, SealForgeReader, CaptainSkillReader
+from FehWikiBot.Skills.Reader import SkillReader, RefineryReader, SealReader, SealForgeReader, CaptainSkillReader, SkillAbilityReader, SkillLimitReader, SkillTimingReader
 from FehWikiBot.Stages.Reader.Terrain import MapReader, EnvironmentReader, CellEnvironmentReader
 from FehWikiBot.Stages.Reader.Story import StoryMapReader
 from FehWikiBot.Stages.Reader.Special import SpecialMapReader
@@ -35,7 +35,7 @@ from FehWikiBot.Events.Reader.UW import UnitedWarfrontReader
 from FehWikiBot.Events.Reader.YTS import YourTimeToShineReader
 
 READERS : list[IReader] = [ AccessoryReader, AccessoryAideData, AccessoryPurchaseData, StructureReader, MechanismReader, ConsumableReader, FocusReader, CompileCombatManualReader, SoundReader, MapBGMReader, HOBGMReader, HeroReader, EnemyReader,
-                            SkillReader, RefineryReader, SealReader, SealForgeReader, CaptainSkillReader,
+                            SkillReader, RefineryReader, SealReader, SealForgeReader, CaptainSkillReader, SkillAbilityReader, SkillLimitReader, SkillTimingReader,
                             MapReader, EnvironmentReader, CellEnvironmentReader, StoryMapReader, SpecialMapReader, HeroicOrdealsReader, TacticsDrillsReader, StoryChainChallengeReader, ParalogueChainChallengeReader, SquadAssaultReader,
                             VotingGauntletReader, TempestTrialsReader, TapBattleReader, GrandConquestReader, GrandConquestWorldReader, ForgingBondsReader, RokkrSiegesReader, LostLoreReader, HallOfFormsReader, MjolnirsStrikeReader, FrontlinePhalanxReader, PawnsOfLokiReader, HeroesJourneyReader, SummonerDuelsReader, SummonerDuelsRankedReader, SummonerDuelsSurvivalReader, SummonerDuelsSeasonReader, BindingWorldsReader, SeersSnareReader, AffinityAutoBattlesReader, UnitedWarfrontReader, YourTimeToShineReader ]
 

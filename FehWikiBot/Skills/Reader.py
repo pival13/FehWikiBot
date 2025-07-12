@@ -231,3 +231,45 @@ class CaptainSkillReader(IReader):
             self.skip(0x04)
             self.end()
         self.end()
+
+class SkillAbilityReader(IReader):
+    _basePath = 'Common/SRPG/SkillAbility/'
+
+    def parse(self):
+        nb = self.overviewLong(0x08, 0xC0C3644922CF90AB)
+        self.readArray()
+        for _ in range(nb):
+            self.prepareObject()
+            self.readString('id_tag')
+            self.readInt('value', 0xA407EF30)
+            self.assertPadding(4)
+            self.end()
+        self.end()
+
+class SkillLimitReader(SkillAbilityReader):
+    _basePath = 'Common/SRPG/SkillLimit/'
+
+    def parse(self):
+        nb = self.overviewLong(0x08, 0xDF7CD7FA9113A32F)
+        self.readArray()
+        for _ in range(nb):
+            self.prepareObject()
+            self.readString('id_tag')
+            self.readInt('value', 0xD634AE66)
+            self.assertPadding(4)
+            self.end()
+        self.end()
+
+class SkillTimingReader(SkillAbilityReader):
+    _basePath = 'Common/SRPG/SkillTiming/'
+
+    def parse(self):
+        nb = self.overviewLong(0x08, 0x3E41121CB7CF990B)
+        self.readArray()
+        for _ in range(nb):
+            self.prepareObject()
+            self.readString('id_tag')
+            self.readInt('value', 0xD03373D7)
+            self.assertPadding(4)
+            self.end()
+        self.end()
