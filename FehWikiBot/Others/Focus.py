@@ -190,7 +190,12 @@ class Focus(Article):
         elif params['type'] in ('Hero Fest'):
             rarities = ['|rarity5FocusPercent=5.00%','|rarity5Percent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=34.00%']
         elif params['type'] in ('Free Summon', 'Select Summon'):
-            rarities = ['|rarity5FocusPercent=100.00%']
+            if params['name'].find('4★SHSR') != -1:
+                rarities = ['|rarity4SHSpecialPercent=100.00%']
+            elif params['name'].find('Arena Reward') != -1:
+                rarities = ['|rarity4SpecialPercent=100.00%']
+            else:
+                rarities = ['|rarity5FocusPercent=100.00%']
         else:
             rarities = ['|rarity5FocusPercent=3.00%','|rarity5Percent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=36.00%']
         s += '\n'.join(rarities) + '\n'

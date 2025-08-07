@@ -9,6 +9,7 @@ from .SA import SquadAssault
 
 from .HB import *
 from .RD import RivalDomains
+from .Event import EventMap
 from .SpecialMapContainer import unsupportedSpecialMaps
 
 from .Terrain import Map

@@ -52,6 +52,8 @@ if __name__ == '__main__':
         o.createArticle().export('Squad Assault ('+argv[1]+')')
     for o in RivalDomains.fromAssets(argv[1]):
         o.createArticle().export('Rival Domains ('+argv[1]+')')
+    for o in EventMap.fromAssets(argv[1]):
+        o.createArticle().export('Event map ('+argv[1]+')')
     for o in HeroBattle.fromAssets(argv[1]):
         o.createArticle().export(o.category + ' ('+argv[1]+')')
     for o in LimitedHeroBattle.fromAssets(argv[1]):
@@ -87,3 +89,5 @@ if __name__ == '__main__':
         o.createArticle().export('Affinity Auto Battle ('+argv[1]+')')
     for o in UnitedWarfront.fromAssets(argv[1]):
         o.createArticle().export('United Warfront ('+argv[1]+')')
+    for o in YourTimeToShine.fromAssets(argv[1]):
+        print(TODO + 'Your Time to Shine event')

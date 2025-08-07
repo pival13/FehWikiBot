@@ -13,21 +13,24 @@ class YourTimeToShineReader(IReader):
             self.readString('id_tag')
             self.readString('final_battle')
             readAvail(self, 'avail')
-            self.assertBytes(8, 0x723C2229FE9504D3, 'data[0x38:0x40]')
+            self.assertBytes(4, 0xFE9504D3, f'[0x{self._i:02x}]')
+            self.assertBytes(4, 0x723C2229, f'[0x{self._i:02x}]')
 
-            self.readObject('status_effect?')
-            self.assertBytes(8, 0x907EA0A72B8AAAAB, 'status_effect?[0x00:0x08]')
-            self.readArray('ignored?')
-            for i in range(15):
-                self.prepareObject()
-                self.readByte('id_num', 0xD7)
-                self.assertBytes(3,0xF72503)
+            if  self.readObject('status_effect?'):
+                self.assertBytes(8, 0x907EA0A72B8AAAAB, f'[0x{self._i:02x}]')
+                count = self.overviewInt(0x08, 0x7A1AE735)
+                self.readArray('ignored?')
+                for i in range(count):
+                    self.prepareObject()
+                    self.readByte('id_num', 0xD7)
+                    self.assertBytes(3,0xF72503)
+                    self.end()
                 self.end()
-            self.end()
-            self.assertBytes(8, 0xE622780A7A1AE73A, 'status_effect?[0x10:0x18]')
-            self.assertBytes(8, 0xCB17D182B8E582E4, 'status_effect?[0x18:0x20]')
-            self.assertBytes(8, 0x00000000D26CEC29, 'status_effect?[0x20:0x28]')
-            self.end()
+                self.skip(0x04) # count
+                self.assertBytes(4, 0xE622780A, f'[0x{self._i:02x}]')
+                self.assertBytes(8, 0xCB17D182B8E582E4, f'[0x{self._i:02x}]')
+                self.assertBytes(8, 0x00000000D26CEC29, f'[0x{self._i:02x}]')
+                self.end()
             
             count = self.readList('stages', 0x29227C2D)
             for i in range(count):
@@ -48,7 +51,7 @@ class YourTimeToShineReader(IReader):
                 self.readBool('allow_refine', 0x1E)
                 self.skip(1) # self.assertBytes(1, 0x05, f'stages[{i}][0x17]')
                 self.readByte('possible_effects', 0x4A)
-                self.assertBytes(1, 0x2F, f'stages[{i}][0x19]')
+                self.assertBytes(1, 0x2F, f'stages[{i}][0x19] / [0x{self._i:02x}]')
 
                 self.assertPadding(6)
                 readReward(self, 'reward', 0x0571928F)
@@ -70,9 +73,11 @@ class YourTimeToShineReader(IReader):
                 self.end()
             self.end()
             
-            self.assertBytes(8, 0x7E0E8A4F6D9CF37C, 'data[0x58:0x60]')
-            self.assertBytes(8, 0x9DA572CBD2340BE0, 'data[0x60:0x68]')
-            self.assertBytes(4, 0x53777B51, 'data[0x68:0x6C]')
+            self.assertBytes(4, 0x6D9CF37D, f'[0x{self._i:02x}], bonus_version?')
+            self.assertBytes(4, 0x7E0E8A4F, f'[0x{self._i:02x}]')
+            self.assertBytes(4, 0xD2340BE0, f'[0x{self._i:02x}]')
+            self.assertBytes(4, 0x9DA572CB, f'[0x{self._i:02x}]')
+            self.assertBytes(4, 0x53777B51, f'[0x{self._i:02x}]')
             self.assertPadding(4)
             self.end()
         self.end()

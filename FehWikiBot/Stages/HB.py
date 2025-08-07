@@ -176,7 +176,7 @@ class HeroBattle(SpecialMapContainer):
         if self.data['maps'][0]['max_turn']:
             o['mapMode'] = 'Turn Limit Map'
             reqs.append(f"Turns to win: {self.data['maps'][0]['max_turn']}")
-        if self.data['maps'][0]['max_turn']:
+        if self.data['maps'][0]['min_turn']:
             o['mapMode'] = 'Defensive Battle Map'
             reqs.append(f"Turns to defend: {self.data['maps'][0]['min_turn']}")
         if self.data['maps'][0]['reinforcements']:

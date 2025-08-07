@@ -1,16 +1,30 @@
 #!/usr/bin/env python3
 
-import util
-
 import json
 import re
 from os.path import exists
+from PIL import Image
 
 from FehWikiBot import Wiki
 from FehWikiBot.PersonalData import WEBP_ASSETS_DIR_PATH
 from FehWikiBot.Tool.globals import ERROR, TODO
-from FehWikiBot.Tool import waitSec
+from FehWikiBot.Tool import waitSec, cleanStr, askFor
 from FehWikiBot.Utility.Units import Units
+
+def _trimImage(filepath: str) -> Image:
+    try:
+        img = Image.open(filepath)
+        left,up,right,down = img.getbbox()
+        extraW = (10 - (right-left)%10) % 10
+        extraH = (10 - (down-up)%10) % 10
+        return img.crop((
+            max(0, left-extraW//2),
+            max(0, up-extraH//2),
+            min(img.width, right+(extraW+1)//2),
+            min(img.height, down+(extraH+1)//2),
+        ))
+    except Exception as e:
+        return None
 
 def categories(filepath: str) -> str:
     if re.search(r'/bgm_[^/]+\.ogg', filepath):
@@ -112,13 +126,12 @@ def upload(filepath: str, comment: str):
 
         elif filepath.find('/Wep/') != -1:
             from FehWikiBot.Skills.Weapon import Weapon
-            from PIL import Image
             o = Weapon.get(name[:-5],'sprite_wepR') or Weapon.get(name[:-5],'sprite_wepL')
             img = Image.open(filepath)
             if not o: pass
             elif ('a' in img.mode or 'A' in img.mode) and img.getextrema()[-1][1] < 0x80:
                 waitSec(5)
-                Wiki.exportPage('File:'+util.cleanStr(name), '#REDIRECT [[File:Blank.png]]', 'Redirect empty file '+comment[comment.find('('):], create=True)
+                Wiki.exportPage('File:'+cleanStr(name), '#REDIRECT [[File:Blank.png]]', 'Redirect empty file '+comment[comment.find('('):], create=True)
                 return
             elif name[:6] == 'wep_mg' and not exists(filepath.replace('.png','.ssbp')) and img.size == (128,64):
                 color = ['Red','Blue','Green','Colorless'][int(name[6])%4]
@@ -148,7 +161,16 @@ def upload(filepath: str, comment: str):
         elif filepath.find('/Banner_Map/') != -1 and not re.search(r'/(ST_)?CX?\d+(_C)?\.', filepath):
             name = 'Banner_' + name
         elif filepath.find('/SkyCastle/Chip/') != -1:
-            name = re.search(r'/SkyCastle/Chip/(.*?)/', filepath)[1] + '_' + name
+            from FehWikiBot.Others.AetherRaids import Structure
+            dirName = re.search(r'/SkyCastle/Chip/(.*?)/', filepath)[1]
+            o = Structure.get(dirName, 'sprite')
+            if o and name == 'BU.webp':
+                waitSec(5)
+                Wiki.uploadImage('Structure ' + o.name + '.png', _trimImage(filepath), content.replace('|assets=','|Cropped from|assets=')+'\n[[Category:Structure sprites]]', comment, True)
+                return
+            elif o and name == dirName+'.webp' and not exists(filepath.replace('tex/'+dirName+'.webp','anim.ssbp')):
+                return
+            name = dirName + '_' + name
         elif filepath.find('/SkyCastle/Holiday/') != -1:
             name = re.search(r'/([^/]*)/[^/]*$', filepath)[1] + '_' + name
         elif filepath.find('/Occupation/BG/') != -1:
@@ -181,8 +203,6 @@ def upload(filepath: str, comment: str):
             return
         elif filepath.find('/UI/Icon_EliteCastle') != -1: # Icon for castle background
             return
-        elif re.match(r'/BG_\d+\.png$', filepath):
-            util.askFor('Here is a new kind of file')
     else:
         print(TODO, type, f, re.search(r'/([^/]+)$', filepath)[1])
         return
@@ -190,7 +210,7 @@ def upload(filepath: str, comment: str):
     waitSec(5)
     Wiki.uploadFile(name, open(filepath, 'rb'), content, comment, True)
     if name2:
-        Wiki.exportPage('File:'+util.cleanStr(name2), '#REDIRECT [[File:'+util.cleanStr(name)+']]', 'Redirect', create=True)
+        Wiki.exportPage('File:'+cleanStr(name2), '#REDIRECT [[File:'+cleanStr(name)+']]', 'Redirect', create=True)
 
 
 from sys import argv

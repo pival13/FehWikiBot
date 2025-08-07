@@ -129,6 +129,22 @@ class Heroes(Container):
     @classmethod
     def fromFace(cls, name: str): return cls.get(name, 'face_dir')
 
+    @classmethod
+    def fromName(cls, name: str):
+        for f in cls._DATA.values():
+            for data in f.values():
+                o = cls()
+                o.data = data
+                if o.name == name:
+                    return o
+        cls.loadAll()
+        for f in cls._DATA.values():
+            for data in f.values():
+                o = cls()
+                o.data = data
+                if o.name == name:
+                    return o
+
     @property
     def shortName(self): return Messages.EN(self.data['id_tag'])
 
@@ -147,6 +163,14 @@ class Heroes(Container):
 
     @property
     def isDuo(self): return self.data['extra'] and self.data['extra']['kind'] in ('Duo','Harmonized')
+
+    @property
+    def seasonal(self) -> bool:
+        if not 'seasonal' in self.data:
+            from ..Tool.Wiki import Wiki
+            props = Wiki.cargoQuery('Units',"IFNULL(Properties__full,'')=Props",where="TagID='"+self.data['id_tag']+"' AND IFNULL(Properties__full,'') NOT LIKE '%enemy%'",limit=1)
+            self.data['seasonal'] = props.find('special') != -1 or props.find('specDisplay') != -1
+        return self.data['seasonal']
 
     def Stats(self, level=40, rarity=5, hpmodifier=1.0):
         growth = lambda g: ((level-1) * ((g * (100+7*(rarity-3))) // 100)) // 100

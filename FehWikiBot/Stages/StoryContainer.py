@@ -80,6 +80,8 @@ class StoryContainer(ArticleContainer):
         if self.map['Normal']['min_turn']:
             o['mapMode'] = 'Defensive Battle Map'
             reqs.append(f"Turns to defend: {self.map['Normal']['min_turn']}")
+        if self.map['Normal']['reinforcements']:
+            o['mapMode'] = 'Reinforcement Map'
         o['winReq'] = '<br>'.join(reqs)
 
         return super().Infobox('Battle', o)

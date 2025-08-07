@@ -15,16 +15,15 @@ class YourTimeToShine(ArticleContainer):
     @property
     def number(self) -> int:
         from ..Tool.Wiki import Wiki
-        return 1
         return int(Wiki.cargoQuery('YourTimeToShine', 'COUNT(DISTINCT _pageName)=Nb', where='StartTime < "'+self.data['avail']['start']+'"', limit=1))+1
 
 
     def Infobox(self):
         return super().Infobox('Your Time to Shine', {
-            'bonusVersion': 1, # self.data[], # TODO
-            'finalMap': self.data['final_battle'][:-1],
-            'startTime': self.data['avail']['start'],
-            'endTime': self.data['avail']['end']
+            'bonusVersion': 2, # self.data[], # TODO
+            'finalBattle': self.data['final_battle'][:-1],
+            'start': self.data['avail']['start'],
+            'end': self.data['avail']['end']
         })
     
     def Availability(self):
@@ -46,15 +45,29 @@ class YourTimeToShine(ArticleContainer):
     def Battles(self):
         from ..Tool.globals import DIFFICULTIES
         from ..Stages import Map,StageFromMap
+        import re
+
         map = Map.get(self.data['final_battle'])
-        stage = StageFromMap(map.data['terrain']['map_id'])
+        stage = StageFromMap(map.data['terrain']['map_id']).loadArticle(False)
+        diff = DIFFICULTIES[self.data['stages'][-1]['difficulty']]
+        units = re.search(r'UnitData.*\|\s*'+diff+r'\s*=\s*(\[.*?\])\s*(?:\||\}\})', stage.page, re.DOTALL)
+        units = units[1] if units else ('[\n'+Map.Unit(Map.PLACEHOLDER_UNIT)+'\n]')
+
         s =  '==Final Stratum==\n'
         s += '{{#invoke:UnitData|main\n'
         s += '|derivedMap='+stage.name + '\n'
         s += '|derived=your_time_to_shine|derivedTabs={}\n'
         s += '|mapImage=' + map.Image(shortest=True).replace('|allyPos='+','.join(map.data['starting_pos']),'')
         s += '|allyPos=' + ','.join(map.data['starting_pos']) + '\n'
+        s +=f'|{diff}={units}\n'
         return s + '}}'
+    
+    def Heroes(self):
+        from datetime import datetime
+        s =  '==Bonus Heroes==\n'
+        version = 2# TODO
+        s += f"{{{{UnitsByVersion|from={version}|to={version+1}|maxDate={datetime.now().strftime('%Y-%m-%d')}}}}}"
+        return s
 
     def createArticle(self) -> Self:
         if self.data is None: return self

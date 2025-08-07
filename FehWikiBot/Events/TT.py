@@ -18,8 +18,16 @@ class TempestTrials(ArticleContainer):
         from ..Utility.Messages import Messages
         return super().name or Messages.EN('MID_SEQUENTIAL_MAP_TERM_'+self.data['id_tag'])
 
+    @property
+    def serie(self) -> str|None:
+        import re
+        name = self.name
+        serie = re.sub(r',? \b(?:Pt. |Part )?\d+$', '', name)
+        if serie != name: return serie
+        serie = re.sub(r' Finale$', '', name)
+        if serie != name: return serie
+
     def Infobox(self):
-        from re import sub,search
         from ..Utility.Sound import BGM
         from ..Utility.Units import Heroes
         from ..Stages import MainStory, Paralogue, Map
@@ -51,7 +59,7 @@ class TempestTrials(ArticleContainer):
 
         return '{| style="float:right"\n|' + super().Infobox('Tempest Trials', {
             'name': self.name,
-            'series': sub(' \w+$','',self.name) if search(' (\d+|Finale)$',self.name) else None,
+            'series': self.serie,
             'promoArt': 'Tempest_Trials_' + cleanStr(self.name) + '_2.jpg',
             'bonusHeroes': ';'.join([Heroes.get(h).name for h in bHeroes]),
             'rewardHeroes': ';'.join([Heroes.get(h).name for h in rHeroes]),
@@ -120,7 +128,6 @@ class TempestTrials(ArticleContainer):
         return s[:-1]
 
     def Story(self):
-        import re
         from ..Utility.Scenario import Scenario
         from ..Tool.globals import TODO
         from ..Stages.Paralogues import Paralogue
@@ -130,7 +137,7 @@ class TempestTrials(ArticleContainer):
             self.story = Scenario.Story(self.data['scenario_file']) + '<noinclude>[[Category:Tempest Trials scenarios]]</noinclude>'
         elif len(scenario) == 4 and sorted(scenario.keys()) == sorted(KEYS):
             self.story =  '{{#vardefine:isBase|{{#ifeq:{{BASEPAGENAME}}|'+self.name+'|1}}}}'
-            self.story += '{{#vardefine:isTTSerie|{{#ifeq:{{FULLPAGENAME}}|'+re.sub(r' \d+| Finale','',self.name)+'/Story|1}}}}<!--\n'
+            self.story += '{{#vardefine:isTTSerie|{{#ifeq:{{FULLPAGENAME}}|'+self.serie+'/Story|1}}}}<!--\n'
             self.story += '-->{{#if:{{#var:isBase}}{{#var:isTTSerie}}|<!--\n-->{{#invoke:Scenario|story\n'
             self.story += '|opening=' + str(scenario[KEYS[0]]) + '\n'
             self.story += '}}}}<!--\n-->{{#if:{{#var:isTTSerie}}||<!--\n-->{{#invoke:Scenario|story\n'
