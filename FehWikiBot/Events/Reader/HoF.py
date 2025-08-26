@@ -38,7 +38,7 @@ class HallOfFormsReader(IReader):
                 self.readBool('refines', 0x7F)
                 self.readByte('passive', 0x42)
                 self.readInt('passive_min_sp', 0x4B722738)
-                self.assertBytes(0x04, 0xFFEC756C, f'&chambers[{i}][0x28]')
+                self.readInt('min_skill_id', 0x00138A93, signed=True)
                 self.assertPadding(4)
                 readReward(self, 'reward', 0xAE4D663F)
                 self.skip(0x04)

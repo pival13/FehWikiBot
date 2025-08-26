@@ -140,8 +140,8 @@ class HeroBattle(SpecialMapContainer):
             elif ((heroes[0].data['extra'] or {}).get('kind') == 'Emblem' and (heroes[1].data['extra'] or {}).get('kind') == 'Mythic') or \
                  ((heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[1].data['extra'] or {}).get('kind') == 'Emblem'):
                 return 'Mythic & Emblem Hero Battle'
-            elif ((heroes[0].data['extra'] or {}).get('kind') == 'Duo' and (heroes[0].data['extra'] or {}).get('kind') == 'Mythic') or \
-                 ((heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[0].data['extra'] or {}).get('kind') == 'Duo'):
+            elif ((heroes[0].data['extra'] or {}).get('kind') == 'Duo'    and (heroes[1].data['extra'] or {}).get('kind') == 'Mythic') or \
+                 ((heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[1].data['extra'] or {}).get('kind') == 'Duo'):
                 return 'Duo & Mythic Hero Battle'
         from ..Tool.globals import TODO
         print(TODO + 'Unknown Hero Battle '+str(self))

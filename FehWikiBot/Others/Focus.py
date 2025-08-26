@@ -84,7 +84,7 @@ class Focus(Article):
         kwargs['start'] = _parseTime(start)
         kwargs['end'] = _parseTime(end)
 
-        if self.page.find(kwargs['start'].strftime('%Y-%m-%d')) != -1 or self.page.find(kwargs['start'].strftime('%b %d, %Y')) != -1:
+        if (self.page.find(kwargs['start'].strftime('%Y-%m-%d')) != -1 or self.page.find(kwargs['start'].strftime('%b %d, %Y')) != -1) and kwargs['type'] != 'Select Summon':
             pass
 
         elif self.page == '':
@@ -206,7 +206,7 @@ class Focus(Article):
                 s += f'|rarity{i+1}=5\n'
 
         s += '|start=' + params['start'].strftime('%Y-%m-%d') + 'T07:00:00Z\n'
-        s += '|end=' + params['end'].strftime('%Y-%m-%d') + 'T06:59:59Z\n'
+        s += '|end=' + ((params['end'].strftime('%Y-%m-%d') + 'T06:59:59Z\n') if params['end'] else '\n')
         s += '}}'
         return s
     

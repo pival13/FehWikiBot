@@ -47,7 +47,10 @@ if __name__ == '__main__':
         o.createArticle().export('Heroic Ordeals ('+argv[1]+')')
     for o in MergedOrdeals.fromAssets(argv[1]):
         o.createArticle().export('Merged Ordeals ('+argv[1]+')')
-    # Chain Challenge
+    for o in StoryChainChallenge.fromAssets(argv[1]):
+        o.createArticle().export('Story Chain Challenge ('+argv[1]+')')
+    for o in ParalogueChainChallenge.fromAssets(argv[1]):
+        o.createArticle().export('Paralogue Chain Challenge ('+argv[1]+')')
     for o in SquadAssault.fromAssets(argv[1]):
         o.createArticle().export('Squad Assault ('+argv[1]+')')
     for o in RivalDomains.fromAssets(argv[1]):

@@ -55,7 +55,7 @@ class SquadAssault(ArticleContainer):
             s += '|allyPos=' + ','.join(map.data['starting_pos']) + '\n'
             s += '}}'
         return s
-    
+
     def OtherLanguage(self):
         return super().OtherLanguage('MID_STAGE_TITLE_'+self.data['id_tag'])
 

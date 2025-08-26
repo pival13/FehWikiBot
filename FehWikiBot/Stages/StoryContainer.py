@@ -26,11 +26,6 @@ class StoryContainer(ArticleContainer):
                 o.name = name
         return o
 
-    @ArticleContainer.name.getter
-    def name(self) -> str:
-        from ..Utility.Messages import EN
-        return super().name or EN('MID_STAGE_'+self.id_tag) if self.data is not None else None
-
     @property
     def map(self):
         return self.data['maps'][self.idx]
@@ -38,6 +33,11 @@ class StoryContainer(ArticleContainer):
     @property
     def id_tag(self):
         return self.map['Normal']['id_tag'][:-1]
+
+    @ArticleContainer.name.getter
+    def name(self) -> str:
+        from ..Utility.Messages import EN
+        return super().name or EN('MID_STAGE_'+self.id_tag) if self.data is not None else None
 
     @property
     def groupName(self) -> str:
