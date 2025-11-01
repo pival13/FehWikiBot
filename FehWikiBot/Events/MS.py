@@ -96,7 +96,9 @@ class MjolnirsStrike(ArticleContainer):
         if not content: return self
 
         lvs = re.findall(r'レベル (\d+)', content)
-        timeStronger = re.search(r'\d+時間中、(\d+)時間', content)[1]
+        timeStronger = re.search(r'\d+時間中、(\d+)時間', content)
+        if timeStronger is None: return self
+        timeStronger = timeStronger[1]
         situations = json.loads(re.search(r'data-situations="([^"]*)"', content)[1].replace('&quot;','"'))
 
         self.page = re.sub(r'\|askrLV=.*?\n',f'|askrLV={lvs[0]}\n', self.page)

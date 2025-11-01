@@ -87,7 +87,11 @@ def upload(filepath: str, comment: str):
     content += categories(filepath)
     if type in (name,'lz','plist','ssbp','ssae','ckb','csb'):
         return
-    if type in ('.ogg'): pass
+    if type == 'ogg':
+        if filepath.find('/JPJA/') != -1:
+            name = name.replace('.ogg','_jp.ogg')
+        elif filepath.find('/TWZH/') != -1:
+            return
     elif type in ('webp','png'):
         data = open(filepath, 'rb').read(12)
         if data[8:12] == b'WEBP':
@@ -216,9 +220,10 @@ def upload(filepath: str, comment: str):
 from sys import argv
 if __name__ == '__main__':
     if len(argv) != 2: exit(1)
-    for f in json.load(open('jsons/newFiles.json', 'r')):
+    data = json.load(open('jsons/changes.json', 'r'))
+    for f in data['added']:
         try: upload(WEBP_ASSETS_DIR_PATH + f.replace('\\','/'), f'New file ({argv[1]})')
         except: print(ERROR + f)
-    for f in json.load(open('jsons/changedFiles.json', 'r')):
+    for f in data['updated']:
         try: upload(WEBP_ASSETS_DIR_PATH + f.replace('\\','/'), f'Updated file ({argv[1]})')
         except: print(ERROR + f)

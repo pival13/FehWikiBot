@@ -19,7 +19,8 @@ class AccessoryReader(IReader):
             self.readInt('num_id', 0xf765ad9c)
             self.readInt('sort_id', 0x0159b21d)
             self.insert('type', self.TYPES.get(self.getByte(0xf6)) or f"Unknow ({self.overviewByte(-1,0xf6)})")
-            self.assertBytes(2, 0xA526, f"[{self._stack[-1][0]['id_tag']}]._1")
+            self.skip(0x02)#
+            # self.assertBytes(2, 0xA526, f"[{self._stack[-1][0]['id_tag']}]._1")
             self.readBool('summoner', 0xf6)
             self.assertBytes(4, 0x981B01B7, '_filler')
             self.end()

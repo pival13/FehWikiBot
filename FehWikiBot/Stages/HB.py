@@ -139,7 +139,7 @@ class HeroBattle(SpecialMapContainer):
                 return 'Legendary & Mythic Hero Battle'
             elif ((heroes[0].data['extra'] or {}).get('kind') == 'Emblem' and (heroes[1].data['extra'] or {}).get('kind') == 'Mythic') or \
                  ((heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[1].data['extra'] or {}).get('kind') == 'Emblem'):
-                return 'Mythic & Emblem Hero Battle'
+                return 'Emblem & Mythic Hero Battle'
             elif ((heroes[0].data['extra'] or {}).get('kind') == 'Duo'    and (heroes[1].data['extra'] or {}).get('kind') == 'Mythic') or \
                  ((heroes[0].data['extra'] or {}).get('kind') == 'Mythic' and (heroes[1].data['extra'] or {}).get('kind') == 'Duo'):
                 return 'Duo & Mythic Hero Battle'

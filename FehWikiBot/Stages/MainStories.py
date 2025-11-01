@@ -129,6 +129,9 @@ class MainStory(StoryContainer):
         from ..Utility.Scenario import Scenario
         from ..Tool.globals import ROMAN
         s = Scenario.Story(self.id_tag, isStory=True)
+        if s.find('{unit=') == -1:
+            self.story = ''
+            return ''
         if s[:8] == '{{#ifeq:' and s[-4:] == '}}}}':
             self.story = ''
             s = '==Story==\n' + s[48:-2]

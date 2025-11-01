@@ -34,7 +34,7 @@ def _createChildClass(obj):
     from .Assist import Assist
     from .Special import Special
     from .Passive import Passive
-    if obj is None: return None
+    if obj is None or obj.data is None: return None
     elif obj.type == 'Weapon': o = Weapon()
     elif obj.type == 'Assist': o = Assist()
     elif obj.type == 'Special': o = Special()
@@ -160,14 +160,19 @@ class Skills(JsonContainer, ArticleContainer, metaclass=_SkillMeta):
         if self.data['id_tag'] in APPEND:
             s += ' (' + APPEND[self.data['id_tag']] + ')'
         return s
-    
+
     @property
     def articleName(self):
         import re
         from ..Utility.Messages import EN
+        APPEND = {
+            'Pair Up': 'Passive',
+        }
         s = self.name
         if hasattr(self,'_datas'):
             s = re.sub(r'\s+\d+$','', EN(self._datas[0]['name_id']).replace('/',' '))
+        if s in APPEND:
+            s += ' (' + APPEND[s] + ')'
         return s
 
     @property

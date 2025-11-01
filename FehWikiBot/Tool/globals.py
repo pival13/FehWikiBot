@@ -12,6 +12,7 @@ __all__ = [
 ]
 
 GREEN_TEXT = '\33[1;92m'
+YELLOW_TEXT = '\33[1;93m'
 GREY_TEXT = '\33[1;30m'
 YELLOW_BG = '\33[1;30;103m'
 RED_BG = '\33[1;37;101m'

@@ -9,7 +9,7 @@ def waitSec(time):
     from time import sleep
     from datetime import datetime, timedelta
     global _now
-    
+
     if _now != 0 and datetime.now() < _now+timedelta(seconds=time):
         sleep((_now+timedelta(seconds=time)-datetime.now()).total_seconds())
     _now = datetime.now()

@@ -21,15 +21,15 @@ def StageFromMap(map_id):
     elif re.match(r'X\d{4}',map_id): return Paralogue.get(map_id)
     elif re.match(r'XX\d{3}',map_id): return Paralogue.get(map_id) # Xenologue
     elif re.match(r'P[ABC]\d{3}',map_id): return TacticsDrills.get(map_id)
-    elif re.match(r'H\d{4}',map_id): return HeroicOrdeals.get(map_id)
-    elif re.match(r'J\d{4}',map_id): return MergedOrdeals.get(map_id)
+    elif re.match(r'H\d{4}',map_id): return HeroicOrdeals.get(str(int(map_id[1:])))
+    elif re.match(r'J\d{4}',map_id): return MergedOrdeals.get(str(int(map_id[1:])))
     elif re.match(r'SB_\d{4}',map_id): return SquadAssault.get(map_id)
-    # elif re.match(r'ST_C\d{4}',map_id): Chain Challenge
-    # elif re.match(r'ST_CX\d{3}',map_id): Chain Challenge
+    elif re.match(r'ST_C\d{4}',map_id): return StoryChainChallenge.get(map_id)
+    elif re.match(r'ST_CX\d{3}',map_id): return ParalogueChainChallenge.get(map_id)
     elif re.match(r'Q\d{4}',map_id): return RivalDomains.get(map_id)
     elif re.match(r'[TL]\d{4}',map_id): return HeroBattle.get(map_id)
     elif re.match(r'I\d{4}',map_id): return LimitedHeroBattle.get(map_id)
-    # r'V\d{4}' == Event map
+    elif re.match(r'V\d{4}',map_id): return EventMap.get(map_id)
     elif re.match(r'W\d{4}',map_id): return TempestTrials.get(map_id+'A',('sets',0,'battles',-1,'maps',0))
     # r'U\d{4}' == Hero Battle (1/2 star)
     # r'R\d{4}' == Relay Defense

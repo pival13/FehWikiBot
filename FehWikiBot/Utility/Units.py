@@ -60,7 +60,6 @@ class NPC:
         'ch00_49_Heith_Normal':         {'id': 'PID_ヘイズ',        'name': 'Heiðr: Innocent Goddess'},
         'ch00_51_Njord_M_Normal':       {'id': '',                  'name': 'Njörðr'}, # PID_ニョルズ
         'ch00_59_Lerazr_M_Disappear':   {'id': 'EID_レーラズ',      'name': 'Læraðr: Quieting Heart (Disappear)'},
-        'ch00_66_Woden_M_Normal':       {'id': '',                  'name': 'Alfaðör'}, # EID_天の王
          # This is the tag used for non-face unit on scenarios
         'ch90_02_FighterAX_M_Normal':   {'id': '', 'name': ''}
     }
@@ -128,22 +127,6 @@ class Heroes(Container):
 
     @classmethod
     def fromFace(cls, name: str): return cls.get(name, 'face_dir')
-
-    @classmethod
-    def fromName(cls, name: str):
-        for f in cls._DATA.values():
-            for data in f.values():
-                o = cls()
-                o.data = data
-                if o.name == name:
-                    return o
-        cls.loadAll()
-        for f in cls._DATA.values():
-            for data in f.values():
-                o = cls()
-                o.data = data
-                if o.name == name:
-                    return o
 
     @property
     def shortName(self): return Messages.EN(self.data['id_tag'])

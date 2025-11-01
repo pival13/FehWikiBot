@@ -72,15 +72,15 @@ class Paralogue(StoryContainer):
         ret[name] = '#REDIRECT [[Paralogue Maps#' + prefix + ': ' + name + ']]'
 
         from ..Utility.Scenario import Scenario
-        from datetime import datetime
-        from ..Tool.globals import TIME_FORMAT
+        from ..Events.TT import TempestTrials
         story = ''
         for i,map in enumerate(maps):
             story += f'==[[{map.name}|Part {i+1}]]==\n' + '{{:'+map.name+'/Story}}\n'
-        # TODO Use Tempest Trials class
-        time = datetime.strptime(maps[0].data['avail']['start'], TIME_FORMAT)
-        tt = EN('MID_SEQUENTIAL_MAP_TERM_'+time.strftime('%Y%m'))
-        story += f'==[[{tt}|Extra]]==\n' + '{{:'+tt+'/Story}}\n'
+        for k,dict in cls._DATA.items():
+            if maps[0].data[cls._key] in dict:
+                tt = TempestTrials.fromAssets(k)[0]
+                break
+        story += f'==[[{tt.name}|Extra]]==\n' + '{{:'+tt.name+'/Story}}\n'
         story += Scenario.Navbar('paralogue', maps[0].category()) + '\n'
         story += Scenario.Navbox('paralogue')
         ret[name+'/Story'] = story

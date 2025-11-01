@@ -4,7 +4,7 @@ import json
 from os.path import realpath, dirname
 from FehWikiBot.Utility.Messages import Messages
 
-if __name__ == '__main__':
+def CreateDiffMessage():
     old = json.load(open(realpath(dirname(__file__) + '/jsons/data.json'), encoding='UTF-8'))
     Messages.EN('M') # Load all messages
     new = Messages._DATA['USEN']
@@ -47,3 +47,6 @@ if __name__ == '__main__':
     s += '}'
     open(realpath(dirname(__file__) + '/_diff.json'), 'w', encoding='UTF-8').write(s)
     json.dump(new, open(realpath(dirname(__file__) + '/jsons/data.json'), 'w', encoding='UTF-8'), indent=2, ensure_ascii=False)
+
+if __name__ == '__main__':
+    CreateDiffMessage()

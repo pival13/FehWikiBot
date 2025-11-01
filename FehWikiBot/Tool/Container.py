@@ -116,6 +116,23 @@ class Container(metaclass=_ContainerMeta):
         return os
 
     @classmethod
+    def fromName(cls, name: str) -> Self|None:
+        for f in cls._DATA.values():
+            for data in f.values():
+                o = cls()
+                o.data = data
+                if o.name == name:
+                    return o
+        cls.loadAll()
+        for f in cls._DATA.values():
+            for data in f.values():
+                o = cls()
+                o.data = data
+                if o.name == name:
+                    return o
+
+
+    @classmethod
     def load(cls, name: str) -> bool:
         # if isinstance(cls._key, (int,str)): cls._key = [cls._key]
         if name in cls._DATA: return False

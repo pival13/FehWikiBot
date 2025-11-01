@@ -3,7 +3,7 @@
 from requests import Session as _Session, exceptions as _reqExcept
 from time import sleep as _sleep
 
-from .globals import ERROR as _ERROR, RESET_TEXT as _RESET_TEXT, GREEN_TEXT as _GREEN_TEXT, GREY_TEXT as _GREY_TEXT, YELLOW_BG as _YELLOW_BG
+from .globals import ERROR as _ERROR, RESET_TEXT as _RESET_TEXT, GREEN_TEXT as _GREEN_TEXT, GREY_TEXT as _GREY_TEXT, YELLOW_TEXT as _YELLOW_TEXT
 
 __all__ = [ 'APIError', 'CargoError', 'Wiki' ]
 
@@ -234,7 +234,7 @@ class Wiki:
         elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'articleexists':
             print(f"{_GREY_TEXT}- Already exist{_RESET_TEXT}: {name}")
         elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'timeout':
-            print(f"{_YELLOW_BG}! Timeout{_RESET_TEXT}: {name}")
+            print(f"{_YELLOW_TEXT}! Timeout{_RESET_TEXT}: {name}")
         elif 'error' in result and 'info' in result['error']:
             print(_ERROR + f"Failed to export \"{name}\": {result['error']['info']}")
         else:
@@ -269,7 +269,7 @@ class Wiki:
         elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'fileexists-no-change':
             print(f"{_GREY_TEXT}- Already exist{_RESET_TEXT}: {name}")
         elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'timeout':
-            print(f"{_YELLOW_BG}! Timeout{_RESET_TEXT}: {name}")
+            print(f"{_YELLOW_TEXT}! Timeout{_RESET_TEXT}: {name}")
         elif 'error' in result and 'info' in result['error']:
             print(_ERROR + f"Failed to upload \"{name}\": {result['error']['info']}")
         else:
@@ -308,7 +308,7 @@ class Wiki:
         if 'move' in result:
             print(f"{_GREEN_TEXT}* Moved{_RESET_TEXT}: {name}")
         elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'timeout':
-            print(f"{_YELLOW_BG}! Timeout{_RESET_TEXT} on move: {name} → {newName}")
+            print(f"{_YELLOW_TEXT}! Timeout{_RESET_TEXT} on move: {name} → {newName}")
         elif 'error' in result and 'info' in result['error']:
             print(_ERROR + f"Failed to move \"{name}\": {result['error']['info']}")
         else:
@@ -324,7 +324,7 @@ class Wiki:
         if 'delete' in result:
             print(f"{_GREEN_TEXT}- Deleted{_RESET_TEXT}: {name}")
         elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'timeout':
-            print(f"{_YELLOW_BG}! Timeout{_RESET_TEXT} on delete: {name}")
+            print(f"{_YELLOW_TEXT}! Timeout{_RESET_TEXT} on delete: {name}")
         elif 'error' in result and 'info' in result['error']:
             print(_ERROR + f"Failed to delete \"{name}\": {result['error']['info']}")
         else:
@@ -344,7 +344,7 @@ class Wiki:
             if 'edit' in result and result['edit']['result'] == 'Success':
                 print(f'{_GREEN_TEXT}+ Redirected{_RESET_TEXT}: {pageToDelete} → {redirectionTarget}')
             elif 'error' in result and 'code' in result['error'] and result['error']['code'] == 'timeout':
-                print(f"{_YELLOW_BG}! Timeout{_RESET_TEXT} on redirect: {pageToDelete} → {redirectionTarget}")
+                print(f"{_YELLOW_TEXT}! Timeout{_RESET_TEXT} on redirect: {pageToDelete} → {redirectionTarget}")
             elif 'error' in result:
                 print(_ERROR + f'Failed to redirect \"{pageToDelete}\" → \"{redirectionTarget}\": {result["error"]["info"]}')
             else:

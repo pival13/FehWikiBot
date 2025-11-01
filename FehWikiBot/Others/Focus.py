@@ -88,7 +88,7 @@ class Focus(Article):
             pass
 
         elif self.page == '':
-            if 'notif' not in kwargs or kwargs['notif'] == '':
+            if ('notif' not in kwargs or kwargs['notif'] == '') and False:
                 match kwargs['type']:
                     case 'New Heroes': kwargs['notif'] = 'New Heroes Summoning Event: '+kwargs['name']+' (Notification)'
                     case 'Special': kwargs['notif'] = 'Special Heroes Summoning Event: '+kwargs['name']+' (Notification)'
@@ -106,6 +106,8 @@ class Focus(Article):
             self.page =  self.Infobox(kwargs) + '\n'
             self.page += self.OtherLanguage() + '\n'
             self.page += '{{Summoning Event Navbox}}'
+            if kwargs['type'] in ('New Heroes','Special','Tempest Trials'):
+                self.page += '\n{{Daily Log-In Bonus/Focus}}'
 
         else:
             if 'shsr' in kwargs and kwargs['shsr'] and kwargs['name'].find('SHSR') == -1:
@@ -157,37 +159,35 @@ class Focus(Article):
             s += '|youtubeEN=https://www.youtube.com/watch?v=' + params['youtube'][0] + '\n'
             s += '|youtubeJP=https://www.youtube.com/watch?v=' + params['youtube'][1] + '\n'
 
+        if 'focus4' in params and (not isinstance(params['focus4'],list) or len(params['focus4']) == 0):
+            params.pop('focus4')
         rarities = [f'|rarity{r}{s}Percent={float(params[str(r)+s]):.02f}%' for r in range(5,0,-1) for s in ('Focus','SHSpecial','Special','') if (str(r)+s) in params]
         if rarities != []: pass
-        elif params['type'] in ('Special') and params['name'][-9:] == ' (4★SHSR)':
-            if 'focus4' in params:
-                rarities = ['|rarity5FocusPercent=4.00%','|rarity5Percent=2.00%','|rarity4FocusPercent=3.00%','|rarity4SHSpecialPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=52.00%','|rarity3Percent=33.00%']
-            else:
-                rarities = ['|rarity5FocusPercent=4.00%','|rarity5Percent=2.00%','|rarity4SHSpecialPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=33.00%']
-        elif params['type'] in ('New Heroes','Special','New Heroes Revival'):
-            if 'focus4' in params:
-                rarities = ['|rarity5FocusPercent=3.00%','|rarity5Percent=3.00%','|rarity4FocusPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=52.00%','|rarity3Percent=36.00%']
-            else:
-                rarities = ['|rarity5FocusPercent=3.00%','|rarity5Percent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=36.00%']
-        elif params['type'] in ('Returning', 'Double Special Heroes'):
-            if 'focus4' in params:
-                rarities = ['|rarity5FocusPercent=6.00%','|rarity4FocusPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=54.00%','|rarity3Percent=34.00%']
-            else:
-                rarities = ['|rarity5FocusPercent=6.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=57.00%','|rarity3Percent=34.00%']
-        elif params['type'] in ('ω Special Heroes'):
+        elif (params['type'] in ('Weekly Revival','Legendary Revival')) or (params['type'] in ('Special') and params.get('shsr')):
+            rarities = ['|rarity5FocusPercent=4.00%','|rarity5Percent=2.00%']
+            if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
+            if params.get('shsr'): rarities.append('|rarity4SHSpecialPercent=3.00%')
+            rarities.append('|rarity4SpecialPercent=3.00%')
+            rarities.append(f"|rarity4Percent={52 if len(rarities) >= 5 else 55}.00%")
+            rarities.append(f"|rarity3Percent={33 if len(rarities) >= 5 else 36}.00%")
+        elif params['type'] in ('Returning', 'Double Special Heroes', 'Legendary & Mythic Hero Remix'):
+            rarities = ['|rarity5FocusPercent=6.00%']
+            if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
+            rarities.append('|rarity4SpecialPercent=3.00%')
+            rarities.append(f"|rarity4Percent={54 if len(rarities) >= 3 else 57}.00%")
+            rarities.append('|rarity3Percent=34.00%')
+        elif params['type'] == 'ω Special Heroes':
             rarities = ['|rarity5FocusPercent=6.00%','|rarity5Percent=2.00%']
             if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
             if params.get('shsr'): rarities.append('|rarity4SHSpecialPercent=3.00%')
             rarities.append('|rarity4SpecialPercent=3.00%')
             rarities.append(f"|rarity4Percent={50 if len(rarities) > 3 else 53}.00%")
             rarities.append(f"|rarity3Percent={33 if len(rarities) > 5 else 36}.00%")
+        elif params['name'].find('12 Luminaries') != -1:
+            rarities = ['|rarity5FocusPercent=8.00%','|rarity4FocusPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=53.00%','|rarity3Percent=33.00%']
         elif params['type'] in ('Legendary', 'Mythic', 'Emblem', 'Legendary & Mythic', 'Emblem & Mythic'):
             rarities = ['|rarity5FocusPercent=8.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=34.00%']
-        elif params['type'] in ('Legendary & Mythic Hero Remix'):
-            rarities = ['|rarity5FocusPercent=6.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=57.00%','|rarity3Percent=34.00%']
-        elif params['type'] in ('Weekly Revival','Legendary Revival'):
-            rarities = ['|rarity5FocusPercent=4.00%','|rarity5Percent=2.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=36.00%']
-        elif params['type'] in ('Hero Fest'):
+        elif params['type'] == 'Hero Fest':
             rarities = ['|rarity5FocusPercent=5.00%','|rarity5Percent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=34.00%']
         elif params['type'] in ('Free Summon', 'Select Summon'):
             if params['name'].find('4★SHSR') != -1:
@@ -197,7 +197,10 @@ class Focus(Article):
             else:
                 rarities = ['|rarity5FocusPercent=100.00%']
         else:
-            rarities = ['|rarity5FocusPercent=3.00%','|rarity5Percent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=36.00%']
+            if 'focus4' in params:
+                rarities = ['|rarity5FocusPercent=3.00%','|rarity5Percent=3.00%','|rarity4FocusPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=52.00%','|rarity3Percent=36.00%']
+            else:
+                rarities = ['|rarity5FocusPercent=3.00%','|rarity5Percent=3.00%',                             '|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=36.00%']
         s += '\n'.join(rarities) + '\n'
 
         for i,h in enumerate(params.get('heroes') or []):
