@@ -20,7 +20,7 @@ class YourTimeToShine(ArticleContainer):
 
     def Infobox(self):
         return super().Infobox('Your Time to Shine', {
-            'bonusVersion': 2, # self.data[], # TODO
+            'bonusVersion': self.data['bonus_version'],
             'finalBattle': self.data['final_battle'][:-1],
             'start': self.data['avail']['start'],
             'end': self.data['avail']['end']
@@ -64,8 +64,8 @@ class YourTimeToShine(ArticleContainer):
     
     def Heroes(self):
         from datetime import datetime
+        version = self.data['bonus_version']
         s =  '==Bonus Heroes==\n'
-        version = 2# TODO
         s += f"{{{{UnitsByVersion|from={version}|to={version+1}|maxDate={datetime.now().strftime('%Y-%m-%d')}}}}}"
         return s
 

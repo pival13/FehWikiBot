@@ -17,7 +17,7 @@ from .Terrain import Map
 def StageFromMap(map_id):
     import re
     from ..Events.TT import TempestTrials
-    if   re.match(r'S\d{4}',map_id): return MainStory.get(map_id)
+    if   re.match(r'S[0-9A-F]\d{3}',map_id): return MainStory.get(map_id)
     elif re.match(r'X\d{4}',map_id): return Paralogue.get(map_id)
     elif re.match(r'XX\d{3}',map_id): return Paralogue.get(map_id) # Xenologue
     elif re.match(r'P[ABC]\d{3}',map_id): return TacticsDrills.get(map_id)

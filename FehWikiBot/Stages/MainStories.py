@@ -7,8 +7,9 @@ class MainStory(StoryContainer):
     @classmethod
     def get(cls, key: str) -> Self | None:
         import re
-        if not re.match(r'^S\d{3}[1-5][A-C]?$', key): return None
-        obj = super().get('C0'+key[1:4], 'id_tag')
+        if not re.match(r'^S[0-9A-F]\d{2}[1-5][A-C]?$', key): return None
+        groupid = 'C' + ('00'+str(int(key[1],16)))[-2:] + key[2:4]
+        obj = super().get(groupid, 'id_tag')
         if obj is None: return None
         o = cls()
         o.data = obj.data

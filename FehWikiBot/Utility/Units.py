@@ -60,6 +60,7 @@ class NPC:
         'ch00_49_Heith_Normal':         {'id': 'PID_ヘイズ',        'name': 'Heiðr: Innocent Goddess'},
         'ch00_51_Njord_M_Normal':       {'id': '',                  'name': 'Njörðr'}, # PID_ニョルズ
         'ch00_59_Lerazr_M_Disappear':   {'id': 'EID_レーラズ',      'name': 'Læraðr: Quieting Heart (Disappear)'},
+        'ch00_62_Rune_M_Enemy':         {'id': 'PID_ルーン',        'name': 'Rune: Source of Wisdom (Alfaðör)'},
          # This is the tag used for non-face unit on scenarios
         'ch90_02_FighterAX_M_Normal':   {'id': '', 'name': ''}
     }

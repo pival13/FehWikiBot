@@ -6,14 +6,14 @@ from os.path import exists
 from PIL import Image
 
 from FehWikiBot import Wiki
-from FehWikiBot.PersonalData import WEBP_ASSETS_DIR_PATH
+from FehWikiBot.PersonalData import WEBP_ASSETS_DIR_PATH as ROOT
 from FehWikiBot.Tool.globals import ERROR, TODO
 from FehWikiBot.Tool import waitSec, cleanStr, askFor
 from FehWikiBot.Utility.Units import Units
 
 def _trimImage(filepath: str) -> Image:
     try:
-        img = Image.open(filepath)
+        img = Image.open(ROOT+filepath)
         left,up,right,down = img.getbbox()
         extraW = (10 - (right-left)%10) % 10
         extraH = (10 - (down-up)%10) % 10
@@ -82,8 +82,7 @@ def upload(filepath: str, comment: str):
     type = name[name.rfind('.')+1:]
     content = ''
 
-    if filepath.find('/assets/') != -1:
-        content += '{{Copyright game}}{{Source|assets=' + filepath[filepath.find('/assets/'):] + '}}'
+    content += '{{Copyright game}}{{Source|assets=/assets/' + filepath + '}}'
     content += categories(filepath)
     if type in (name,'lz','plist','ssbp','ssae','ckb','csb'):
         return
@@ -93,7 +92,7 @@ def upload(filepath: str, comment: str):
         elif filepath.find('/TWZH/') != -1:
             return
     elif type in ('webp','png'):
-        data = open(filepath, 'rb').read(12)
+        data = open(ROOT+filepath, 'rb').read(12)
         if data[8:12] == b'WEBP':
             name = name.replace('.png', '.webp')
         if re.search(r'/Unit/.+_[pP]air/', filepath):
@@ -131,13 +130,13 @@ def upload(filepath: str, comment: str):
         elif filepath.find('/Wep/') != -1:
             from FehWikiBot.Skills.Weapon import Weapon
             o = Weapon.get(name[:-5],'sprite_wepR') or Weapon.get(name[:-5],'sprite_wepL')
-            img = Image.open(filepath)
+            img = Image.open(ROOT+filepath)
             if not o: pass
             elif ('a' in img.mode or 'A' in img.mode) and img.getextrema()[-1][1] < 0x80:
                 waitSec(5)
                 Wiki.exportPage('File:'+cleanStr(name), '#REDIRECT [[File:Blank.png]]', 'Redirect empty file '+comment[comment.find('('):], create=True)
                 return
-            elif name[:6] == 'wep_mg' and not exists(filepath.replace('.png','.ssbp')) and img.size == (128,64):
+            elif name[:6] == 'wep_mg' and not exists(ROOT+filepath.replace('.png','.ssbp')) and img.size == (128,64):
                 color = ['Red','Blue','Green','Colorless'][int(name[6])%4]
                 inherit = 'Exclusive' if o.exclusive else 'Inheritable'
                 content = content.replace('[[Category:'+inherit+' Weapon sprites]]','')
@@ -155,7 +154,7 @@ def upload(filepath: str, comment: str):
 
         elif filepath.find('/Unit_Accessory/') != -1:
             from FehWikiBot.Others.Accessory import Accessories
-            if exists(filepath[:-len(name)] + '/Thumbnail.png') and name[:-5] != 'Thumbnail': return
+            if exists(ROOT+filepath[:-len(name)] + '/Thumbnail.png') and name[:-5] != 'Thumbnail': return
             o = Accessories.get(filepath[filepath.rfind('/', 0, -len(name))+1:-len(name)],'sprite')
             name = o.data['sprite'] + '.webp'
             name2 = ('Accessory ' + o.name + '.png') if o else None
@@ -172,7 +171,7 @@ def upload(filepath: str, comment: str):
                 waitSec(5)
                 Wiki.uploadImage('Structure ' + o.name + '.png', _trimImage(filepath), content.replace('|assets=','|Cropped from|assets=')+'\n[[Category:Structure sprites]]', comment, True)
                 return
-            elif o and name == dirName+'.webp' and not exists(filepath.replace('tex/'+dirName+'.webp','anim.ssbp')):
+            elif o and name == dirName+'.webp' and not exists(ROOT+filepath.replace('tex/'+dirName+'.webp','anim.ssbp')):
                 return
             name = dirName + '_' + name
         elif filepath.find('/SkyCastle/Holiday/') != -1:
@@ -212,7 +211,7 @@ def upload(filepath: str, comment: str):
         return
 
     waitSec(5)
-    Wiki.uploadFile(name, open(filepath, 'rb'), content, comment, True)
+    Wiki.uploadFile(name, open(ROOT+filepath, 'rb'), content, comment, True)
     if name2:
         Wiki.exportPage('File:'+cleanStr(name2), '#REDIRECT [[File:'+cleanStr(name)+']]', 'Redirect', create=True)
 
@@ -222,8 +221,8 @@ if __name__ == '__main__':
     if len(argv) != 2: exit(1)
     data = json.load(open('jsons/changes.json', 'r'))
     for f in data['added']:
-        try: upload(WEBP_ASSETS_DIR_PATH + f.replace('\\','/'), f'New file ({argv[1]})')
+        try: upload(f.replace('\\','/'), f'New file ({argv[1]})')
         except: print(ERROR + f)
     for f in data['updated']:
-        try: upload(WEBP_ASSETS_DIR_PATH + f.replace('\\','/'), f'Updated file ({argv[1]})')
+        try: upload(f.replace('\\','/'), f'Updated file ({argv[1]})')
         except: print(ERROR + f)

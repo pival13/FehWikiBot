@@ -42,7 +42,7 @@ class HeroBattle(SpecialMapContainer):
             case 'Duo & Mythic Hero Battle':
                 o = DuoMythicHeroBattle()
             case _:
-                return self
+                o = HeroBattle()
         o.data = self.data
         o.page = self.page
         if hasattr(self,'_name'): o._name = self._name
@@ -62,7 +62,7 @@ class HeroBattle(SpecialMapContainer):
     @classmethod
     def fromAssets(cls, file: str):
         os = [o._toChildClass() for o in super().fromAssets(file)]
-        return [o for o in os if (cls == HeroBattle and o is not None and not type(o) == LimitedHeroBattle) or type(o) == cls]
+        return [o for o in os if (cls == HeroBattle and o is not None and type(o) != LimitedHeroBattle) or type(o) == cls]
 
     @classmethod
     def fromWiki(cls, name: str):

@@ -130,6 +130,7 @@ class Skills(JsonContainer, ArticleContainer, metaclass=_SkillMeta):
         from ..Utility.Messages import EN
         import re
         s = EN(key).replace('$a','').replace('\n\n','<br><br>')
+        s = s.replace('\n―――','<br>―――').replace('―――\n','―――<br>')
         s = re.sub(r'(?:\n|<br>)((?:Effect:\s*)?【[^】]+】)(?:\n|<br>)', '<br>\\1<br>', s)
         return s.replace('\n',' ')
 
@@ -150,6 +151,7 @@ class Skills(JsonContainer, ArticleContainer, metaclass=_SkillMeta):
             'SID_クワシル': 'weapon', # Kvasir
             'SID_グルヴェイグ': 'weapon', # Gullveig
             'SID_シーフ': 'weapon', # Thief
+            'SID_フィンブル': 'weapon', # Fimbulvetr
             'SID_ミステルトィン': 'sword', # Missiltainn
             'SID_魔書ミステルトィン': 'tome', # Missiltainn
             'SID_絶対化身': 'Sacred Seal', # Beast

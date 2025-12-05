@@ -73,10 +73,10 @@ class YourTimeToShineReader(IReader):
                 self.end()
             self.end()
             
-            self.assertBytes(4, 0x6D9CF37D, f'[0x{self._i:02x}], bonus_version?')
+            self.readInt('bonus_version', 0x6D9CF37D)
             self.assertBytes(4, 0x7E0E8A4F, f'[0x{self._i:02x}]')
-            self.assertBytes(4, 0xD2340BE0, f'[0x{self._i:02x}]')
-            self.assertBytes(4, 0x9DA572CB, f'[0x{self._i:02x}]')
+            self.assertBytes(4, 0xD2340BE0, f'[0x{self._i:02x}], max_hero_id?')
+            self.assertBytes(4, 0x9DA572CB, f'[0x{self._i:02x}], max_skill_id?')
             self.assertBytes(4, 0x53777B51, f'[0x{self._i:02x}]')
             self.assertPadding(4)
             self.end()

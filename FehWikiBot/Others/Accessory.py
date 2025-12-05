@@ -75,4 +75,14 @@ class Accessories(ArticleContainer):
         self.page += '{{Accessories Navbox|'+self.data['type']+'}}'
 
         return self
-        
+
+    def update(self):
+        import re
+
+        if self.data is None: return self
+
+        if self.data['@Shop'] is not None and self.page.find('{{Shop accessory') == -1:
+            s = '{{Shop accessory|' + str(self.data['@Shop']['required']['count']) + '}}'
+            self.page = re.sub(r'(==\s*Obtained.*?)\n+==', '\\1\n' + s + '\n==', self.page, 1, re.DOTALL)
+
+        return self
