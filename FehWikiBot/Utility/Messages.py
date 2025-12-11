@@ -78,6 +78,7 @@ class Messages(metaclass=_MessageMeta):
 
     @classmethod
     def _load(cls, path):
+        from os import makedirs
         from os.path import exists, getmtime
         from json import load, dump
         from ..PersonalData import JSON_ASSETS_DIR_PATH as jsonPath, BINLZ_ASSETS_DIR_PATH as assetsPath
@@ -90,6 +91,7 @@ class Messages(metaclass=_MessageMeta):
         if exists(assetsPath) and (not exists(jsonPath) or getmtime(assetsPath) >= getmtime(jsonPath)):
             parser = MessageReader.fromAssets(path)
             if parser.isValid():
+                makedirs(jsonPath[:jsonPath.rfind('/')], exist_ok=True)
                 dump(parser.object, open(jsonPath, mode='w', encoding='utf8'), ensure_ascii=False, indent=2)
                 for o in parser.object:
                     cls._DATA[lang][o['key']] = o['value']

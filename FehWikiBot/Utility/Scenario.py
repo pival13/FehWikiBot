@@ -80,6 +80,7 @@ class Scenario(metaclass=_ScenarioMeta):
 
     @classmethod
     def load(cls, tag: str) -> bool:
+        from os import makedirs
         from os.path import exists, getmtime
         from json import load, dump
         from ..PersonalData import JSON_ASSETS_DIR_PATH as jsonPath, BINLZ_ASSETS_DIR_PATH as assetsPath
@@ -92,6 +93,7 @@ class Scenario(metaclass=_ScenarioMeta):
             elif exists(assetsPath+path+'.bin.lz') and (not exists(jsonPath+path+'.json') or getmtime(assetsPath+path+'.bin.lz') >= getmtime(jsonPath+path+'.json')):
                 parser = MessageReader.fromAssets(path+'.bin.lz')
                 if not parser.isValid(): continue
+                makedirs(jsonPath+path[:path.rfind('/')], exist_ok=True)
                 dump(parser.object, open(jsonPath+path+'.json', mode='w', encoding='utf-8'), ensure_ascii=False, indent=2)
                 json = parser.object
             elif exists(jsonPath+path+'.json'):

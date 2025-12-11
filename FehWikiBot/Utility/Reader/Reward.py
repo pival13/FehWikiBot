@@ -16,8 +16,8 @@ class RewardReader(IReader):
         return super().isValid() and self.overviewLong(-(self._i+0x18)) == 0x160707001B9AD871
 
     def parse(self):
-        from Crypto.Cipher import AES
-        from Crypto.Util import Counter
+        from Cryptodome.Cipher import AES
+        from Cryptodome.Util import Counter
 
         if not self.isValid(): return
         iv = int.from_bytes(self._buff[-0x10:], 'big')

@@ -161,7 +161,7 @@ def upload(filepath: str, comment: str):
         elif filepath.find('/Field/') != -1 and filepath.find('/Field/Common/') == -1:
             name = 'Map_' + name
             name2 = name.replace('.webp','.png')
-        elif filepath.find('/Banner_Map/') != -1 and not re.search(r'/(ST_)?CX?\d+(_C)?\.', filepath):
+        elif filepath.find('/Banner_Map/') != -1 and not re.search(r'/(ST_)?CX?[0-9A-F]+(_C)?\.', filepath):
             name = 'Banner_' + name
         elif filepath.find('/SkyCastle/Chip/') != -1:
             from FehWikiBot.Others.AetherRaids import Structure

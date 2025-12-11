@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from FehWikiBot.Others.Accessory import Accessories
+from FehWikiBot.Others.Accessory import Accessories, AccessoriesPurchasable
 from FehWikiBot.Others.AetherRaids import Structure
 from FehWikiBot.Others.CompileManual import CompileManual
 from FehWikiBot.Skills import *
@@ -15,6 +15,8 @@ if __name__ == '__main__':
     dones = []
     for o in Accessories.fromAssets(argv[1]):
         o.createArticle().export('Accessory ('+argv[1]+')')
+    for o in AccessoriesPurchasable.fromAssets(argv[1]):
+        Accessories.get(o.data['id_tag']).loadArticle().update().export('Accessory purchasable ('+argv[1]+')', create=False)
     for o in Structure.fromAssets(argv[1]):
         o.loadArticle().update().export('Structure ('+argv[1]+')', create=-1)
     CompileManual.updateExportFromAssets(argv[1])
@@ -93,4 +95,4 @@ if __name__ == '__main__':
     for o in UnitedWarfront.fromAssets(argv[1]):
         o.createArticle().export('United Warfront ('+argv[1]+')')
     for o in YourTimeToShine.fromAssets(argv[1]):
-        print(TODO + 'Your Time to Shine event')
+        o.createArticle().export('Your Time to Shine ('+argv[1]+')')

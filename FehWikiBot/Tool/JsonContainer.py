@@ -22,6 +22,7 @@ class JsonContainer(Container):
 
     @classmethod
     def load(cls, name: str) -> bool:
+        from os import makedirs
         from os.path import exists, getmtime
         import json
         from ..PersonalData import JSON_ASSETS_DIR_PATH as jsonPath, BINLZ_ASSETS_DIR_PATH as assetsPath
@@ -35,6 +36,7 @@ class JsonContainer(Container):
             reader = cls._reader.fromAssets(name)
             if not reader.isValid(): return False
             obj = reader.object
+            makedirs(jsonPath[:jsonPath.rfind('/')], exist_ok=True)
             json.dump(obj, open(jsonPath, mode='w', encoding='utf-8'), ensure_ascii=False, indent=2)
         elif exists(jsonPath):
             obj = json.load(open(jsonPath, mode='r', encoding='utf-8'))
