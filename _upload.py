@@ -5,11 +5,10 @@ import re
 from os.path import exists
 from PIL import Image
 
-from FehWikiBot import Wiki
+from FehWikiBot import Wiki, Units
 from FehWikiBot.PersonalData import WEBP_ASSETS_DIR_PATH as ROOT
 from FehWikiBot.Tool.globals import ERROR, TODO
-from FehWikiBot.Tool import waitSec, cleanStr, askFor
-from FehWikiBot.Utility.Units import Units
+from FehWikiBot.Tool import waitSec, cleanStr
 
 def _trimImage(filepath: str) -> Image:
     try:

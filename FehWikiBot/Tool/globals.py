@@ -2,7 +2,7 @@
 
 #! /usr/bin/env python3
 
-from datetime import datetime as _datetime
+from datetime import datetime as _datetime, UTC
 
 __all__ = [
     'TODO', 'WARNING', 'ERROR', 'TIME_FORMAT', 'MIN_TIME', 'MAX_TIME',
@@ -22,8 +22,8 @@ WARNING = YELLOW_BG + '! WARNING' + RESET_TEXT + ': '
 ERROR =  RED_BG + '! ERROR' + RESET_TEXT + ': '
 
 TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-MIN_TIME = _datetime.utcfromtimestamp(0).strftime(TIME_FORMAT)
-MAX_TIME = _datetime.utcfromtimestamp(0x7FFFFFFF).strftime(TIME_FORMAT)
+MIN_TIME = _datetime.fromtimestamp(0, UTC).strftime(TIME_FORMAT)
+MAX_TIME = _datetime.fromtimestamp(0x7FFFFFFF, UTC).strftime(TIME_FORMAT)
 
 DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
 ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']

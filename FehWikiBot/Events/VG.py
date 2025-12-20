@@ -57,14 +57,14 @@ class VotingGauntlet(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return super().name or (EN('MID_VOTE_TERM_' + self.data['id_tag']) if hasattr(self,'data') and self.data is not None else None)
 
 
     def Infobox(self):
         from num2words import num2words
         from ..Tool import Wiki
-        from ..Utility.Units import Heroes
+        from ..Units import Heroes
         nb = int(Wiki.cargoQuery('VotingGauntlets', 'COUNT(DISTINCT _pageName)=Nb', where='StartTime < "'+self.data['avail']['start']+'"', limit=1))+1
         return super().Infobox('Voting Gauntlet', {
             'tournamentNumber': nb,

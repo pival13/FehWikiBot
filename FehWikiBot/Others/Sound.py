@@ -2,8 +2,7 @@
 
 __all__ = 'Sound', 'BGM'
 
-from typing_extensions import Self
-from ..Tool import Container, JsonContainer, classproperty
+from ..Tool import Container, classproperty
 from .Reader.Sound import SoundReader, MapBGMReader, HOBGMReader
 
 class Sound(Container):

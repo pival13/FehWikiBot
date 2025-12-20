@@ -57,14 +57,14 @@ class MainStory(StoryContainer):
 
     @classmethod
     def GroupArticle(cls, maps: list[Self]) -> dict[str,str]:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         ret = {}
         name = EN('MID_CHAPTER_'+maps[0].data['id_tag'])
         prefix = EN('MID_CHAPTER_TITLE_'+maps[0].data['id_tag'])
         chapter = prefix[prefix.find('Chapter'):]
         ret[name] = '#REDIRECT [[Story Maps#' + chapter + ': ' + name + ']]'
 
-        from ..Utility.Scenario import Scenario
+        from ..Lang import Scenario
         story = ''
         for i,map in enumerate(maps):
             if map.story == '': continue
@@ -122,12 +122,12 @@ class MainStory(StoryContainer):
 
 
     def Availability(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         notif = ''#'New Heroes Summoning Event: New Heroes & ' + 'Ascended Laegjarn' + '(Notification)'
         return super().Availability('[[Main Story]] map', self.data['avail'], '', isMap=True)
 
     def Story(self):
-        from ..Utility.Scenario import Scenario
+        from ..Lang import Scenario
         from ..Tool.globals import ROMAN
         s = Scenario.Story(self.id_tag, isStory=True)
         if s.find('{unit=') == -1:

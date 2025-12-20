@@ -10,8 +10,8 @@ class HeroicOrdeals(ArticleContainer):
 
     @classmethod
     def load(cls, name: str) -> bool:
-        from ..Utility.Sound import BGM
-        from ..Utility.Units import Heroes
+        from ..Others.Sound import BGM
+        from ..Units import Heroes
         if not super().load(name): return False
         for o in cls._DATA[name].values():
             origin = Heroes.get(int(o['id_tag']), 'num_id').data['origin']
@@ -24,20 +24,19 @@ class HeroicOrdeals(ArticleContainer):
 
     @classmethod
     def fromAssets(cls, file: str) -> list[Self]:
-        from ..Utility.Units import Heroes
+        from ..Units import Heroes
         os = [str(h.data['num_id']) for h in Heroes.fromAssets(file)]
         return [o for o in cls.fromUnique() if o.data['id_tag'] in os]
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
         if hasattr(self, '_name'): return self._name
         if self.data is None: return None
         return 'Heroic Ordeals: ' + self.unit.name + '\'s Trial'
 
     @property
     def unit(self):
-        from ..Utility.Units import Heroes
+        from ..Units import Heroes
         if self.data is None: return None
         if not hasattr(self, '_unit'):
             self._unit = Heroes.get(int(self.data['id_tag']), 'num_id')
@@ -52,8 +51,8 @@ class HeroicOrdeals(ArticleContainer):
         return self._map
 
     def Infobox(self):
-        from ..Utility.Messages import EN
-        from ..Utility.Sound import Sound
+        from ..Lang import EN
+        from ..Others.Sound import Sound
         from ..Tool.globals import MOVE_TYPE
         LVL = {'Normal':30,'Hard':35,'Lunatic':40}
         RARITY = {'Normal':4,'Hard':5,'Lunatic':5}
@@ -117,8 +116,8 @@ class MergedOrdeals(HeroicOrdeals):
         return self._map
 
     def Infobox(self):
-        from ..Utility.Messages import EN
-        from ..Utility.Sound import Sound
+        from ..Lang import EN
+        from ..Others.Sound import Sound
         from ..Tool.globals import MOVE_TYPE
         return super(HeroicOrdeals,self).Infobox('Battle', {
             'bannerImage': '',

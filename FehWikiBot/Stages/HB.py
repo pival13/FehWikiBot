@@ -3,13 +3,13 @@
 from typing_extensions import Self
 from .SpecialMapContainer import SpecialMapContainer
 
-__all__ = ['HeroBattle','HB',
-           'GrandHeroBattle','GHB',
-           'BoundHeroBattle','BHB',
-           'LegendaryHeroBattle','DoubleLegendaryHeroBattle','LHB',
-           'MythicHeroBattle','DoubleMythicHeroBattle','MHB',
-           'EmblemHeroBattle','EHB',
-           'LegendaryMythicHeroBattle','EmblemMythicHeroBattle',
+__all__ = ['HeroBattle',
+           'GrandHeroBattle',
+           'BoundHeroBattle',
+           'LegendaryHeroBattle',
+           'MythicHeroBattle',
+           'EmblemHeroBattle',
+           'DoubleLegendaryHeroBattle','DoubleMythicHeroBattle','LegendaryMythicHeroBattle','EmblemMythicHeroBattle',
            'LimitedHeroBattle']
 
 class HeroBattle(SpecialMapContainer):
@@ -88,7 +88,7 @@ class HeroBattle(SpecialMapContainer):
 
     @SpecialMapContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         s = super().name
         if s is None and self.data is not None:
             s = EN('MID_STAGE_'+self.data['id_tag']) + ': ' + EN('MID_STAGE_HONOR_'+self.data['id_tag'])
@@ -103,8 +103,8 @@ class HeroBattle(SpecialMapContainer):
 
     @property
     def heroes(self):
-        from ..Utility.Scenario import Scenario
-        from ..Utility.Units import Heroes
+        from ..Lang import Scenario
+        from ..Units import Heroes
         import re
         tags = re.findall(r'ch\d{2}_\d{2}_\w+', Scenario(self.id_tag, 'MID_SCENARIO_MAP_BEGIN').texts['USEN'])
         heroes = []
@@ -149,9 +149,9 @@ class HeroBattle(SpecialMapContainer):
 
 
     def Infobox(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         from ..Utility.Reward import Rewards
-        from ..Utility.Sound import BGM
+        from ..Others.Sound import BGM
         o =  {
             'bannerImage': 'Banner ' + self.data['id_tag'] + '.webp',
             'stageTitle': EN('MID_STAGE_TITLE_'+self.data['id_tag']),
@@ -209,7 +209,7 @@ class HeroBattle(SpecialMapContainer):
         return Map.UnitData(maps).replace('|allyPos=|enemyPos=','').replace('=-','=')
 
     def Story(self) -> str:
-        from ..Utility.Scenario import Scenario
+        from ..Lang import Scenario
         s =  '==Story==\n'
         s += Scenario.Story(self.data['id_tag']) + '\n'
         s += Scenario.StoryNavbar(self.data['id_tag'])

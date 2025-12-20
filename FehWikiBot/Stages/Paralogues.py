@@ -65,13 +65,12 @@ class Paralogue(StoryContainer):
 
     @classmethod
     def GroupArticle(cls, maps: list[Self]) -> dict[str,str]:
-        from ..Utility.Messages import EN
+        from ..Lang import EN, Scenario
         ret = {}
         name = EN('MID_CHAPTER_'+maps[0].data['id_tag'])
         prefix = EN('MID_CHAPTER_TITLE_'+maps[0].data['id_tag'])
         ret[name] = '#REDIRECT [[Paralogue Maps#' + prefix + ': ' + name + ']]'
 
-        from ..Utility.Scenario import Scenario
         from ..Events.TT import TempestTrials
         story = ''
         for i,map in enumerate(maps):
@@ -97,12 +96,12 @@ class Paralogue(StoryContainer):
         import re
         o = Article.fromWiki('Template:Paralogue Maps Navbox')
         if o.page.find(prefix + ': ' + name) == -1:
-            count = int(re.findall(r'\|list(\d+)', o.page)[-2]) # -1 is for xenologue
+            count = int(re.findall(r'\|group(\d+)', o.page)[-1])
             s =  f' |group{count+1}=[[Paralogue Maps#{prefix}: {name}|{prefix}: {name}]]\n'
             s += f' |list{count+1}=\n'
             for i,map in enumerate(maps):
                 s += f'# [[{map.name}]]\n'
-            ret['Template:Paralogue Maps Navbox'] = o.page.replace('|group99', s+'|group99')
+            ret['Template:Paralogue Maps Navbox'] = o.page.replace('}}<noinclude>', s+'}}<noinclude>')
 
         return ret
 
@@ -134,7 +133,7 @@ class Paralogue(StoryContainer):
 
 
     def Availability(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         type = '[[Paralogue]] map' if self.data['id_tag'][:2] != 'XX' else '[[Xenologue]]'
         notif = 'Special Heroes Summoning Event: ' + EN('MID_CHAPTER_'+self.data['id_tag'])
         return super().Availability(type, self.data['avail'], notif, isMap=True)
@@ -157,7 +156,7 @@ class Paralogue(StoryContainer):
             return 'Unknown'
 
     def Story(self):
-        from ..Utility.Scenario import Scenario
+        from ..Lang import Scenario
         self.story =  Scenario.Story(self.id_tag)
         self.story += '<noinclude>[[Category:'+self.category()+' scenarios]]</noinclude>'
         return '==Story==\n{{/Story}}\n' + Scenario.StoryNavbar(self.map['Normal']['id_tag'][:-1])

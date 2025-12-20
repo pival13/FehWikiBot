@@ -36,19 +36,19 @@ class StoryContainer(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return super().name or EN('MID_STAGE_'+self.id_tag) if self.data is not None else None
 
     @property
     def groupName(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return (EN('MID_CHAPTER_TITLE_'+self.data['id_tag']) + ': ' + EN('MID_CHAPTER_'+self.data['id_tag'])) if self.data is not None else None
 
     def Infobox(self):
         from ..Tool.globals import ROMAN
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         from ..Utility.Reward import Rewards
-        from ..Utility.Sound import BGM
+        from ..Others.Sound import BGM
         from .Terrain import Map
         o =  {
             'bannerImage': self.data['id_tag'] + (' C' if self.idx == 4 else '')  + '.webp',

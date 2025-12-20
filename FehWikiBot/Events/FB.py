@@ -14,7 +14,7 @@ class ForgingBonds(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         k = self.data['title_id'].replace(self.data['id_tag'],self.data['scenario_id'])
         return super().name or EN(k) if self.data is not None else None
 
@@ -32,7 +32,7 @@ class ForgingBonds(ArticleContainer):
         self.pages[''] = v
 
     def Infobox(self):
-        from ..Utility.Units import Units
+        from ..Units import Units
         from ..Others.Accessory import Accessories
         return super().Infobox('Forging Bonds', {
             'number': self.number,
@@ -69,8 +69,8 @@ class ForgingBonds(ArticleContainer):
         return s + '\n}}'
 
     def Story(self):
-        from ..Utility.Units import Units
-        from ..Utility.Scenario import Scenario
+        from ..Units import Units
+        from ..Lang import Scenario
         s  = '==Special conversations==\n'
         s += '===' + self.name + '===\n'
         s += '{{/Story}}\n'

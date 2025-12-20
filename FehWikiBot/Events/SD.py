@@ -52,7 +52,7 @@ class SummonerDuelsEvent(ArticleContainer):
 
 
     def Infobox(self):
-        from ..Utility.Units import Units
+        from ..Units import Units
         from ..Skills import CaptainSkill
         return super().Infobox(self.type, {
             'mapImage': '{{MapLayout '+self.season.data['fixed_map_id']+'}}',

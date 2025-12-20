@@ -12,8 +12,8 @@ class CompileManual(Container):
         from datetime import datetime
         from ..Tool.Wiki import Wiki
         from ..Tool.misc import waitSec
-        from ..Utility.Units import Heroes
-        from ..Utility.Messages import EN
+        from ..Units import Heroes
+        from ..Lang import EN
 
         cls.load(tag)
         datas = cls._DATA.get(tag)

@@ -77,7 +77,7 @@ class Article:
 
     def OtherLanguage(self, tag, tag2=None, swapJp=True):
         def lang(l,sep,swap):
-            from ..Utility.Messages import Messages
+            from ..Lang import Messages
             s = Messages.get(tag,l).replace('\n',' ')
             if s == '' or tag2 is None: return s
             if swap:
@@ -87,10 +87,8 @@ class Article:
 
         s = '==In other languages==\n'
         s += '{{OtherLanguages\n'
-        try:
-            if lang('USEN', ': ', False) != self.name:
-                s += '|english=' + lang('USEN', ': ', False) + '\n'
-        except:
+        name = self.articleName if hasattr(self, 'articleName') else self.name if hasattr(self, 'name') else ''
+        if lang('USEN', ': ', False) != name:
             s += '|english=' + lang('USEN', ': ', False) + '\n'
         s += '|japanese=' +    lang('JPJA', '　', swapJp) + '\n'
         s += '|german=' +      lang('EUDE', ': ', False) + '\n'

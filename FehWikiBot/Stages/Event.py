@@ -23,12 +23,12 @@ class EventMap(SpecialMapContainer):
 
     @SpecialMapContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return super().name or (EN('MID_STAGE_'+self.data['id_tag']) + ': ' + self.event)
 
     @property
     def event(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         s = EN('MID_STAGE_HONOR_'+self.data['id_tag'])
         if s == 'Daily':
             from datetime import datetime
@@ -50,9 +50,9 @@ class EventMap(SpecialMapContainer):
 
 
     def Infobox(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         from ..Utility.Reward import Rewards
-        from ..Utility.Sound import BGM
+        from ..Others.Sound import BGM
         from .Terrain import Map
         o =  {
             'bannerImage': 'Banner ' + self.data['banner_id'] + '.webp',
@@ -95,7 +95,7 @@ class EventMap(SpecialMapContainer):
     
     def UnitData(self):
         from .Terrain import Map
-        from ..Utility.Units import Heroes
+        from ..Units import Heroes
 
         s = "==Unit data==\n"
         s += "{{#invoke:UnitData|main|globalai="
@@ -146,7 +146,7 @@ class EventMap(SpecialMapContainer):
         return s.replace('=-;','=;') + '\n}}'
     
     def Story(self):
-        from ..Utility.Scenario import Scenario
+        from ..Lang import Scenario
         s = Scenario.Conversation(self.data['id_tag'], 'MID_SCENARIO_MAP_BEGIN')
         if s == '': return ''
         return '==Story==\n' + s + '\n' + Scenario.StoryNavbar(self.data['id_tag']) + '\n'

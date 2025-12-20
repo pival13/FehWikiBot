@@ -10,7 +10,7 @@ class CaptainSkill(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return super().name or EN('MID_REALTIME_PVP_SKILL_' + self.data['id_tag'])
 
     def Infobox(self):

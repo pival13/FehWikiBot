@@ -1,11 +1,14 @@
 #! /usr/bin/env python3
 
 class Reward:
+    """ Convert a RewardObj (single or list) into its stringified ObjArg representation.
+     Used as str(Reward(obj)). """
+
     def __init__(self, obj: dict | list[dict]):
         self._obj = obj if isinstance(obj,list) else [obj]
 
     def __str__(self) -> str:
-        from ..Utility.Units import Heroes
+        from ..Units import Heroes
         from ..Skills import SacredSeals
         from ..Others.Accessory import Accessories
         from ..Others.AetherRaids import AetherRaidsItem
@@ -50,6 +53,7 @@ class Reward:
 
 
 def Rewards(obj: dict[str,dict|list[dict]], indent=2) -> str:
+    """ Convert a dictionary of [diff, RewardObj] into a stringified ObjArg of [diff, Reward] """
     ret = []
     for k,v in obj.items():
         ret.append(str(k) + '=' + str(Reward(v)) + ';')

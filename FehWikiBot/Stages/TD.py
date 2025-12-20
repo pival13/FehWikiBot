@@ -10,7 +10,7 @@ class TacticsDrills(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return super().name or EN('MID_STAGE_' + self.data['id_tag']) if self.data is not None else None
 
     @property
@@ -22,7 +22,7 @@ class TacticsDrills(ArticleContainer):
         return self._map
 
     def Infobox(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         from ..Utility.Reward import Rewards
         return super().Infobox('Battle', {
             'bannerImage': 'Banner_Tactics_Drills_' + self.data['type'].replace(' ','_') + '.png',
@@ -45,7 +45,7 @@ class TacticsDrills(ArticleContainer):
         return super().Availability('[[Tactics Drills]]', self.data['avail'], notif, isMap=True)
 
     def Text(self):
-        from ..Utility.Scenario import Scenario
+        from ..Lang import Scenario
         scenar = Scenario.get(self.data['id_tag']).get('MID_MAP_FIELD_TEXT')
         s =  '==Text==\n'
         if scenar:
@@ -60,7 +60,7 @@ class TacticsDrills(ArticleContainer):
 
     def Solution(self):
         import re
-        from ..Utility.Units import Units
+        from ..Units import Units
 
         s =  '==Solution==\n'
         s += '{{#invoke:TacticsDrillsSolution|main\n'

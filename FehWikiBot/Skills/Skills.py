@@ -127,7 +127,7 @@ class Skills(JsonContainer, ArticleContainer, metaclass=_SkillMeta):
 
     @staticmethod
     def description(key):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         import re
         s = EN(key).replace('$a','').replace('\n\n','<br><br>')
         s = s.replace('\n―――','<br>―――').replace('―――\n','―――<br>')
@@ -137,7 +137,7 @@ class Skills(JsonContainer, ArticleContainer, metaclass=_SkillMeta):
 
     @ArticleContainer.name.getter
     def name(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         APPEND = {
             'SID_ファルシオン': 'Mystery', # Falchion
             'SID_ファルシオン外伝': 'Gaiden', # Falchion
@@ -166,7 +166,7 @@ class Skills(JsonContainer, ArticleContainer, metaclass=_SkillMeta):
     @property
     def articleName(self):
         import re
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         APPEND = {
             'Pair Up': 'Passive',
         }

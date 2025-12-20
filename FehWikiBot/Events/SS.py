@@ -17,7 +17,7 @@ class SeersSnare(ArticleContainer):
         return int(Wiki.cargoQuery('SeersSnare', 'COUNT(DISTINCT _pageName)=Nb', where='StartTime < "'+self.data['avail']['start']+'"', limit=1))+1
 
     def Infobox(self):
-        from ..Utility.Units import Units
+        from ..Units import Units
         return super().Infobox('Seers Snare', {
             'bonusTitles': ';'.join(map(str, self.data['entries'])),
             'bosses': ';'.join([Units.get(o['unit']).name for o in self.data['boss_battle'][1:]] + [Units.get(self.data['boss_battle'][0]['unit']).name]),
@@ -47,7 +47,7 @@ class SeersSnare(ArticleContainer):
     
     def UnitData(self):
         from ..Stages.Terrain import Map
-        from ..Utility.Units import Units
+        from ..Units import Units
         def weaponToSeal(unit: Units):
             from ..Tool.globals import WEAPON_MASK
             if (1 << unit.data['weapon']) & WEAPON_MASK['Red']: return 'SID_時を彷徨う者・赤'

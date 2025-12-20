@@ -19,7 +19,7 @@ class HeroesJourney(ArticleContainer):
 
 
     def Infobox(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return super().Infobox('Heroes Journey', {
             'memento': ';'.join([EN('MID_'+id+'_Title') for id in self.data['memento_events']]),
             'startTime': self.data['avail']['start'],
@@ -33,7 +33,7 @@ class HeroesJourney(ArticleContainer):
 
     def Rewards(self):
         from ..Utility.Reward import Reward
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         s =  '==Rewards==\n'
         s += '===Battle rewards===\n'
         s += '{{#invoke:Reward/HeroesJourney|battle\n'

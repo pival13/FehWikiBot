@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 from typing_extensions import Self, LiteralString
-from .Reader.Message import MessageReader
+from .Reader import MessageReader
 
 __all__ = 'Scenario'
 
@@ -153,7 +153,7 @@ class Scenario(metaclass=_ScenarioMeta):
 
 def _parseObjects(objs):
     import re
-    from .Sound import Sound
+    from ..Others.Sound import Sound
     from ..Tool.globals import TODO
 
     for l,obj in objs.items():
@@ -268,7 +268,7 @@ def _mergeObjects(langs):
 
 def _stringifyObjects(objs):
     from .Messages import Messages
-    from .Units import Units, NPC
+    from ..Units import Units, NPC
 
     stack = []
     for i,obj in enumerate(objs):

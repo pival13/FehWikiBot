@@ -3,6 +3,7 @@
 from FehWikiBot.Others.Accessory import Accessories, AccessoriesPurchasable
 from FehWikiBot.Others.AetherRaids import Structure
 from FehWikiBot.Others.CompileManual import CompileManual
+from FehWikiBot.Units import *
 from FehWikiBot.Skills import *
 from FehWikiBot.Stages import *
 from FehWikiBot.Events import *
@@ -20,6 +21,9 @@ if __name__ == '__main__':
     for o in Structure.fromAssets(argv[1]):
         o.loadArticle().update().export('Structure ('+argv[1]+')', create=-1)
     CompileManual.updateExportFromAssets(argv[1])
+
+    for o in Enemies.fromAssets(argv[1]):
+        o.createArticle().export('Enemy ('+argv[1]+')')
 
     for refSkill in Skills.fromAssets(argv[1], 'Refine'):
         refWep = Skills.get(refSkill.data['id_tag'], 'refine_id')

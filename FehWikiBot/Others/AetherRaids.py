@@ -10,7 +10,7 @@ class AetherRaidsConsumable(Container):
 
     @property
     def name(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return EN('MID_ITEM_SKYCASTLE_'+self.data['id_tag']).replace('Stones','Stone')
 
 AetherRaidsItem = AetherRaidsConsumable
@@ -59,7 +59,7 @@ class AetherRaidsStructure(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         if super().name or self.data is None: return super().name
         if not hasattr(self, 'levels'):
             return EN('MID_SCF_' + self.data['id_tag'])
@@ -70,7 +70,7 @@ class AetherRaidsStructure(ArticleContainer):
             return s
 
     def Infobox(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         data = self.levels[0] if hasattr(self, 'levels') else self.data
         id = data['id_tag'][:-1] if hasattr(self, 'levels') else data['id_tag']
         return super().Infobox('Structure', {

@@ -72,13 +72,13 @@ class BaseChainChallenge(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         from ..Tool.globals import ROMAN
         return super().name or (('Chain Challenge: ' + (f"Book {ROMAN[self.data['book']]}, " if self.data['book'] else '') + EN('MID_STAGE_TITLE_'+self.id_tag)) if self.data is not None else None)
 
     @property
     def groupName(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         from ..Tool.globals import ROMAN
         return 'Chain Challenge: ' + (f"Book {ROMAN[self.data['book']]}, " if not self.data['is_paralogue'] else '') + EN('MID_CHAPTER_'+self.data['id_tag'])
 
@@ -184,7 +184,7 @@ class BaseChainChallenge(ArticleContainer):
 
 
     def Infobox(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         from ..Utility.Reward import Rewards
         from ..Tool.globals import ROMAN
         return super().Infobox('Battle', {

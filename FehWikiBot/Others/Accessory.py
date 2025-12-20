@@ -32,12 +32,12 @@ class Accessories(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import Messages
+        from ..Lang import Messages
         if self.data['id_tag'] == 'DAID_黄金の呪い': return 'Golden Curse (Accessory)'
         return super().name or Messages.EN(self.data['id_tag'])
 
     def Infobox(self):
-        from ..Utility.Messages import Messages
+        from ..Lang import Messages
         return super().Infobox('Accessory', {
             'tagid': self.data['id_tag'],
             'sort': self.data['sort_id'],
@@ -55,7 +55,7 @@ class Accessories(ArticleContainer):
         elif self.data['id_tag'][:8] == 'DAID_旅先の' or self.data['id_tag'][:7] == 'DAID_旅の':
             s += '{{Heroes Journey accessory}}\n'
         elif self.data['@Aide']:
-            from ..Utility.Units import Heroes
+            from ..Units import Heroes
             s += '* Obtained by summoning {{Ut|' + Heroes.get(self.data['@Aide']).name + '}} for the first time.\n'
         #{{Rokkr Sieges accessory}}
         #{{Tap Battle accessory}}

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from .Reader.Message import MessageReader
+from .Reader import MessageReader
 
 # git fetch && git checkout <update_tag> -- files/assets/JPJA/* files/assets/EUDE/* files/assets/EUEN/* files/assets/EUES/* files/assets/EUFR/* files/assets/EUIT/* files/assets/TWZH/* files/assets/USES/* files/assets/USPT/*
 

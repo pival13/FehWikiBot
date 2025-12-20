@@ -15,7 +15,7 @@ class TempestTrials(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import Messages
+        from ..Lang import Messages
         return super().name or Messages.EN('MID_SEQUENTIAL_MAP_TERM_'+self.data['id_tag'])
 
     @property
@@ -28,8 +28,8 @@ class TempestTrials(ArticleContainer):
         if serie != name: return serie
 
     def Infobox(self):
-        from ..Utility.Sound import BGM
-        from ..Utility.Units import Heroes
+        from ..Others.Sound import BGM
+        from ..Units import Heroes
         from ..Stages import MainStory, Paralogue, Map
         from ..Tool.misc import cleanStr
         bHeroes = self.data['unit_bonus1']['units'] + self.data['unit_bonus2']['units']
@@ -95,8 +95,8 @@ class TempestTrials(ArticleContainer):
         return s + '}}'
 
     def UnitData(self):
-        from ..Stages.Terrain import Map
-        from ..Utility.Units import Units
+        from ..Stages import Map
+        from ..Units import Units
         from ..Tool.globals import MOVE_TYPE, WEAPON_TYPE, WEAPON_MASK
         s =  '==Unit data==\n'
         s += '{{#invoke:UnitData|main\n'
@@ -128,7 +128,7 @@ class TempestTrials(ArticleContainer):
         return s[:-1]
 
     def Story(self):
-        from ..Utility.Scenario import Scenario
+        from ..Lang import Scenario
         from ..Tool.globals import TODO
         from ..Stages.Paralogues import Paralogue
         scenario = Scenario.get(self.data['scenario_file'])

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from requests import Session as _Session, exceptions as _reqExcept
+import requests
 from time import sleep as _sleep
 
 from .globals import ERROR as _ERROR, RESET_TEXT as _RESET_TEXT, GREEN_TEXT as _GREEN_TEXT, GREY_TEXT as _GREY_TEXT, YELLOW_TEXT as _YELLOW_TEXT
@@ -24,7 +24,7 @@ class Wiki:
     def login(cls, user, password):
         for _ in range(3):
             try:
-                S = _Session()
+                S = requests.Session()
                 token = S.get(url=Wiki.URL, params={
                     "action": "query",
                     "meta": "tokens",
@@ -44,7 +44,7 @@ class Wiki:
                 else:
                     cls._S = S
                     return
-            except (_reqExcept.ConnectTimeout,_reqExcept.ConnectionError) as e:
+            except (requests.RequestException.ConnectTimeout,requests.RequestException.ConnectionError) as e:
                 pass
         raise e
 
@@ -206,6 +206,10 @@ class Wiki:
         })['query']['categorymembers']
         return [o['title'] for o in result]
 
+    @classmethod
+    def getFile(cls, file):
+        url = cls.URL[:cls.URL.rfind('/')] + '/Special:Redirect/file/'
+        return requests.get(url=url + file).content
 
     ##################################################################
     #
@@ -370,7 +374,7 @@ class Wiki:
                     return cls._S.get(url=Wiki.URL, params=params).json()
                 else:
                     return cls._S.get(url=Wiki.URL, params=params)
-            except (_reqExcept.Timeout, _reqExcept.ConnectionError) as e:
+            except (requests.RequestException.Timeout, requests.RequestException.ConnectionError) as e:
                 _sleep(5)
         raise e
 
@@ -390,10 +394,10 @@ class Wiki:
                     return cls._S.post(url=Wiki.URL, data=params, timeout=10, **kwargs).json()
                 else:
                     return cls._S.post(url=Wiki.URL, data=params, timeout=10, **kwargs)
-            except _reqExcept.ReadTimeout as e:
+            except requests.RequestException.ReadTimeout as e:
                 if params['format'] == 'json': return {'error': {'info': 'Response timeout', 'code': 'timeout'}}
                 else: raise e
-            except (_reqExcept.ConnectTimeout, _reqExcept.ConnectionError) as e:
+            except (requests.RequestException.ConnectTimeout, requests.RequestException.ConnectionError) as e:
                 _sleep(5)
         raise e
 

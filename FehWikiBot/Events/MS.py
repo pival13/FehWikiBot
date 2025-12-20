@@ -10,7 +10,7 @@ class MjolnirsStrikeMechanism(Container):
 
     @property
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return EN('MID_MF_' + self.data['id_tag'][:-1])
 
 MSMechanism = MjolnirsStrikeMechanism
@@ -33,7 +33,7 @@ class MjolnirsStrike(ArticleContainer):
 
 
     def Infobox(self):
-        from ..Utility.Units import Heroes
+        from ..Units import Heroes
         from ..Tool.misc import cleanStr
         return super().Infobox('Mjolnirs Strike', {
             'image': f"Mjolnirs Strike {cleanStr(Heroes.get(self.data['boss_id']).name)}.jpg",

@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
 
-from ...Tool.Reader import IReader, readStat, readTime
+from ..Tool.Reader import IReader, readStat, readTime
 
 class HeroReader(IReader):
     _basePath = 'Common/SRPG/Person/'
 
     def parse(self):
-        from ...Tool.globals import BLESSING,WARNING
+        from ..Tool.globals import BLESSING,WARNING
         KIND = ['','LegendMythic','Duo','Harmonized','Ascended','Rearmed','Attuned','Emblem','Aided','Entwined','Chosen']
         nb = self.overviewLong(0x08, 0xde51ab793c3ab9e1)
         self.readArray()

@@ -19,7 +19,7 @@ class HallOfForms(ArticleContainer):
 
 
     def Infobox(self):
-        from ..Utility.Units import Heroes
+        from ..Units import Heroes
         return super().Infobox('Hall of Forms', {
             'number': self.number,
             'promoArt': f'Hall of Forms {self.number}.jpg',
@@ -36,7 +36,7 @@ class HallOfForms(ArticleContainer):
 
     def Rewards(self):
         from ..Utility.Reward import Reward
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         s =  '==Rewards==\n'
         s += '===Daily rewards===\n'
         s += '{{#invoke:Reward/HallOfForms|daily\n'
@@ -50,7 +50,7 @@ class HallOfForms(ArticleContainer):
 
     def loadArticle(self, canCreate=True, revision=0) -> Self:
         from ..Tool.Wiki import Wiki
-        from ..Utility.Units import Heroes
+        from ..Units import Heroes
         name = Wiki.cargoQuery('HallOfForms',where=' AND '.join(['Forma HOLDS \''+Heroes.get(h).name.replace('\'','\\\'')+'\'' for h in self.data['formas']['units']]), limit=1)
         s = Wiki.getPageContent(name, revision) if name else None
         if s is not None:

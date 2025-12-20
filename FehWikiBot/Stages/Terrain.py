@@ -270,7 +270,7 @@ class Map(Container):
 
     @classmethod
     def Unit(cls, unit, i=None) -> str:
-        from ..Utility.Units import Units, Heroes, Enemies
+        from ..Units import Units, Heroes, Enemies
         from ..Skills import Weapon, Assist, Special, Passive
         from ..Others.Accessory import Accessories
         s =  '{'

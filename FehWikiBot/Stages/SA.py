@@ -10,7 +10,7 @@ class SquadAssault(ArticleContainer):
 
     @ArticleContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return super().name or (EN('MID_STAGE_TITLE_'+self.data['id_tag']) if self.data is not None else None)
 
     def Infobox(self):

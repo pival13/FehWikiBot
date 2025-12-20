@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from ...Tool.Reader import IReader, InvalidReaderError
+from ..Tool.Reader import IReader, InvalidReaderError
 
 class MessageReader(IReader):
     XOR = [

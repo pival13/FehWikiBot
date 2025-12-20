@@ -23,7 +23,7 @@ class Passive(Skills):
     def data(self, v):
         from ..PersonalData import BINLZ_ASSETS_DIR_PATH
         from os import listdir
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         import re
 
         def getPrev(prev):
@@ -57,7 +57,7 @@ class Passive(Skills):
     def Infobox(self):
         import re
         from ..Tool.misc import cleanStr
-        from ..Utility.Messages import EN
+        from ..Lang import EN
 
         obj = {
             'name': re.sub(r'\s*\d*$','', EN(self._datas[0]['name_id'])),
@@ -128,7 +128,7 @@ class Passive(Skills):
     def update(self):
         import re
         from num2words import num2words
-        from ..Utility.Messages import EN
+        from ..Lang import EN
 
         prevKey = r'\{\{\s*Passive\s*'
         reEndArg = r'(\{\{([^}]|\}(?!\}))*\}\}|[^{])*?(?=\||\}\})'

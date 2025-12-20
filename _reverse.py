@@ -5,9 +5,9 @@ from FehWikiBot.Others.Reader.Accessory import AccessoryReader, AccessoryAideDat
 from FehWikiBot.Others.Reader.AetherRaids import StructureReader, ConsumableReader
 from FehWikiBot.Others.Reader.Summon import FocusReader
 from FehWikiBot.Others.Reader.CompileManual import CompileCombatManualReader
-from FehWikiBot.Utility.Reader.Message import MessageReader
-from FehWikiBot.Utility.Reader.Sound import SoundReader, MapBGMReader, HOBGMReader
-from FehWikiBot.Utility.Reader.Unit import HeroReader, EnemyReader
+from FehWikiBot.Others.Reader.Sound import SoundReader, MapBGMReader, HOBGMReader
+from FehWikiBot.Lang.Reader import MessageReader
+from FehWikiBot.Units.Reader import HeroReader, EnemyReader
 from FehWikiBot.Skills.Reader import SkillReader, RefineryReader, SealReader, SealForgeReader, CaptainSkillReader, SkillAbilityReader, SkillLimitReader, SkillTimingReader
 from FehWikiBot.Stages.Reader.Terrain import MapReader, EnvironmentReader, CellEnvironmentReader
 from FehWikiBot.Stages.Reader.Story import StoryMapReader
@@ -70,7 +70,10 @@ if __name__ == '__main__':
         f = arg.replace(realpath(BINLZ_ASSETS_DIR_PATH+'/'+r._basePath), '')[1:]
         if f.replace('\\','/').find('/') != -1: continue
 
-        o = r.fromAssets(f)
+        if hasattr(r, 'fromUnique'):
+            o = r.fromUnique()
+        else:
+            o = r.fromAssets(f)
         if not o.isValid():
             print(WARNING + 'File not found')
             exit(1)

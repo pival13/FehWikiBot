@@ -12,13 +12,13 @@ class RivalDomains(SpecialMapContainer):
 
     @SpecialMapContainer.name.getter
     def name(self) -> str:
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         return super().name or \
             (EN(self.data['maps'][0]['name_id']) + ': ' + EN(self.data['maps'][0]['honor_id']) + f" ({int(self.data['id_tag'][1:])})") \
                 if self.data is not None else None
 
     def Infobox(self):
-        from ..Utility.Messages import EN
+        from ..Lang import EN
         from ..Utility.Reward import Rewards
         GC_BONUS = { '歩行': 'Infantry', '重装': 'Armored', '騎馬': 'Cavalry', '飛行': 'Flying' }
         return super().Infobox('Battle', {
@@ -78,7 +78,7 @@ class RivalDomains(SpecialMapContainer):
 
             nGC = (int(o[0][1:])-1) // 30 + 1
             page = Wiki.getPageContent('Grand Conquests ' + str(nGC))
-            GCLayout = re.search(r'\|\s*(\d+)\s*\n\|\s*\{\{MapLayout\D+'+o[0]+'.*\n(?:(?!\}\}\n).*\n)+\}\}', page)
+            GCLayout = re.search(r'\|\s*(\d+)\s*\n\|\s*\{\{MapLayout\D+'+o[0]+r'.*\n(?:(?!\}\}\n).*\n)+\}\}', page)
             if not GCLayout: raise Exception('Failed to find the layout of ' + o[0] + ' in GC ' + str(nGC))
             self._dup = (nGC, int(GCLayout[1]))
             bg = re.search(r'backdrop\s*=\s*(\w*)', GCLayout[0])[1]

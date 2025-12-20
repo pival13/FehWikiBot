@@ -279,10 +279,10 @@ def readStat(reader: Reader, key:str=None):
 
 def readTime(reader: Reader, key:str=None, xor=0):
     from .globals import TIME_FORMAT
-    from datetime import datetime
+    from datetime import datetime, UTC
     timestamp = reader.getLong(xor)
     try:
-        time = datetime.utcfromtimestamp(timestamp).strftime(TIME_FORMAT) if timestamp not in [0xFFFFFFFFFFFFFFFF,xor] else None
+        time = datetime.fromtimestamp(timestamp, UTC).strftime(TIME_FORMAT) if timestamp not in [0xFFFFFFFFFFFFFFFF,xor] else None
     except:
         time = None
     reader.insert(key, time)
