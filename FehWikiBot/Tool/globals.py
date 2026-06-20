@@ -26,7 +26,7 @@ MIN_TIME = _datetime.fromtimestamp(0, UTC).strftime(TIME_FORMAT)
 MAX_TIME = _datetime.fromtimestamp(0x7FFFFFFF, UTC).strftime(TIME_FORMAT)
 
 DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
-ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV']
 
 MOVE_TYPE = [ 'Infantry', 'Armored', 'Cavalry', 'Flying' ]
 WEAPON_TYPE = [
@@ -100,8 +100,8 @@ ITEM_KIND = {
     27: 'AR Item', 28: 'Throne', 29: 'Summoning Ticket',
     30: 'Dragonflower', 32: 'Combat Manual', 33: 'R&R Affinity', 34: 'Havoc Axe', 35: 'Music', 36: 'Forma Torch',
     37: 'Midgard Gem', 39: 'Divine Code', 43: 'Forma Soul', 
-    44: 'Guardian Shield', 45: 'Trait Fruit', 50: 'Binding Torch',
-    53: 'Hero Stamina',
+    44: 'Guardian Shield', 45: 'Trait Fruit', 46: 'Celestial Stone', 50: 'Binding Torch',
+    52: 'Aide\'s Essence', 53: 'Hero Stamina',
     'Lost Lore Team': 'Lost Lore Team', 'Memento Points': 'Memento Point'
 }
 

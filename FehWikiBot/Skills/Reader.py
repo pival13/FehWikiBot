@@ -128,7 +128,7 @@ class SkillReader(IReader):
             self.readShort('limit3_params1', 0xA590, signed=True)
             self.readShort('limit3_params2', 0xA590, signed=True)
             self.readByte('range_shape', 0x5C)
-            self.readBool('target_either', 0xA7)
+            self.readBool('target_either', 0xA7) # Use either target_mov or target_wep
             self.readByte('canto_range', 0x41)
             self.readByte('pathfinder_range', 0xBE)
             self.readBool('arcane_weapon', 0xAA)

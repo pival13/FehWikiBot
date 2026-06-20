@@ -108,6 +108,8 @@ class Focus(Article):
             self.page += '{{Summoning Event Navbox}}'
             if kwargs['type'] in ('New Heroes','Special','Tempest Trials'):
                 self.page += '\n{{Daily Log-In Bonus/Focus}}'
+                if kwargs['name'][:14] == 'Harmonized CYL':
+                    self.page = self.page[:-2] + '|name=Har. CYL Heroes Bonus}}'
 
         else:
             if 'shsr' in kwargs and kwargs['shsr'] and kwargs['name'].find('SHSR') == -1:
@@ -163,19 +165,22 @@ class Focus(Article):
             params.pop('focus4')
         rarities = [f'|rarity{r}{s}Percent={float(params[str(r)+s]):.02f}%' for r in range(5,0,-1) for s in ('Focus','SHSpecial','Special','') if (str(r)+s) in params]
         if rarities != []: pass
-        elif (params['type'] in ('Weekly Revival','Legendary Revival')) or (params['type'] in ('Special') and params.get('shsr')):
+        # 4% / 2%
+        elif (params['type'] in ('Weekly Revival','Legendary Revival','Mythic Revival')) or (params['type'] == 'Special' and params.get('shsr')):
             rarities = ['|rarity5FocusPercent=4.00%','|rarity5Percent=2.00%']
             if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
-            if params.get('shsr'): rarities.append('|rarity4SHSpecialPercent=3.00%')
+            if params.get('shsr'): rarities.append('|rarity4SHSpecialPercent=6.00%')
             rarities.append('|rarity4SpecialPercent=3.00%')
-            rarities.append(f"|rarity4Percent={52 if len(rarities) >= 5 else 55}.00%")
-            rarities.append(f"|rarity3Percent={33 if len(rarities) >= 5 else 36}.00%")
-        elif params['type'] in ('Returning', 'Double Special Heroes', 'Legendary & Mythic Hero Remix'):
+            rarities.append(f"|rarity4Percent={52 if 'focus4' in params else 55}.00%")
+            rarities.append(f"|rarity3Percent={30 if params.get('shsr') else 36}.00%")
+        # 8 Units, no 5*
+        elif params['type'] in ('Returning', 'Double Special Heroes', 'Legendary & Mythic Hero Remix', 'A Hero Rises'):
             rarities = ['|rarity5FocusPercent=6.00%']
             if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
             rarities.append('|rarity4SpecialPercent=3.00%')
             rarities.append(f"|rarity4Percent={54 if len(rarities) >= 3 else 57}.00%")
             rarities.append('|rarity3Percent=34.00%')
+        # 8 Units, with 5*
         elif params['type'] == 'ω Special Heroes':
             rarities = ['|rarity5FocusPercent=6.00%','|rarity5Percent=2.00%']
             if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
@@ -183,10 +188,13 @@ class Focus(Article):
             rarities.append('|rarity4SpecialPercent=3.00%')
             rarities.append(f"|rarity4Percent={50 if len(rarities) > 3 else 53}.00%")
             rarities.append(f"|rarity3Percent={33 if len(rarities) > 5 else 36}.00%")
-        elif params['name'].find('12 Luminaries') != -1:
-            rarities = ['|rarity5FocusPercent=8.00%','|rarity4FocusPercent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=53.00%','|rarity3Percent=33.00%']
-        elif params['type'] in ('Legendary', 'Mythic', 'Emblem', 'Legendary & Mythic', 'Emblem & Mythic'):
-            rarities = ['|rarity5FocusPercent=8.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=34.00%']
+        # 12 Units, no 5*
+        elif params['type'] in ('Legendary', 'Mythic', 'Emblem', '12 Luminaries') or params['type'].find(' & ') != -1:
+            rarities = ['|rarity5FocusPercent=8.00%']
+            if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
+            rarities.append('|rarity4SpecialPercent=3.00%')
+            rarities.append(f'|rarity4Percent={53 if len(rarities) > 2 else 55}.00%')
+            rarities.append(f'|rarity3Percent={33 if len(rarities) > 3 else 34}.00%')
         elif params['type'] == 'Hero Fest':
             rarities = ['|rarity5FocusPercent=5.00%','|rarity5Percent=3.00%','|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=34.00%']
         elif params['type'] in ('Free Summon', 'Select Summon'):

@@ -40,7 +40,7 @@ class TacticsDrills(ArticleContainer):
     
     def Availability(self):
         from datetime import datetime
-        from FehWikiBot.Tool.globals import TIME_FORMAT
+        from ..Tool.globals import TIME_FORMAT
         notif = 'New Tactics Drills! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %d, %Y').replace(' 0', ' ') + ')'
         return super().Availability('[[Tactics Drills]]', self.data['avail'], notif, isMap=True)
 

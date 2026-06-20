@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import requests
+import requests.exceptions
 from time import sleep as _sleep
 
 from .globals import ERROR as _ERROR, RESET_TEXT as _RESET_TEXT, GREEN_TEXT as _GREEN_TEXT, GREY_TEXT as _GREY_TEXT, YELLOW_TEXT as _YELLOW_TEXT
@@ -44,7 +45,7 @@ class Wiki:
                 else:
                     cls._S = S
                     return
-            except (requests.RequestException.ConnectTimeout,requests.RequestException.ConnectionError) as e:
+            except (requests.exceptions.ConnectTimeout,requests.exceptions.ConnectionError) as e:
                 pass
         raise e
 
@@ -374,7 +375,7 @@ class Wiki:
                     return cls._S.get(url=Wiki.URL, params=params).json()
                 else:
                     return cls._S.get(url=Wiki.URL, params=params)
-            except (requests.RequestException.Timeout, requests.RequestException.ConnectionError) as e:
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
                 _sleep(5)
         raise e
 
@@ -391,13 +392,13 @@ class Wiki:
         for _ in range(3):
             try:
                 if params['format'] == 'json':
-                    return cls._S.post(url=Wiki.URL, data=params, timeout=10, **kwargs).json()
+                    return cls._S.post(url=Wiki.URL, data=params, timeout=15, **kwargs).json()
                 else:
-                    return cls._S.post(url=Wiki.URL, data=params, timeout=10, **kwargs)
-            except requests.RequestException.ReadTimeout as e:
+                    return cls._S.post(url=Wiki.URL, data=params, timeout=15, **kwargs)
+            except requests.exceptions.ReadTimeout as e:
                 if params['format'] == 'json': return {'error': {'info': 'Response timeout', 'code': 'timeout'}}
                 else: raise e
-            except (requests.RequestException.ConnectTimeout, requests.RequestException.ConnectionError) as e:
+            except (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError) as e:
                 _sleep(5)
         raise e
 

@@ -27,7 +27,7 @@ class SeersSnare(ArticleContainer):
 
     def Availability(self):
         from datetime import datetime
-        from FehWikiBot.Tool.globals import TIME_FORMAT
+        from ..Tool.globals import TIME_FORMAT
         notif = 'Seer\'s Snare (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')'
         return super().Availability('[[Seer\'s Snare]]', self.data['avail'], notif)
 

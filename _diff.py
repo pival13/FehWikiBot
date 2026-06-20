@@ -2,7 +2,7 @@
 
 import json
 from os.path import realpath, dirname
-from FehWikiBot.Utility.Messages import Messages
+from FehWikiBot import Messages
 
 def CreateDiffMessage():
     old = json.load(open(realpath(dirname(__file__) + '/jsons/data.json'), encoding='UTF-8'))

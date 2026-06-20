@@ -98,9 +98,9 @@ def upload(filepath: str, comment: str):
             return
         if filepath.find('/Face/') != -1 or filepath.find('/Unit/') != -1:
             unit = re.search(r'/(?:Unit|Face)/([^/]+)/', filepath)[1]
-            if unit[-4:] == 'EX01':
+            if unit.find('EX01') != -1:
                 name = 'Resplendent_' + name
-                unit = unit[:-4]
+                unit = unit.replace('EX01','')
             if unit[-7:] == 'airMain':
                 name = Units.fromFace(unit[:-4]).name + '_Main_' + name
             elif unit[-6:] == 'airSub':

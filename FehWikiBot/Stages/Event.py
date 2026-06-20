@@ -43,8 +43,9 @@ class EventMap(SpecialMapContainer):
         from ..Tool.Wiki import Wiki
         from ..Tool.misc import waitSec
         if self.page == '': return
-        waitSec(10)
-        Wiki.exportPage('File:Map '+self.data['id_tag']+'.png', '#REDIRECT [[File:Map ' + self.jsonData['baseMap'] + '.webp]]', summary, minor=minor, create=create)
+        if self.jsonData.get('baseMap'):
+            waitSec(10)
+            Wiki.exportPage('File:Map '+self.data['id_tag']+'.png', '#REDIRECT [[File:Map ' + self.jsonData['baseMap'] + '.webp]]', summary, minor=minor, create=create)
         waitSec(10)
         Wiki.exportPage(self.name, self.page, summary, minor=minor, create=create)
 
@@ -54,6 +55,11 @@ class EventMap(SpecialMapContainer):
         from ..Utility.Reward import Rewards
         from ..Others.Sound import BGM
         from .Terrain import Map
+        map = Map.get(self.jsonData.get('baseMap', self.data['id_tag'])+'A')
+        if map is None:
+            map = Map.create(self.data['id_tag']).Image()
+        else:
+            map = map.Image().replace(self.jsonData['baseMap'], self.data['id_tag'])
         o =  {
             'bannerImage': 'Banner ' + self.data['banner_id'] + '.webp',
             'stageTitle': EN('MID_STAGE_TITLE_'+self.data['id_tag']),
@@ -61,7 +67,7 @@ class EventMap(SpecialMapContainer):
             'stageEpithet': EN('MID_STAGE_HONOR_'+self.data['id_tag']),
             'mapGroup': self.event,
             'mapMode': None,
-            'mapImage': Map.get(self.jsonData['baseMap']+'A').Image()
+            'mapImage': map
         }
         o |= {'lvl'+o['diff']:    o['level'] for o in self.data['maps']}
         o |= {'rarity'+o['diff']: o['rarity'] for o in self.data['maps']}
@@ -85,7 +91,7 @@ class EventMap(SpecialMapContainer):
             o['mapMode'] = 'Reinforcement Map'
         o['winReq'] = '<br>'.join(reqs)
 
-        return super().Infobox('Battle', o).replace(self.jsonData['baseMap'],self.data['id_tag'])
+        return super().Infobox('Battle', o)
 
     def Availability(self):
         if self.event[-1] == ')':
@@ -104,7 +110,7 @@ class EventMap(SpecialMapContainer):
 
         for idiff,map in enumerate(self.data['maps']):
             s += '\n|' + map['diff'] + '=[\n'
-            for unit in self.jsonData['units']:
+            for unit in self.jsonData.get('units', []):
                 o = Map.PLACEHOLDER_UNIT.copy()
                 o['pos'] = unit['pos']
                 o['rarity'] = map['rarity']
@@ -155,18 +161,19 @@ class EventMap(SpecialMapContainer):
         from ..Tool.globals import TODO
         from ..Tool.Wiki import Wiki
         s =  '==Trivia==\n'
-        if self.jsonData['baseMap'][:1] == 'X':
-            o = Wiki.cargoQuery('Maps','_pageName=Page,StageTitle',where="Map='"+self.jsonData['baseMap']+"'", limit=1)
-            s += f"* This map is based on [[{o['Page']}|{o['StageTitle']}]]."
-        elif self.jsonData['baseMap'][:1] == 'S':
-            o = Wiki.cargoQuery('Maps','_pageName=Page,StageTitle,BookGroup',where="Map='"+self.jsonData['baseMap']+"'", limit=1)
-            s += f"* This map is based on [[{o['Page']}|{o['StageTitle'].replace(': Part ','-')}]] of [[{o['BookGroup']}]]."
-        elif self.jsonData['baseMap'][:1] in ('L','T'):
-            os = Wiki.cargoQuery('Maps,MapUnits,Units', 'Maps._pageName=Page,Maps.MapGroup=Group,Units._pageName=Unit', where="Map='"+self.jsonData['baseMap']+"' AND IFNULL(Units.Properties__full,'') NOT LIKE '%generic%'", join='Maps._pageName=MapUnits._pageName,MapUnits.Unit=Units.WikiName', group='Units._pageName', order='MapUnits._ID')
-            s += f"* This map is based on the [[{os[0]['Page']}|{os[0]['Group']}]] against "+' and '.join(['{{Ut|'+o['Unit']+'}}' for o in os])+'.'
-        else:
-            print(TODO + f'Unsupported "baseMap"="{self.jsonData["baseMap"]}"')
-            s += '* '
+        if self.jsonData.get('baseMap'):
+            if self.jsonData['baseMap'][:1] == 'X':
+                o = Wiki.cargoQuery('Maps','_pageName=Page,StageTitle',where="Map='"+self.jsonData['baseMap']+"'", limit=1)
+                s += f"* This map is based on [[{o['Page']}|{o['StageTitle']}]]."
+            elif self.jsonData['baseMap'][:1] == 'S':
+                o = Wiki.cargoQuery('Maps','_pageName=Page,StageTitle,BookGroup',where="Map='"+self.jsonData['baseMap']+"'", limit=1)
+                s += f"* This map is based on [[{o['Page']}|{o['StageTitle'].replace(': Part ','-')}]] of [[{o['BookGroup']}]]."
+            elif self.jsonData['baseMap'][:1] in ('L','T'):
+                os = Wiki.cargoQuery('Maps,MapUnits,Units', 'Maps._pageName=Page,Maps.MapGroup=Group,Units._pageName=Unit', where="Map='"+self.jsonData['baseMap']+"' AND IFNULL(Units.Properties__full,'') NOT LIKE '%generic%'", join='Maps._pageName=MapUnits._pageName,MapUnits.Unit=Units.WikiName', group='Units._pageName', order='MapUnits._ID')
+                s += f"* This map is based on the [[{os[0]['Page']}|{os[0]['Group']}]] against "+' and '.join(['{{Ut|'+o['Unit']+'}}' for o in os])+'.'
+            else:
+                print(TODO + f'Unsupported "baseMap"="{self.jsonData["baseMap"]}"')
+                s += '* '
         return s
     
     def OtherLanguage(self):
