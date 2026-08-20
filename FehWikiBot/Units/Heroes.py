@@ -36,8 +36,9 @@ class Heroes(Container):
     def seasonal(self) -> bool:
         if not '@seasonal' in self.data:
             from ..Tool.Wiki import Wiki
-            props = Wiki.cargoQuery('Units',"IFNULL(Properties__full,'')=Props",where="TagID='"+self.data['id_tag']+"' AND IFNULL(Properties__full,'') NOT LIKE '%enemy%'",limit=1)
-            self.data['@seasonal'] = props.find('special') != -1 or props.find('specDisplay') != -1
+            props = Wiki.cargoQuery('Units',"CONCAT(IF(IFNULL(Properties__full,'') LIKE '%special%' OR IFNULL(Properties__full,'') LIKE '%specDisplay%', '1', '0'))=Val",
+                                    where="TagID='"+self.data['id_tag']+"'",limit=1)
+            self.data['@seasonal'] = bool(int(props))
         return self.data['@seasonal']
 
     def Stats(self, level=40, rarity=5, hpmodifier=1.0):

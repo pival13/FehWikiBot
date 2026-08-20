@@ -296,8 +296,10 @@ def _stringifyObjects(objs):
                 if obj['expression'] != prev['expression']:
                     o['expression'] = obj['expression'][5:]
                 if obj['name'] != prev['name']:
-                    if   unit.isDuo and obj['name'] == 'M'+unit.data['id_tag']: o['duo'] = ''
-                    elif unit.isDuo and obj['name'] == 'M'+unit.duoId: o['duo'] = 1
+                    if   unit.isDuo and obj['name'] == 'M'+unit.duoId:
+                        o['duo'] = 1
+                    elif unit.isDuo and Messages.EN(obj['name']) == Messages.EN(unit.data['id_tag']):
+                        o['duo'] = ''
                     else:
                         o['name'] = Messages.EN(obj['name'])
                         if 'textJP' in obj: o['nameJP'] = Messages.JP(obj['name'])

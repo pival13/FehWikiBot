@@ -27,7 +27,7 @@ class FocusTickets(Container):
         if   self.data['ticket_path'].find('Icon_FreeSummonRed') != -1:
             return 'Red First Summon Ticket' + n
         elif self.data['ticket_path'].find('Icon_FreeSummon_Arena') != -1:
-            return 'Silver First Summon Ticket' + n
+            return 'Silver First Summon Ticket ' + self.data['ticket_path'][-5]
         elif self.data['ticket_path'].find('Icon_FreeSummon_Secret') != -1:
             return 'Golden First Summon Ticket' + n
         elif re.search(r'FreeSummon\d*\.png$', self.data['ticket_path']):
@@ -88,20 +88,7 @@ class Focus(Article):
             pass
 
         elif self.page == '':
-            if ('notif' not in kwargs or kwargs['notif'] == '') and False:
-                match kwargs['type']:
-                    case 'New Heroes': kwargs['notif'] = 'New Heroes Summoning Event: '+kwargs['name']+' (Notification)'
-                    case 'Special': kwargs['notif'] = 'Special Heroes Summoning Event: '+kwargs['name']+' (Notification)'
-                    case 'Legendary' | 'Mythic' | 'Emblem': kwargs['notif'] = kwargs['type']+' Hero Summoning Event - '+kwargs['heroes'][0]+' (Notification)'
-                    case 'Double Special Heroes': kwargs['notif'] = f"Double Special Heroes Summoning Event ({kwargs['start'].strftime('%b %Y')}) (Notification)"
-                    case 'ω Special Heroes': kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].year}) (Notification)"
-                    case 'Legendary & Mythic Hero Remix': kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].strftime('%b %Y')}) (Notification)"
-                    case 'Returning': kwargs['notif'] = f"New Heroes Return ({kwargs['start'].strftime('%b %Y')}) (Notification)"
-                    case 'Bound Hero Battle': kwargs['notif'] = 'Summoning Focus: Bound Hero Battle ('+kwargs['name'][7:-9]+') (Notification)'
-                    case 'Tempest Trials': kwargs['notif'] = 'Summoning Focus: Tempest Trials+ ('+kwargs['page'][23:-1]+') (Notification)'
-                    case 'Other': kwargs['notif'] = ''
-                    case _: kwargs['notif'] = 'Summoning ' + kwargs['page'] + ' (Notification)'
-            if ('heroes' not in kwargs or kwargs['heroes'] == []) and kwargs['type'] != 'Free Summon':
+            if len(kwargs.get('heroes',[])) == 0 and kwargs['type'] != 'Free Summon':
                 return self
             self.page =  self.Infobox(kwargs) + '\n'
             self.page += self.OtherLanguage() + '\n'
@@ -117,21 +104,10 @@ class Focus(Article):
             if kwargs['type'] == 'Hall of Forms Revival':
                 kwargs['name'] += ' Revival'
             format = '%Y' if type in ('Special','ω Special Heroes') else '%b %Y'
-            if 'notif' not in kwargs or kwargs['notif'] == '':
-                if kwargs['type'] == 'Special':
-                    kwargs['notif'] = f"Special Heroes Revival: {kwargs['name']} ({kwargs['start'].year}) (Notification)"
-                elif kwargs['type'] == 'ω Special Heroes':
-                    kwargs['notif'] = f"{kwargs['name']} ({kwargs['start'].year}) (Notification)"
-                elif kwargs['type'] == 'New Heroes Revival':
-                    kwargs['notif'] = f"New Heroes Revival: {kwargs['name'][9:]} (Notification)"
-                elif kwargs['type'] in ('Weekly Revival','Hall of Forms Revival'):
-                    kwargs['notif'] = f"Summoning {kwargs['name']} ({kwargs['start'].strftime(format)}) (Notification)"
-                else:
-                    kwargs['notif'] = ''
             if 'heroes' not in kwargs or kwargs['heroes'] == []:
-                heroes = re.findall(r'\|\s*(hero\d+)\s*=\s*(.+?)(?=\n|\||\})', self.page)
+                heroes = re.findall(r'\|\s*hero(\d+)\s*=\s*(.+?)(?=\n|\||\})', self.page)
                 heroes = {o[0] : o[1] for o in heroes}
-                kwargs['heroes'] = [o[1] for o in sorted([(k,v) for k,v in heroes.items()], key=lambda o: o[0])]
+                kwargs['heroes'] = [o[1] for o in sorted([(k,v) for k,v in heroes.items()], key=lambda o: int(o[0]))]
                 rarities = re.findall(r'\|\s*rarity(\d+)\s*=\s*(.+?)(?=\n|\||\})', self.page)
                 rarities = {o[0]: o[1] for o in rarities}
                 if len(rarities) != 0:
@@ -156,7 +132,10 @@ class Focus(Article):
         s = '{{#invoke:SummoningFocus|focusPage\n'
         s += '|name=' + params['name'] + '\n'
         s += '|bannerType=' + params['type'] + '\n'
-        s += '|description=\n'
+        if 'notif' in params:
+            s += '|description={{SummoningEventDescription|notif=' + params['notif'] + '}}\n'
+        else:
+            s += '|description=\n'
         if 'youtube' in params and len(params['youtube']) == 2:
             s += '|youtubeEN=https://www.youtube.com/watch?v=' + params['youtube'][0] + '\n'
             s += '|youtubeJP=https://www.youtube.com/watch?v=' + params['youtube'][1] + '\n'
@@ -211,7 +190,7 @@ class Focus(Article):
                 rarities = ['|rarity5FocusPercent=3.00%','|rarity5Percent=3.00%',                             '|rarity4SpecialPercent=3.00%','|rarity4Percent=55.00%','|rarity3Percent=36.00%']
         s += '\n'.join(rarities) + '\n'
 
-        for i,h in enumerate(params.get('heroes') or []):
+        for i,h in enumerate(params.get('heroes', [])):
             s += f'|hero{i+1}={h}\n'
             if 'focus4' in params and (i+1) not in params['focus4']:
                 s += f'|rarity{i+1}=5\n'

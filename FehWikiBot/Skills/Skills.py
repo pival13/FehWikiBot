@@ -150,6 +150,7 @@ class Skills(JsonContainer, ArticleContainer, metaclass=_SkillMeta):
             'SID_ヘイズ': 'weapon', # Heiðr
             'SID_クワシル': 'weapon', # Kvasir
             'SID_グルヴェイグ': 'weapon', # Gullveig
+            'SID_グロア': 'weapon', # Gróa
             'SID_シーフ': 'weapon', # Thief
             'SID_フィンブル': 'weapon', # Fimbulvetr
             'SID_ミステルトィン': 'sword', # Missiltainn

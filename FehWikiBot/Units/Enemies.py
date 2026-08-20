@@ -50,7 +50,7 @@ class Enemies(ArticleContainer):
         from datetime import date
         from ..Lang import Messages
         from ..Tool.globals import WEAPON_TYPE, MOVE_TYPE
-        return super().Infobox('Infobox', {
+        return super().Infobox('Enemy', {
             'Name': Messages.EN(self.data['id_tag']),
             'Title': Messages.EN(self.data['id_tag'].replace('ID_','ID_HONOR_')),
             'Origin': 'Fire Emblem Heroes',

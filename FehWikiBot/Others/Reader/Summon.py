@@ -49,13 +49,13 @@ class FocusReader(IReader):
                 self.end()
             else:
                 self.skip(0x20)
-                self.insert('5_non_focus', self.overviewShort(0x74, 0x7E7E) == self.overviewShort(0x76, 0xCD24) == self.overviewShort(0x78, 0xF66C) == self.overviewShort(0x7A, 0xA257) == 6)
             self.skip(0x50)
             self.skip(0x08) # tips
             self.skip(0x08) # units
             self.skip(0x10)
             self.readShort('sort_id', 0x5F1A)
-            self.readShort('is_top', 0x495A, signed=True)
+            self.skip(0x01) # self.readByte('is_top', 0xA5, signed=True)
+            self.skip(0x01) # self.readByte('category', 0x4D^0x64^2)
             self.skip(0x08) # classes count x4
             self.skip(0x02)
             self.readByte('tips_count', 0xFB)
