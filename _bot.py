@@ -100,3 +100,5 @@ if __name__ == '__main__':
         o.createArticle().export('United Warfront ('+argv[1]+')')
     for o in YourTimeToShine.fromAssets(argv[1]):
         o.createArticle().export('Your Time to Shine ('+argv[1]+')')
+    for o in DivineGames.fromAssets(argv[1]):
+        o.createArticle().export('Divine Games ('+argv[1]+')')

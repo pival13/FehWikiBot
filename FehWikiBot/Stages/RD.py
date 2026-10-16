@@ -74,7 +74,11 @@ class RivalDomains(SpecialMapContainer):
             o = list(o['query']['pages'].values())[0]
             o = o['duplicatefiles'] if 'duplicatefiles' in o else []
             o = [p['name'][4:9] for p in o if p['name'][:5] == 'Map_O']
-            if o == []: raise Exception('No duplicate for ' + mid)
+            if o == []:
+                if self.CompareWithGrandConquests(53):
+                    o = [f'O{int(mid[1:])+53:04}']
+                else:
+                    raise Exception('Unknown duplicate for ' + mid)
 
             nGC = (int(o[0][1:])-1) // 30 + 1
             page = Wiki.getPageContent('Grand Conquests ' + str(nGC))
@@ -127,5 +131,20 @@ class RivalDomains(SpecialMapContainer):
             'version1': 'Standard', 'mapImage': s1,
             'version2': 'Infernal', 'mapImageV2': s2
         }
+
+    def CompareWithGrandConquests(self, delta):
+        from io import BytesIO
+        from PIL import Image,ImageChops
+        from ..PersonalData import WEBP_ASSETS_DIR_PATH
+        from ..Tool.Wiki import Wiki
+        baseid = int(self.data['maps'][0]['base_id'][1:5])
+        filepath = WEBP_ASSETS_DIR_PATH + f'Common/Field/Chip/Q{baseid:04}.png'
+        img1 = Image.open(filepath)
+        buff = Wiki.getFile(f'File:Map O{baseid+delta:04}.png')
+        img2 = Image.open(BytesIO(buff))
+        diff = ImageChops.difference(img1,img2)
+        for lo,hi in diff.getextrema():
+            if hi > 25: return False
+        return True
 
 RD = RivalDomains

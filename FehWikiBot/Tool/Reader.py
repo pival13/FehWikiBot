@@ -71,8 +71,12 @@ class Reader:
     def fromAssets(cls, path:str):
         from ..PersonalData import BINLZ_ASSETS_DIR_PATH as basePath
         from os.path import isfile
-        if not isfile(basePath + path): return cls([])
-        return cls(open(basePath + path, 'rb').read())
+        if isfile(path):
+            return cls(open(path, 'rb').read())
+        elif isfile(basePath + path):
+            return cls(open(basePath + path, 'rb').read())
+        else:
+            return cls([])
 
     def isValid(self):
         return len(self._buff) != 0
@@ -271,10 +275,7 @@ def readStat(reader: Reader, key:str=None):
     reader.readShort('spd', 0xA55E, True)
     reader.readShort('def', 0x8566, True)
     reader.readShort('res', 0xAEE5, True)
-    #reader.readShort('')
-    #reader.readShort('')
-    #reader.readShort('')
-    reader.skip(0x06)
+    reader.assertBytes(0x06, 0x0559291A6457, str(reader.__class__.__name__)+'['+key+'+0x0A]')
     reader.end()
 
 def readTime(reader: Reader, key:str=None, xor=0):
@@ -313,6 +314,30 @@ def getAllStrings(reader: Reader, key=DEFAULT_XOR) -> dict[str,str]:
     t = {}
     for i in range(len(reader._buff) // 0x08):
         t[hex(i*0x08)] = Reader.decodeString(reader._buff[i*0x08:i*0x08+0x40], key)
+    return t
+
+def getAllAvails(reader: Reader) -> dict[str,str]:
+    copy = reader
+
+    def getTime(xor):
+        from .globals import TIME_FORMAT
+        from datetime import datetime, UTC
+        timestamp = copy.getLong(xor)
+        try:
+            return datetime.fromtimestamp(timestamp, UTC).strftime(TIME_FORMAT) if timestamp not in [0xFFFFFFFFFFFFFFFF,xor] else None
+        except:
+            return None
+
+    t = {}
+    while copy._i < len(copy._buff):
+        start = getTime(0xDC0DA236C537F660)
+        if not start: continue
+        end = getTime(0xC8AD692AFABD56E9)
+        if end:
+            t[hex(copy._i - 0x10)] = { 'start': start, 'end': end }
+        else:
+            copy._i -= 0x08
+            t[hex(copy._i - 0x08)] = { 'start': start }
     return t
 
 def getAllRewards(reader: Reader, payload=0x48):

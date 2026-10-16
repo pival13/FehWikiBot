@@ -122,8 +122,8 @@ class SeersSnareReader(IReader):
             self.end()
             self.assertBytes(8, 0x2E410F8A_7D443EB7, '&boss_battle[8,16]')
             self.skip(4)#, 0x5DAA0403, '_3')
-            self.readMask('entries', 2, 0xDDEF)
-            self.assertBytes(14, 0xAFEB1B0B_11BA3876_3CA19888_6625, '&entries[2,16]')
+            self.readMask('entries', 3, 0x25DDEF)
+            self.assertBytes(13, 0xAFEB1B0B_11BA3876_3CA19888_66, '&entries[3,16]')
             self.readInt('max_hero', 0xF0219C5D) # NOTE: Still inaccurate
             self.readInt('max_skill', 0xAFCE3F9A) # NOTE: Still inaccurate
             self.assertBytes(4, 0x6CDBCD44, '25 - 35')

@@ -10,6 +10,7 @@ __all__ = ['HeroBattle',
            'MythicHeroBattle',
            'EmblemHeroBattle',
            'DoubleLegendaryHeroBattle','DoubleMythicHeroBattle','LegendaryMythicHeroBattle','EmblemLegendaryHeroBattle','EmblemMythicHeroBattle',
+           'CelebrationHeroBattle',
            'LimitedHeroBattle']
 
 class HeroBattle(SpecialMapContainer):
@@ -43,6 +44,8 @@ class HeroBattle(SpecialMapContainer):
                 o = EmblemMythicHeroBattle()
             case 'Duo & Mythic Hero Battle':
                 o = DuoMythicHeroBattle()
+            case 'Celebration Hero Battle':
+                o = CelebrationHeroBattle()
             case _:
                 o = HeroBattle()
         o.data = self.data
@@ -124,6 +127,7 @@ class HeroBattle(SpecialMapContainer):
     @property
     def category(self):
         if self.data['id_tag'][0] == 'I': return 'Limited Hero Battle'
+        if self.name[:11] == 'Celebration': return 'Celebration Hero Battle'
         heroes = self.heroes
         if len(heroes) == 1:
             if self.data['id_tag'][0] == 'T': return 'Grand Hero Battle'
@@ -195,13 +199,16 @@ class HeroBattle(SpecialMapContainer):
 
     def Units(self) -> str:
         from .Terrain import Map
-        HP_MOD = {'Normal':1.2, 'Hard':1.3, 'Lunatic':1.4, 'Infernal':1.5, 'Abyssal':1.65}
+        from ..Tool.globals import DIFFICULTIES
+        HP_MOD = {}
+        for i,v in enumerate([1.2,1.3,1.4,1.5,1.65,1.65]):
+            HP_MOD[DIFFICULTIES[i]] = v
         maps = self.maps
         for data in self.data['maps']:
             for i,hero in enumerate(self.heroes):
                 maps[data['diff']].data['units'][i]['unit'] = hero.data['id_tag']
                 maps[data['diff']].data['units'][i]['stats'] = hero.Stats(data['level'], data['rarity'])
-                if data['diff'] == 'Abyssal':
+                if data['diff'] in DIFFICULTIES[4:]:
                     for k in Map.PLACEHOLDER_UNIT['stats']:
                         maps[data['diff']].data['units'][i]['stats'][k] += 4
                 maps[data['diff']].data['units'][i]['stats']['hp'] = int(HP_MOD[data['diff']] * maps[data['diff']].data['units'][i]['stats']['hp'])
@@ -316,6 +323,8 @@ class EmblemMythicHeroBattle(BoundHeroBattle):
         from ..Tool.globals import TIME_FORMAT
         return super(BoundHeroBattle,self).Availability('Emblem & Mythic Hero Battle! (' + datetime.strptime(self.data['avail']['start'], TIME_FORMAT).strftime('%b %Y') + ')')
 
+class CelebrationHeroBattle(BoundHeroBattle): pass
+
 class DuoMythicHeroBattle(BoundHeroBattle): pass
 class DoubleLegendaryHeroBattle(LegendaryHeroBattle): pass
 class DoubleMythicHeroBattle(MythicHeroBattle): pass
@@ -326,6 +335,7 @@ BHB = BoundHeroBattle
 LHB = LegendaryHeroBattle
 MHB = MythicHeroBattle
 EHB = EmblemHeroBattle
+CHB = CelebrationHeroBattle
 
 
 class LimitedHeroBattle(HeroBattle):

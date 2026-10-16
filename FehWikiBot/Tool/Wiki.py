@@ -209,8 +209,17 @@ class Wiki:
 
     @classmethod
     def getFile(cls, file):
-        url = cls.URL[:cls.URL.rfind('/')] + '/Special:Redirect/file/'
-        return requests.get(url=url + file).content
+        result = cls.get({
+            "action": "query",
+            "prop": "imageinfo",
+            "titles": ('File:' if file[:5] != 'File:' else '') + file,
+            "iiprop": "url"
+        })['query']['pages']
+        if len(result) == 0: return None
+        result = list(result.values())[0]
+        if 'imageinfo' not in result or len(result['imageinfo']) == 0: return None
+        result = result['imageinfo'][0]['url']
+        return cls._S.get(url=result).content
 
     ##################################################################
     #

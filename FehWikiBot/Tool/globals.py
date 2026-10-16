@@ -25,7 +25,7 @@ TIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 MIN_TIME = _datetime.fromtimestamp(0, UTC).strftime(TIME_FORMAT)
 MAX_TIME = _datetime.fromtimestamp(0x7FFFFFFF, UTC).strftime(TIME_FORMAT)
 
-DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal']
+DIFFICULTIES = ['Normal', 'Hard', 'Lunatic', 'Infernal', 'Abyssal', 'Celestial']
 ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV']
 
 MOVE_TYPE = [ 'Infantry', 'Armored', 'Cavalry', 'Flying' ]

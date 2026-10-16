@@ -3,12 +3,11 @@
 import json
 from os.path import realpath, dirname
 from FehWikiBot import Messages
+from FehWikiBot.Lang.Reader import MessageReader
+from FehWikiBot.PersonalData import BINLZ_ASSETS_DIR_PATH
+OLD_ASSETS_DIR_PATH = BINLZ_ASSETS_DIR_PATH.replace('Data','Old/Data')
 
-def CreateDiffMessage():
-    old = json.load(open(realpath(dirname(__file__) + '/jsons/data.json'), encoding='UTF-8'))
-    Messages.EN('M') # Load all messages
-    new = Messages._DATA['USEN']
-
+def DumpDiff(old, new):
     s = '{\n'
     keysOld = list(old.keys())
     keysNew = list(new.keys())
@@ -45,8 +44,34 @@ def CreateDiffMessage():
         diff = {'old':[],'new':[]}
 
     s += '}'
+    return s
+
+def CreateDiffFile(path):
+    old,new = '',''
+    if path.find(BINLZ_ASSETS_DIR_PATH) != -1:
+        new = MessageReader.fromAssets(path).object
+        old = MessageReader.fromAssets(path.replace(BINLZ_ASSETS_DIR_PATH,OLD_ASSETS_DIR_PATH)).object
+    else:
+        old = MessageReader.fromAssets(path).object
+        new = MessageReader.fromAssets(path.replace(OLD_ASSETS_DIR_PATH,BINLZ_ASSETS_DIR_PATH)).object
+    old = {o['key']:o['value'] for o in old}
+    new = {o['key']:o['value'] for o in new}
+    s = DumpDiff(old, new)
+    open(realpath(dirname(__file__) + '/_diffFile.json'), 'w', encoding='UTF-8').write(s)
+
+
+def CreateDiffMessage():
+    old = json.load(open(realpath(dirname(__file__) + '/jsons/data.json'), encoding='UTF-8'))
+    Messages.EN('M') # Load all messages
+    new = Messages._DATA['USEN']
+
+    s = DumpDiff(old, new)
     open(realpath(dirname(__file__) + '/_diff.json'), 'w', encoding='UTF-8').write(s)
     json.dump(new, open(realpath(dirname(__file__) + '/jsons/data.json'), 'w', encoding='UTF-8'), indent=2, ensure_ascii=False)
 
 if __name__ == '__main__':
-    CreateDiffMessage()
+    from sys import argv
+    if len(argv) == 1:
+        CreateDiffMessage()
+    else:
+        CreateDiffFile(realpath(argv[1]))

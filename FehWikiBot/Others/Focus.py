@@ -46,20 +46,6 @@ class Focus(Article):
             o.page = ''
         return o
 
-    TYPES = [
-        'New Heroes', 'New Heroes Revival', 'Returning',
-        'Special', 'Double Special Heroes',
-        'Legendary', 'Mythic', 'Legendary & Mythic', 'Legendary & Mythic Hero Remix',
-        'Voting Gauntlet', 'Tempest Trials', 'Hall of Forms', 'Hall of Forms Revival'
-        'Bound Hero Battle',
-        'Skill', 'New Power',
-        'Weekly Revival', 'Legendary Revival',
-        'Hero Fest',
-        'A Hero Rises',
-        'Other',
-        'Free Summon',
-        'Select Summon',
-    ]
 
     def update(self, *, type: LiteralString, start: str, end: str, **kwargs) -> Self:
         def _parseTime(time: str):
@@ -99,9 +85,9 @@ class Focus(Article):
                     self.page = self.page[:-2] + '|name=Har. CYL Heroes Bonus}}'
 
         else:
-            if 'shsr' in kwargs and kwargs['shsr'] and kwargs['name'].find('SHSR') == -1:
+            if kwargs.get('shsr',False) and kwargs['name'].find('SHSR') == -1:
                 kwargs['name'] += ' (4★SHSR)'
-            if kwargs['type'] == 'Hall of Forms Revival':
+            if kwargs['type'] == 'Hall of Forms Revival' and kwargs['name'].find('Revival') == -1:
                 kwargs['name'] += ' Revival'
             format = '%Y' if type in ('Special','ω Special Heroes') else '%b %Y'
             if 'heroes' not in kwargs or kwargs['heroes'] == []:
@@ -153,7 +139,7 @@ class Focus(Article):
             rarities.append(f"|rarity4Percent={52 if 'focus4' in params else 55}.00%")
             rarities.append(f"|rarity3Percent={30 if params.get('shsr') else 36}.00%")
         # 8 Units, no 5*
-        elif params['type'] in ('Returning', 'Double Special Heroes', 'Legendary & Mythic Hero Remix', 'A Hero Rises'):
+        elif params['type'] in ('Returning', 'Double Special Heroes', 'A Hero Rises') or params['type'].find('Hero Remix') != -1:
             rarities = ['|rarity5FocusPercent=6.00%']
             if 'focus4' in params: rarities.append('|rarity4FocusPercent=3.00%')
             rarities.append('|rarity4SpecialPercent=3.00%')

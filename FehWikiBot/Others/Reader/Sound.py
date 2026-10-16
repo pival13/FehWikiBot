@@ -88,10 +88,11 @@ class HOBGMReader(MapBGMReader):
 
     @classmethod
     def fromUnique(cls):
-        # TODO Check whenever both are merge
         o1 = cls.fromAssets('00_first')
         o2 = cls.fromAssets('v0701b_engage')
-        o1._obj = o1.object + o2.object
+        o3 = cls.fromAssets('v1009a_color')
+        o4 = cls.fromAssets('v1010a_halloween')
+        o1._obj = o1.object + o2.object + o3.object + o4.object
         return o1
 
     def parse(self):

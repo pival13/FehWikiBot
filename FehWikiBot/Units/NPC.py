@@ -5,6 +5,7 @@ class NPC:
         # 'ch00_00_Eclat_X_Normal':       {'name': 'Kiran'}, # Mini unit only
         'ch00_00_Eclat_X_Avatar00':     {'id': 'EID_アバター',      'name': 'Kiran: Hero Summoner'},
         'ch00_01_Alfons_M_Stain':       {'id': 'PID_アルフォンス',  'name': 'Alfonse: Prince of Askr (Injured)'},
+        'ch00_01_Alfons_M_SAVIOR01D':   {'id': 'PID_救世アルフォンス', 'name': 'Alfonse: Opening Miracle (Dead)'},
         'ch00_04_Veronica_F_Stain':     {'id': 'EID_ヴェロニカ',    'name': 'Veronica: Emblian Princess (Injured)'},
         'ch00_04_Veronica2_F_Enemy':    {'id': 'EID_ヴェロニカ2',   'name': 'Veronica: Princess Beset (Legendary Dark)'},
         'ch00_04_Veronica2_F_Stain':    {'id': 'EID_ヴェロニカ2',   'name': 'Veronica: Princess Rising (Injured)'},

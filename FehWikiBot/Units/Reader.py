@@ -7,7 +7,7 @@ class HeroReader(IReader):
 
     def parse(self):
         from ..Tool.globals import BLESSING,WARNING
-        KIND = ['','LegendMythic','Duo','Harmonized','Ascended','Rearmed','Attuned','Emblem','Aided','Entwined','Chosen']
+        KIND = ['','LegendMythic','Duo','Harmonized','Ascended','Rearmed','Attuned','Emblem','Aided','Entwined','Chosen','Vista']
         nb = self.overviewLong(0x08, 0xde51ab793c3ab9e1)
         self.readArray()
         for _ in range(nb):
@@ -116,3 +116,20 @@ class EnemyReader(IReader):
             readStat(self, 'growth_rates')
             self.end()
         self.end()
+
+class ResplendentHeroReader(IReader):
+    _basePath = 'Common/SubscriptionCostume/'
+
+    def parse(self):
+        nb = self.overviewInt(0x08, 0x17E55C54)
+        self.readArray()
+        for _ in range(nb):
+            self.prepareObject()
+            self.readLong('num_id', 0xBFC98CB0CFDCD2D1)
+            readTime(self, 'start', 0x91f9ebb0b4a90f77)
+            readTime(self, 'end', 0x75dc9cc8b9ece87f)
+            self.readString('id_tag')
+            self.end()
+        self.end()
+
+SubscriptionCostumeReader = ResplendentHeroReader

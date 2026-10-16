@@ -60,8 +60,8 @@ class AffinityAutoBattlesReader(IReader):
             self.assertPadding(0x04)
             readAvail(self, 'avail')
             self.assertBytes(0x08, 0x641861218D8C2487, 'block4')
-            self.readMask('entries', 2, 0x4C3F)
-            self.assertBytes(0x06, 0x20BE28C5E8A0, 'block5')
+            self.readMask('entries', 3, 0xA04C3F)
+            self.assertBytes(0x05, 0x20BE28C5E8, 'block5')
             self.end()
         self.end()
 

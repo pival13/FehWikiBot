@@ -18,3 +18,4 @@ from .SS import SeersSnare
 from .AAB import AffinityAutoBattles
 from .UW import UnitedWarfront
 from .YTS import YourTimeToShine
+from .DG import DivineGames

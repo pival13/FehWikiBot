@@ -55,7 +55,7 @@ class UnitedWarfront(ArticleContainer):
             o = HeroBattle.get(stage['map_id']).loadArticle(False)
             ally = re.search(r'allyPos\s*=\s*([\w\s,]*?)\n?', o.page)
             ally = ally[1] if ally else ''
-            image = re.search(r'UnitData.*mapImage\s*=\s*(\{\{.+?\}\})\s*\|\s*(?:Normal|Hard|Lunatic|Infernal|Abyssal)', o.page, re.DOTALL)
+            image = re.search(r'UnitData.*mapImage\s*=\s*(\{\{.+?\}\})\s*\|\s*(?:Normal|Hard|Lunatic|Infernal|Abyssal|Celestial)', o.page, re.DOTALL)
             image = image[1] if image else Map.get(stage['map_id']).Image(shortest=True)
             derivedTabs = []
             units = {}

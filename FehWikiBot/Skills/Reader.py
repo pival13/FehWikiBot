@@ -96,7 +96,8 @@ class SkillReader(IReader):
             # Weak against this type
             self.readWeaponList('wep_weakness', 0x647F9ECD)
             self.readWeaponList('mov_weakness', 0xB7064176)
-            self.readWeaponList('wep_adaptive', 0x494E2629) # Calculate damage using lower Def/Res
+            # Calculate damage using lower Def/Res
+            self.readWeaponList('wep_adaptive', 0x494E2629)
             self.readMoveList('mov_adaptive', 0xEE6CEF2E)
             self.skip(0x04)# self.assertBytes(4, 0x68F6029C, f"[{self._stack[-1][0]['id_tag']}]._1")
             self.skip(0x04)# self.assertBytes(4, 0xC49E0D1E, f"[{self._stack[-1][0]['id_tag']}]._2")
@@ -211,24 +212,32 @@ class CaptainSkillReader(IReader):
     _basePath = 'Common/SRPG/RealTimePvP/CaptainSkill/'
 
     def parse(self):
+        from ..Tool.Reader import readStat
         nb = self.overviewLong(0x08, 0xB77037ED6EBCEC56)
         self.readArray()
         for _ in range(nb):
             self.prepareObject() # 0x58
             self.readString('id_tag')
-            self.skip(0x40)
-            #'stats1': util.getStat(data, offGr+0x08),
-            #'_int1': util.getSInt(data, offGr+0x18, 0x2A4BF41A),
-            #0x08
-            # Padding 0x04
-            #'stats2': util.getStat(data, offGr+0x28),
-            #'_int2': util.getSInt(data, offGr+0x38, 0x2A4BF41A),
-            #0x08
-            # Padding 0x04
+            self.prepareArray('_unknow')
+            for _ in range(2):
+                self.prepareObject()
+                readStat(self, 'stats1')
+                self.readInt('_int1', 0xD5B40BF1, signed=True)
+                # self.assertBytes(4, 0x2A4BF40E, self._stack[-1][0]['id_tag'])
+                self.readShort('_int2', 0xCC79)
+                self.readByte('_int3', 0xE0)
+                self.readByte('_int4', 0xA6)
+                self.readByte('_int5', 0x2B)
+                self.readByte('_int6', 0x66)
+                self.readByte('_int7', 0x27)
+                self.readByte('_int8', 0xCB)
+                self.assertPadding(4)
+                self.end()
+            self.end()
             self.readInt('num_id', 0x54DC7C40)
-            self.readInt('_unknow', 0xC3D1B4BF)
+            self.readInt('_int6', 0xC3D1B4BF)
             self.readInt('icon_id', 0x7B344922)
-            self.skip(0x04)
+            self.assertPadding(4)
             self.end()
         self.end()
 
